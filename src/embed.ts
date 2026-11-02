@@ -1,0 +1,10 @@
+import "./element";
+import { outfit, pose } from "./config";
+const params = new URLSearchParams(location.search);
+const character = document.createElement("thingy-character");
+character.setAttribute("asset-base", "/character/");
+character.setAttribute("outfit", outfit(params.get("outfit")));
+character.setAttribute("pose", pose(params.get("pose")));
+character.setAttribute("light", params.get("light") === "on" ? "on" : "off");
+character.setAttribute("motion", params.get("motion") === "on" ? "on" : "off");
+document.body.append(character);

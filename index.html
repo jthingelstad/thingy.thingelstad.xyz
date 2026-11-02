@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thingy — The character</title>
+    <meta
+      name="description"
+      content="Meet Thingy in three dimensions. Choose an outfit and a pose, turn him around, and bring Jamie’s librarian into your own pages."
+    />
+    <meta name="theme-color" content="#faf8f2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link
+      rel="preload"
+      href="/shared/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/shared/fonts/inter-tight-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="canonical" href="https://thingy.thingelstad.xyz/" />
+  </head>
+  <body>
+    <a class="skip" href="#character">Skip to Thingy</a>
+    <header class="site-header frame">
+      <a class="brand" href="/" aria-label="Thingy home"
+        ><svg viewBox="0 0 28 48" aria-hidden="true">
+          <path d="M5 44Q14 29 23 44Z" fill="#252a26" />
+          <path d="m14 37 1-21" stroke="#252a26" stroke-width="4" />
+          <circle cx="15" cy="12" r="9" fill="#f28a28" />
+          <circle cx="12" cy="9" r="3" fill="#ffac50" opacity=".8" /></svg
+        ><span>Thingy</span></a
+      >
+      <nav aria-label="Main">
+        <a href="#character">The character</a
+        ><a href="#bring-along">Bring Thingy along</a
+        ><a class="ask" href="https://thingy.thingelstad.com/"
+          >Ask Thingy <span data-icon="external"></span
+        ></a>
+      </nav>
+    </header>
+    <main class="frame">
+      <section class="studio" id="character" aria-labelledby="title">
+        <div class="introduction">
+          <h1 id="title">Meet Thingy.</h1>
+          <p>A librarian. A trail companion.<br />A builder. Always Thingy.</p>
+        </div>
+        <div class="turntable">
+          <div class="ground-ring" aria-hidden="true"></div>
+          <thingy-character
+            id="main-thingy"
+            asset-base="/character/"
+            outfit="librarian"
+            pose="present"
+            light="off"
+            motion="off"
+            ><img
+              class="character-fallback"
+              src="/character/v0.10/poses/librarian-present.webp"
+              alt="Thingy in his librarian outfit"
+              width="1000"
+              height="1000"
+          /></thingy-character>
+          <p class="hint">Drag to turn <span>·</span> Scroll to zoom</p>
+        </div>
+        <aside class="controls" aria-labelledby="controls-title">
+          <h2 id="controls-title">Make yourself at home</h2>
+          <fieldset class="outfits">
+            <legend>Outfit</legend>
+            <div id="outfit-options"></div>
+          </fieldset>
+          <fieldset class="expressions">
+            <legend>A little expression</legend>
+            <div id="pose-options"></div>
+          </fieldset>
+          <label class="light-control"
+            ><span>Antenna light</span
+            ><input id="light" type="checkbox" role="switch" /><span
+              class="switch"
+              aria-hidden="true"
+            ></span
+            ><span id="light-label">Light off</span></label
+          >
+          <div class="playback">
+            <button class="button primary" id="play" aria-pressed="false">
+              <span data-icon="play"></span
+              ><span id="play-label">Play</span></button
+            ><button class="button" id="reset">
+              <span data-icon="reset"></span>Reset view
+            </button>
+          </div>
+          <p id="motion-note" class="motion-note" hidden>
+            Your reduced-motion setting is on. Poses stay still.
+          </p>
+        </aside>
+      </section>
+      <section
+        class="bring-along"
+        id="bring-along"
+        aria-labelledby="bring-title"
+      >
+        <div class="bring-intro">
+          <h2 id="bring-title">Bring Thingy along.</h2>
+          <p>
+            Choose a character. Pick a pose.<br />Give him a place on your site.
+          </p>
+          <img
+            id="reuse-preview"
+            src="/character/v0.10/poses/workshop-present.webp"
+            alt="Thingy as the Workshop Builder, presenting a laptop"
+            width="360"
+            height="360"
+            loading="lazy"
+          />
+        </div>
+        <div class="reuse-options">
+          <label for="reuse-outfit">Character</label
+          ><select id="reuse-outfit"></select>
+          <p class="field-label">Pose preview</p>
+          <div id="reuse-poses" class="pose-previews"></div>
+          <p id="reuse-description" class="reuse-description"></p>
+          <a
+            id="example-link"
+            class="text-link"
+            href="/embed/?outfit=workshop&amp;pose=present"
+            >Open this character <span data-icon="external"></span
+          ></a>
+        </div>
+        <div class="embed-code">
+          <h3>Embed in your website</h3>
+          <pre tabindex="0"><code id="embed-code"></code></pre>
+          <button class="button primary copy-button" id="copy">
+            <span data-icon="copy"></span
+            ><span id="copy-label">Copy embed</span></button
+          ><a
+            class="download"
+            id="download"
+            href="/character/v0.10/poses/workshop-present.png"
+            download
+            ><span data-icon="image"></span>Download a pose image
+            <span class="format">(PNG, transparent)</span></a
+          >
+          <p class="embed-note">
+            One address for each outfit and pose. The image works in any page;
+            the embed adds rotation and motion.
+          </p>
+        </div>
+      </section>
+      <section class="builder-example" aria-labelledby="builder-title">
+        <div>
+          <h2 id="builder-title">The builder, on Things I’ve Built.</h2>
+          <p>
+            A welcome, an explanation, a pause to think. The same Thingy can
+            keep a different pose on each page.
+          </p>
+          <a class="text-link" href="/examples/workshop.html"
+            >See the integration examples <span data-icon="external"></span
+          ></a>
+        </div>
+        <div class="builder-lineup" id="builder-lineup"></div>
+      </section>
+    </main>
+    <footer class="frame">
+      <p>
+        A character by
+        <a href="https://www.thingelstad.com/">Jamie Thingelstad</a>.
+        <a href="https://thingelstad.xyz/things/thingy-model/"
+          >How Thingy was built</a
+        >.
+      </p>
+      <p>
+        <a href="https://thingy.thingelstad.com/"
+          >The librarian lives at .com</a
+        >
+        <span>·</span> The character lives at .xyz
+      </p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

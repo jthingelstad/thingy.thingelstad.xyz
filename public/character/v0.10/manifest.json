@@ -1,0 +1,32 @@
+{
+  "version": "0.10",
+  "format": "glTF 2.0",
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "animationFps": 24,
+  "defaultPose": "present",
+  "poses": {
+    "hello": { "label": "Hello", "stillFrame": 49 },
+    "present": { "label": "Present", "stillFrame": 1 },
+    "thinking": { "label": "Thinking", "stillFrame": 37 },
+    "rest": { "label": "At rest", "stillFrame": 1 }
+  },
+  "outfits": {
+    "librarian": { "label": "Librarian", "model": "librarian.glb", "poster": "poses/librarian-present.webp" },
+    "trail": { "label": "Trail companion", "model": "trail.glb", "poster": "poses/trail-present.webp" },
+    "workshop": {
+      "label": "Workshop Builder", "model": "workshop.glb", "poster": "poses/workshop-present.webp",
+      "stills": {
+        "hello": { "png": "poses/workshop-hello.png", "webp": "poses/workshop-hello.webp" },
+        "present": { "png": "poses/workshop-present.png", "webp": "poses/workshop-present.webp" },
+        "thinking": { "png": "poses/workshop-thinking.png", "webp": "poses/workshop-thinking.webp" },
+        "rest": { "png": "poses/workshop-rest.png", "webp": "poses/workshop-rest.webp" }
+      }
+    },
+    "concert": { "label": "Concert companion", "model": "concert.glb", "poster": "poses/concert-present.webp" }
+  },
+  "runtimeMaterials": { "beacon": "Thingy_Beacon" },
+  "optionalNodes": { "laptop": "Thingy_Laptop", "showForPose": "present" },
+  "notes": "Web derivatives of the editable v0.10 character. Geometry and PBR maps are optimized for the browser. This is not a printable model."
+}

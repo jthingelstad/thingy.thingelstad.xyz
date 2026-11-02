@@ -1,0 +1,7 @@
+dist/
+local-only/
+node_modules/
+public/shared/
+public/character/
+docs/design/*.png
+tools/*.py
