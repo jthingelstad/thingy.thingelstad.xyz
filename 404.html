@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Not here — Thingy</title>
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#faf8f2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      .not-found {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: center;
+        gap: 32px;
+        padding-block: 48px 72px;
+      }
+      .not-found img {
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        justify-self: center;
+      }
+      .not-found p {
+        font-size: var(--jt-size-base, 19px);
+        max-width: 32ch;
+      }
+      @media (max-width: 40rem) {
+        .not-found {
+          grid-template-columns: 1fr;
+          padding-block: 24px 48px;
+        }
+        .not-found img {
+          max-width: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header frame">
+      <a class="brand" href="/" aria-label="Thingy home"
+        ><svg viewBox="0 0 28 48" aria-hidden="true">
+          <path d="M5 44Q14 29 23 44Z" fill="#252a26" />
+          <path d="m14 37 1-21" stroke="#252a26" stroke-width="4" />
+          <circle cx="15" cy="12" r="9" fill="#f28a28" />
+          <circle cx="12" cy="9" r="3" fill="#ffac50" opacity=".8" /></svg
+        ><span>Thingy</span></a
+      >
+    </header>
+    <main class="frame not-found">
+      <div>
+        <h1>Nothing on this shelf.</h1>
+        <p>
+          Thingy looked, but this page isn’t here. The character, his outfits
+          and his poses are all on the front page.
+        </p>
+        <p><a class="text-link" href="/">Back to Thingy</a></p>
+      </div>
+      <img
+        src="/character/v0.10/poses/workshop-rest.webp"
+        alt="Thingy, the Workshop Builder, at rest"
+        width="1000"
+        height="1000"
+      />
+    </main>
+    <footer class="frame">
+      <p>
+        A character by
+        <a class="h-card" href="https://www.thingelstad.com/" rel="author"
+          ><span class="p-name">Jamie Thingelstad</span></a
+        >.
+      </p>
+    </footer>
+  </body>
+</html>

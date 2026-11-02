@@ -13,6 +13,9 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - Keep Blender masters, raw bakes, logs, caches, secrets, and machine paths out of
   public assets. Never read `.env*`. Inspect export metadata before publication.
 - Respect reduced motion, provide still-image fallback, and dispose WebGL resources.
-- Development and local previews are authorized. Hosting and DNS are separate;
-  do not change AWS infrastructure or domain records as part of ordinary edits.
-- Run `npm run check` and the relevant browser checks. No live analytics in QA.
+- Development and local previews are authorized. Hosting is `infra/` (README,
+  Hosting): `main` deploys itself after the checks pass. Change infrastructure
+  only through `npm run infra:plan` and `infra:apply` as `cloud-engineer`, never
+  in ordinary edits. The site stack owns this hostname's DNS records.
+- Run `npm run check` and the relevant browser checks. No live analytics in QA:
+  Tinylytics is injected only by the deploy build (`THINGY_TINYLYTICS=true`).

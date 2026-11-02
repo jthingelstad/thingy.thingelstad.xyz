@@ -1,5 +1,8 @@
-name: Check character home
-on: [push, pull_request]
+name: Check and deploy character home
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -8,15 +11,20 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # Sitemap lastmod dates come from git history.
+          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run format:check && npm run check
+      - run: pipx run --spec cfn-lint==1.57.2 cfn-lint infra/site.json infra/delivery.json
+      - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
@@ -25,3 +33,39 @@ jobs:
           name: character-browser-failure
           path: /tmp/thingy-character-browser-results/
           retention-days: 3
+  deploy:
+    name: Deploy
+    needs: [check]
+    # Deploys only once the delivery role exists (repository variable set
+    # after npm run infra:apply). Until then main checks and stops here.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build && node tools/validate-assets.mjs && node tools/validate-site.mjs
+        env:
+          THINGY_TINYLYTICS: "true"
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+      - run: npm run deploy
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,14 +1,15 @@
 # Thingy’s character home
 
 The interactive character companion to [Ask Thingy](https://thingy.thingelstad.com/).
-The intended address is **thingy.thingelstad.xyz**. This repository builds a static
-site; hosting, TLS, DNS, and production publishing are not configured yet.
+It lives at **https://thingy.thingelstad.xyz/**. This repository builds the static
+site and publishes it to AWS from `main` (see [Hosting](#hosting)).
 
 The viewer loads real, skinned GLB meshes derived from the approved v0.10 Blender
 master. It supports four outfits, four poses, orbit and keyboard camera controls,
 an antenna-light switch, and opt-in animation. Reduced-motion preferences keep
 the poses still. A transparent render remains available if WebGL or model loading
-fails. No analytics or third-party runtime requests are included.
+fails. The only third-party request is Tinylytics page counting, in the published
+build only (see [Analytics](#analytics)).
 
 ## Run it
 
@@ -137,52 +138,71 @@ its real decoder, every outfit, and animated poses.
 
 ## Hosting
 
-Upload the contents of `dist/` to static hosting behind the new hostname. Keep
-`/embed/` and `/examples/workshop.html` working as directory/file routes. Do not
-add an `X-Frame-Options` header that prevents the intended embeddings. Public
-module and character assets need `Access-Control-Allow-Origin: *` for native
-components used on other sites. Use the correct MIME types for `.js`, `.json`,
-`.glb`, `.webp`, `.png`, and `.woff2`.
+S3 and CloudFront in Jamie's AWS account (999153317627, us-east-1), defined in
+`infra/` and created with the `cloud-engineer` identity:
 
-Do not cache the HTML or manifest indefinitely. Versioned character files may be
-cached long-term; preserve older versions for their consumers. Production TLS,
-DNS and the hosting deployment need to be connected before the example `.xyz`
-addresses will work outside the local preview.
+- **`thingy-xyz-site`** (`infra/site.json`): the private, versioned bucket; the
+  certificate, validated through its own record in the thingelstad.xyz Route 53
+  zone; the distribution; the A and AAAA alias records for the hostname; the
+  viewer-request function (`/x/` serves `/x/index.html`, `/x` redirects to `/x/`);
+  the access log `/thingy-xyz/web-access` (14 days, no client IP, no query string);
+  the `thingy-xyz-site-distribution-5xx` alarm, which reaches #sites-log; and the
+  CNAME Bing Webmaster Tools verifies the site by. This stack owns the site's DNS
+  names: they are not in projects-sysadmin's zone stack.
+- **`thingy-xyz-delivery`** (`infra/delivery.json`): the GitHub OIDC role the
+  deploy job assumes. It trusts `main` of this repository only and can write
+  objects and invalidate the distribution, nothing else.
 
-### Deployment handoff — November 1, 2026
+`infra/deployment.json` records the live identifiers (created November 1, 2026):
 
-Jamie has authorized publishing this v1 at **https://thingy.thingelstad.xyz/**.
-The site and all delivery assets are committed in the private GitHub repository
-`jthingelstad/thingy.thingelstad.xyz`. The latest application commit, `4e898a8`,
-passed the complete GitHub check, including desktop, phone, and cross-origin
-component browser tests. Blender is not needed to publish this build.
+| Resource      | Identifier                                        |
+| ------------- | ------------------------------------------------- |
+| Bucket        | `thingy-xyz-site-web-999153317627`                |
+| Distribution  | `EUJA70DJHWN4` (`d36jfrqu1wwoe0.cloudfront.net`)  |
+| Certificate   | `566cf451-ef24-4bfc-a180-b95b535b5b9a`            |
+| Deploy role   | `thingy-xyz-delivery-DeploymentRole-fNa3LY9EijLE` |
+| Access log    | `/thingy-xyz/web-access`                          |
+| Tinylytics    | site 3849, in the thingelstad.com group           |
+| Repo variable | `AWS_DEPLOY_ROLE_ARN`, the deploy role's ARN      |
 
-No hosting resources, certificate, DNS records, or Sites project were created
-during the deployment investigation. No cloud mutations or deployment leases
-remain outstanding. The next session should:
+Change infrastructure with
+`npm run infra:plan` (prints the change sets) and `npm run infra:apply`, never
+through the delivery role.
 
-1. Clone this repository over HTTPS, read its guides and the current guides on
-   Otto, use Node 24, and run `npm ci`, `npm run format:check`, `npm run check`,
-   and `npm run test:browser` (install matching Playwright Chromium if needed).
-2. Follow the current AWS deployment guidance on Otto. AWS MCP was unavailable in
-   this session. Otto has the named `cloud-auditor` and `cloud-engineer` profiles,
-   but both failed through their credential helper over SSH even after Jamie
-   confirmed Otto was unlocked. Resolve that access issue and verify the caller
-   before acting; do not substitute `default`, root, or Jamie's human profile.
-3. Use infrastructure as code for hosting and DNS. The domain's authoritative DNS
-   is Route 53, managed by `projects-sysadmin/config/dns-thingelstad-xyz-stack.yaml`.
-   Follow the current ownership rules: a new site's stack may own its own records
-   and ACM DNS validation. Namecheap is the registrar, not the DNS editing path.
-   Existing apex/www certificates do not cover the new hostname.
-4. Publish only `dist/`, with the CORS, framing, MIME types, routing, and caching
-   requirements above. Keep the bucket private behind CloudFront if using the
-   existing AWS pattern. Return real 404 responses for missing files rather than
-   an SPA fallback. Preserve published character versions and old hashed assets.
-5. Verify HTTPS, every outfit and pose, the beacon and animation controls,
-   `/embed/` with query parameters, and a native component loaded from a separate
-   origin. Check actual meshes render, the asset response types are correct, and
-   both iframe and native reuse work. Record the deployed resource identifiers,
-   publishing procedure, and live verification here.
+Every push to `main` that passes the checks deploys: the `Deploy` job builds with
+analytics on, uploads `dist/` (assets before pages; nothing is ever deleted, so
+older character versions and hashed bundles stay published), invalidates the
+distribution, and compares the live bytes of `/`, `/embed/`, `/thingy.js` and
+`/revision.json` with the build and checks a real 404.
+
+What the edge promises, each held by `tests/delivery.test.ts`:
+
+- No `X-Frame-Options`: `/embed/` is framed on other sites by design.
+- `Access-Control-Allow-Origin: *` and `Cross-Origin-Resource-Policy: cross-origin`
+  on every response, so other sites can load `thingy.js` and the character files.
+- Missing paths return a real 404 with `404.html`, never an SPA fallback.
+- Caching (`tools/delivery-plan.mjs`): hashed `assets/` a year, immutable;
+  `thingy.js` and each `manifest.json` five minutes; other character files a day;
+  pages, `llms.txt` and the sitemap revalidate every minute at the edge.
+- Files are stored as built; CloudFront compresses per request.
+
+## Search and machine-readable files
+
+`robots.txt` allows everything and names `sitemap.xml`. The sitemap lists the
+home page and the integration examples, each with the date of the last commit
+that changed it (`tools/write-site-files.mjs`), never the build time. `/embed/`
+and the 404 page carry `noindex`. `llms.txt` describes the asset contract for
+agents. Google covers the site through the `sc-domain:thingelstad.xyz` property;
+Bing tracks it as its own site. projects-sysadmin's `scripts/search-consoles`
+reconciles both.
+
+## Analytics
+
+Tinylytics site 3849 (`iJwbo9BJKkpgx7a9sZo1`), in the thingelstad.com group. The
+script is injected only when the deploy job builds with `THINGY_TINYLYTICS=true`,
+and loads only on thingy.thingelstad.xyz. Local, preview and test builds carry no
+reference to tinylytics.app; `tools/validate-site.mjs` fails if one does. The
+`/embed/` frame and `thingy.js` never count: they sit inside other sites' pages.
 
 The character illustration and model belong to Jamie Thingelstad. Blender source
 files remain in the private character repository. Shared Inter fonts retain
