@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { createServer } from "node:http";
 
 test("outfits, poses, playback, light and keyboard camera work on a real WebGL character", async ({
   page,
@@ -124,4 +125,34 @@ test("reduced motion stays still and a missing 3D asset leaves a useful pose ima
   expect(
     await image.evaluate((el: HTMLImageElement) => el.naturalWidth),
   ).toBeGreaterThan(0);
+});
+
+test("the standalone component finds its assets when used by another origin", async ({
+  page,
+}) => {
+  const server = createServer((_request, response) => {
+    response.setHeader("Content-Type", "text/html");
+    response.end(`<!doctype html><html lang="en"><head><title>A consuming project</title></head><body>
+      <thingy-character id="consumer" outfit="workshop" pose="thinking" style="width:320px;height:380px"></thingy-character>
+      <script type="module" src="http://127.0.0.1:4322/thingy.js"></script></body></html>`);
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("Missing consumer address");
+    await page.goto(`http://127.0.0.1:${address.port}`);
+    await expect(page.locator("#consumer")).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    expect(
+      await page
+        .locator("#consumer")
+        .evaluate((el: HTMLElement & { assetBase: string }) => el.assetBase),
+    ).toBe("http://127.0.0.1:4322/character/");
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve())),
+    );
+  }
 });
