@@ -14,6 +14,10 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
       errors.push(message.text());
   });
   await page.goto("/");
+  // Keep browser-driven scrolling deterministic while WebGL motion remains on.
+  await page.addStyleTag({
+    content: "html { scroll-behavior: auto !important; }",
+  });
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(page).toHaveTitle("Thingy — The character");

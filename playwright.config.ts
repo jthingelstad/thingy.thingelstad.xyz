@@ -6,6 +6,7 @@ export default defineConfig({
   workers: 1,
   outputDir: "/tmp/thingy-character-browser-results",
   use: {
+    trace: "retain-on-failure",
     baseURL: "http://127.0.0.1:4322",
     launchOptions: { args: ["--enable-unsafe-swiftshader"] },
     reducedMotion: "no-preference",
