@@ -114,6 +114,7 @@ export class ThingyCharacter extends HTMLElement {
     this.#updatePoster();
     if (name === "outfit" || name === "asset-base") void this.#load();
     else if (name === "light") this.#setLight();
+    else if (name === "motion") this.#setMotion();
     else this.#setPose();
   }
 
@@ -363,6 +364,20 @@ export class ThingyCharacter extends HTMLElement {
     });
     this.#beacon.intensity = on ? 0.8 : 0;
     this.#dirty = true;
+  }
+
+  #setMotion(): void {
+    if (!this.#action) return;
+    this.#action.paused = !this.playing;
+    this.#mixer?.update(0);
+    this.#dirty = true;
+    this.dispatchEvent(
+      new CustomEvent("thingy-change", {
+        detail: { pose: this.pose, motion: this.playing },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   #keyboard = (event: KeyboardEvent): void => {

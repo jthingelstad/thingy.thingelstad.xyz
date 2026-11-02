@@ -44,19 +44,26 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
   await page.locator('[data-pose="hello"]').click();
   await page.locator("#play").click();
   await expect(character).toHaveAttribute("motion", "on");
-  // Capture a moving WebGL frame directly. Locator screenshots wait for a
-  // stable element and can keep scrolling a smooth-scrolling page on Linux.
-  await character.evaluate((el) =>
-    el.scrollIntoView({ behavior: "instant", block: "center" }),
-  );
-  const bounds = await character.boundingBox();
-  if (!bounds) throw new Error("The character has no visible bounds");
-  const before = await page.screenshot({ clip: bounds });
-  await page.waitForTimeout(1200);
-  const after = await page.screenshot({ clip: bounds });
-  expect(before.equals(after)).toBe(false);
+  await page.waitForTimeout(350);
   await page.locator("#play").click();
   await expect(character).toHaveAttribute("motion", "off");
+  const capture = async () => {
+    await character.evaluate((el) =>
+      el.scrollIntoView({ behavior: "instant", block: "center" }),
+    );
+    const bounds = await character.boundingBox();
+    if (!bounds) throw new Error("The character has no visible bounds");
+    return page.screenshot({ clip: bounds });
+  };
+  const before = await capture();
+  await page.locator("#play").click();
+  await page.waitForTimeout(1200);
+  await page.locator("#play").click();
+  await expect(character).toHaveAttribute("motion", "off");
+  const after = await capture();
+  expect(before.equals(after)).toBe(false);
+  await page.waitForTimeout(350);
+  expect(after.equals(await capture())).toBe(true);
   const canvas = character.locator("canvas");
   await canvas.press("ArrowLeft");
   await canvas.press("+");
