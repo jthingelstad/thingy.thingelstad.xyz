@@ -99,7 +99,7 @@ export class ThingyCharacter extends HTMLElement {
   connectedCallback(): void {
     this.#abort = new AbortController();
     this.#root.innerHTML = `<style>${styles}</style><div class="frame"></div><img alt="" decoding="async"><span class="status" role="status">Getting Thingy ready…</span><span class="sr">Drag to turn Thingy. Use arrow keys to rotate, plus and minus to zoom.</span>`;
-    this.setAttribute("role", "img");
+    this.setAttribute("role", "group");
     this.#updatePoster();
     this.#initialize();
   }
@@ -155,6 +155,7 @@ export class ThingyCharacter extends HTMLElement {
       canvas.setAttribute("aria-label", "Rotate and zoom Thingy");
       this.#root.querySelector(".frame")!.append(canvas);
       this.#controls = new OrbitControls(this.#camera, canvas);
+      canvas.style.touchAction = "pan-y";
       this.#controls.enableDamping = true;
       this.#controls.dampingFactor = 0.09;
       this.#controls.enablePan = false;
