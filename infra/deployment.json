@@ -1,0 +1,21 @@
+{
+  "account": "999153317627",
+  "region": "us-east-1",
+  "stacks": {
+    "site": "thingy-xyz-site",
+    "delivery": "thingy-xyz-delivery"
+  },
+  "productionUrl": "https://thingy.thingelstad.xyz/",
+  "siteBucket": "thingy-xyz-site-web-999153317627",
+  "distributionId": "EUJA70DJHWN4",
+  "cloudfrontDomain": "d36jfrqu1wwoe0.cloudfront.net",
+  "certificateArn": "arn:aws:acm:us-east-1:999153317627:certificate/566cf451-ef24-4bfc-a180-b95b535b5b9a",
+  "deploymentRoleArn": "arn:aws:iam::999153317627:role/thingy-xyz-delivery-DeploymentRole-fNa3LY9EijLE",
+  "stackTags": {
+    "Application": "Thingelstad",
+    "Project": "thingy-xyz",
+    "Repository": "jthingelstad/thingy.thingelstad.xyz",
+    "ManagedBy": "cloudformation",
+    "Environment": "production"
+  }
+}
