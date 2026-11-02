@@ -16,6 +16,8 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - Development and local previews are authorized. Hosting is `infra/` (README,
   Hosting): `main` deploys itself after the checks pass. Change infrastructure
   only through `npm run infra:plan` and `infra:apply` as `cloud-engineer`, never
-  in ordinary edits. The site stack owns this hostname's DNS records.
+  in ordinary edits. The site stack owns this hostname's DNS records. Its
+  distribution uses the shared `edge` web ACL (projects-sysadmin `edge-waf`
+  stack; rules count only until tuned).
 - Run `npm run check` and the relevant browser checks. No live analytics in QA:
   Tinylytics is injected only by the deploy build (`THINGY_TINYLYTICS=true`).
