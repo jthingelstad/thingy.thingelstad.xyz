@@ -186,6 +186,27 @@ What the edge promises, each held by `tests/delivery.test.ts`:
   pages, `llms.txt` and the sitemap revalidate every minute at the edge.
 - Files are stored as built; CloudFront compresses per request.
 
+### Launch verification, November 1, 2026
+
+The first deploy (`a1240b4`, 42 files) was checked against the live site:
+
+- All 42 published files match a deploy-equivalent build byte for byte (only
+  `revision.json`'s `builtAt` differs), each with its expected `Content-Type`,
+  `Access-Control-Allow-Origin: *`, `Cross-Origin-Resource-Policy: cross-origin`
+  and no `X-Frame-Options`. Brotli is served on request.
+- `/embed` redirects to `/embed/` keeping its query; `/no-such-page/` and a missing
+  character file return 404 with the shelf page.
+- In Chromium, every outfit in every pose (16 combinations) reached `data-ready`
+  through `/embed/?outfit=…&pose=…` with no errors and no request to another
+  host; the home page's wardrobe loaded all four outfits; and a page on another
+  origin rendered both `<thingy-character>` from `thingy.js` and the iframe.
+- The home page requests the Tinylytics script for this site; `/embed/` requests
+  nothing outside this host.
+- DNS answers from 1.1.1.1 and 9.9.9.9 (A and AAAA); the access log records
+  requests without client IP or query string; the 5xx alarm is `OK`.
+- The sitemap is submitted to Google (through `sc-domain:thingelstad.xyz`) and
+  Bing (verified site), and Tinylytics watches uptime.
+
 ## Search and machine-readable files
 
 `robots.txt` allows everything and names `sitemap.xml`. The sitemap lists the
