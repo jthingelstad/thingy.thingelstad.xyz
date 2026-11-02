@@ -6,7 +6,15 @@ export default defineConfig({
   workers: 1,
   outputDir: "/tmp/thingy-character-browser-results",
   use: {
-    trace: "retain-on-failure",
+    trace: {
+      mode: "retain-on-failure",
+      screenshots: false,
+      snapshots: true,
+      sources: true,
+    },
+    // Software rendering on hosted CI needs fewer physical pixels. CSS layout,
+    // real meshes, textures, animation and all interactions stay the same.
+    deviceScaleFactor: process.env.CI ? 0.5 : 1,
     baseURL: "http://127.0.0.1:4322",
     launchOptions: { args: ["--enable-unsafe-swiftshader"] },
     reducedMotion: "no-preference",
