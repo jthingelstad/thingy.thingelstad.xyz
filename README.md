@@ -149,6 +149,41 @@ cached long-term; preserve older versions for their consumers. Production TLS,
 DNS and the hosting deployment need to be connected before the example `.xyz`
 addresses will work outside the local preview.
 
+### Deployment handoff — November 1, 2026
+
+Jamie has authorized publishing this v1 at **https://thingy.thingelstad.xyz/**.
+The site and all delivery assets are committed in the private GitHub repository
+`jthingelstad/thingy.thingelstad.xyz`. The latest application commit, `4e898a8`,
+passed the complete GitHub check, including desktop, phone, and cross-origin
+component browser tests. Blender is not needed to publish this build.
+
+No hosting resources, certificate, DNS records, or Sites project were created
+during the deployment investigation. No cloud mutations or deployment leases
+remain outstanding. The next session should:
+
+1. Clone this repository over HTTPS, read its guides and the current guides on
+   Otto, use Node 24, and run `npm ci`, `npm run format:check`, `npm run check`,
+   and `npm run test:browser` (install matching Playwright Chromium if needed).
+2. Follow the current AWS deployment guidance on Otto. AWS MCP was unavailable in
+   this session. Otto has the named `cloud-auditor` and `cloud-engineer` profiles,
+   but both failed through their credential helper over SSH even after Jamie
+   confirmed Otto was unlocked. Resolve that access issue and verify the caller
+   before acting; do not substitute `default`, root, or Jamie's human profile.
+3. Use infrastructure as code for hosting and DNS. The domain's authoritative DNS
+   is Route 53, managed by `projects-sysadmin/config/dns-thingelstad-xyz-stack.yaml`.
+   Follow the current ownership rules: a new site's stack may own its own records
+   and ACM DNS validation. Namecheap is the registrar, not the DNS editing path.
+   Existing apex/www certificates do not cover the new hostname.
+4. Publish only `dist/`, with the CORS, framing, MIME types, routing, and caching
+   requirements above. Keep the bucket private behind CloudFront if using the
+   existing AWS pattern. Return real 404 responses for missing files rather than
+   an SPA fallback. Preserve published character versions and old hashed assets.
+5. Verify HTTPS, every outfit and pose, the beacon and animation controls,
+   `/embed/` with query parameters, and a native component loaded from a separate
+   origin. Check actual meshes render, the asset response types are correct, and
+   both iframe and native reuse work. Record the deployed resource identifiers,
+   publishing procedure, and live verification here.
+
 The character illustration and model belong to Jamie Thingelstad. Blender source
 files remain in the private character repository. Shared Inter fonts retain
 their OFL license files under `public/shared/fonts/`.
