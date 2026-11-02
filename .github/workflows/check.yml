@@ -7,7 +7,9 @@ permissions:
   contents: read
 concurrency:
   group: character-check-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push cancels a stale check, but never a main run: its Deploy job
+  # writes to production and must finish once it starts.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
   check:
     runs-on: ubuntu-latest
