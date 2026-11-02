@@ -148,7 +148,7 @@ export class ThingyCharacter extends HTMLElement {
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.NeutralToneMapping;
       renderer.toneMappingExposure = 1.0;
-      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.enabled = false;
       renderer.shadowMap.type = THREE.PCFShadowMap;
       const canvas = renderer.domElement;
       canvas.tabIndex = 0;

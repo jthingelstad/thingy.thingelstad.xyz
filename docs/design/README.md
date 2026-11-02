@@ -26,3 +26,8 @@ palette, open studio layout, the control rail and selected states, the reuse
 section, and phone stacking. UI verification uses the in-app browser plus the
 project’s isolated Playwright suite. The Playwright MCP profile was already busy;
 the in-app browser was available and used for live inspection instead.
+
+The final lighting pass uses neutral tone mapping and a soft contact shadow.
+Raster self-shadows produced speckling on the thin clothing layers, so they are
+disabled in the viewer. The offline pose images retain the Blender material and
+lighting finish. The browser uses a lighter PBR atlas and environment lighting.
