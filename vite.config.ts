@@ -6,7 +6,10 @@ import { defineConfig, type Plugin } from "vite";
 // test fails if one does. Even the deploy build loads the script only on
 // thingy.thingelstad.xyz. The /embed/ frame never counts: it lives inside
 // other sites' pages, and their own analytics already see those visits.
-const TINYLYTICS = "https://tinylytics.app/embed/iJwbo9BJKkpgx7a9sZo1.js";
+// One shared script for every Tinylytics site, keyed by data-site, with no
+// query parameters; options live in the site's Tinylytics settings.
+const TINYLYTICS = "https://tinylytics.app/js/script.js";
+const TINYLYTICS_SITE = "iJwbo9BJKkpgx7a9sZo1";
 function tinylytics(enabled: boolean): Plugin {
   return {
     name: "thingy-tinylytics",
@@ -16,7 +19,7 @@ function tinylytics(enabled: boolean): Plugin {
         {
           tag: "script",
           injectTo: "body",
-          children: `if (location.hostname === "thingy.thingelstad.xyz") { const s = document.createElement("script"); s.src = "${TINYLYTICS}"; s.defer = true; document.body.append(s); }`,
+          children: `if (location.hostname === "thingy.thingelstad.xyz") { const s = document.createElement("script"); s.defer = true; s.src = "${TINYLYTICS}"; s.dataset.site = "${TINYLYTICS_SITE}"; document.body.append(s); }`,
         },
       ];
     },

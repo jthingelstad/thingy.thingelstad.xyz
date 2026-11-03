@@ -221,7 +221,9 @@ reconciles both.
 
 Tinylytics site 3849 (`iJwbo9BJKkpgx7a9sZo1`), in the thingelstad.com group. The
 script is injected only when the deploy job builds with `THINGY_TINYLYTICS=true`,
-and loads only on thingy.thingelstad.xyz. Local, preview and test builds carry no
+and loads only on thingy.thingelstad.xyz. It is Tinylytics' shared script,
+`https://tinylytics.app/js/script.js` with `data-site="iJwbo9BJKkpgx7a9sZo1"`
+and no query parameters; options live in the site's Tinylytics settings. Local, preview and test builds carry no
 reference to tinylytics.app; `tools/validate-site.mjs` fails if one does. The
 `/embed/` frame and `thingy.js` never count: they sit inside other sites' pages.
 
