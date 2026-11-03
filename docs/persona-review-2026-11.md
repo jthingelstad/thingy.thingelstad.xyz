@@ -1,7 +1,9 @@
 # Thingy persona review, November 3, 2026
 
 Jamie asked for a unified view of Thingy's persona and character, to review
-before it goes back out to the projects as the authority. The proposal is
+before it goes back out to the projects as the authority. Jamie reviewed the
+first draft the same day; his answers are in the calls section below. The
+proposal is
 [`persona/THINGY.md`](../persona/THINGY.md). This document records what every
 surface says today, where the surfaces disagree, the calls that are Jamie's,
 and the plan for this site.
@@ -103,53 +105,80 @@ look and sound alongside his words.
     welcome), and they differ. Interface copy breaks them: "Thingy can help
     add you", "I can trace one idea…".
 
-## The calls
+## The calls and Jamie's answers
 
-Each call is set out plainly: what happens now, the question, the
-recommendation. The proposal assumes each recommendation, marked **New** in
-`persona/THINGY.md`.
+The first draft put eight calls to Jamie. Each is listed below with what
+happens now, the recommendation, and Jamie's answer of November 3, 2026.
+`persona/THINGY.md` carries every answer.
 
 1. **Personality on every surface.**
    - Now: the chat is playful; the newsletter and Things I've Built are
      composed and flat.
-   - The question: should all of them carry the same warm, playful Thingy,
-     with the honesty rules unchanged?
-   - Recommendation: yes. Precision stays; the personality is the same
-     everywhere, only louder in chat.
+   - Recommendation: the same warm, playful Thingy everywhere, loudest in
+     chat, with the honesty rules unchanged.
+   - Jamie: "Agree".
 2. **Opinions.**
    - Now: Things I've Built is "specific or silent"; the chat avoids opinion.
-   - The question: may Thingy offer his own reading of the archive (what
-     connects, what changed, what to read next), labelled as his?
-   - Recommendation: yes. Jamie's views stay quotations only.
+   - Recommendation: Thingy may offer his own reading of the archive,
+     labelled as his. Jamie's views stay quotations only.
+   - Jamie: "Agree".
 3. **He/him for Thingy.**
    - Now: mostly "it".
-   - Recommendation: he/him everywhere, as in Jamie's messages today and this
-     site.
+   - Recommendation: he/him everywhere.
+   - Jamie: "Agree".
 4. **His spoken voice.**
    - Now: `nova`.
-   - The question: if he is "he", should the voice be re-chosen?
    - Recommendation: render one Echoes passage and one Membership passage in
-     three or four candidate voices. Jamie picks by ear, as on September 20.
-     Keeping `nova` is a fine answer.
+     three or four candidate voices for Jamie to pick by ear.
+   - Jamie: "sure, we can explore other "voices"".
 5. **One name.**
-   - Recommendation: "Thingy, Jamie's librarian", with "an AI agent who has
-     read everything Jamie has published" when more is needed. Jamie's own
-     frame in the newsletter keeps "my agentic librarian". Machine metadata
-     can still say "archive agent".
+   - Recommendation in the first draft: "Thingy, Jamie's librarian".
+   - Jamie: "I think it is better to be something like "Thingy, Jamie's
+     sidekick". Librarian is too limiting for what I expect Thingy to do over
+     time. And in general, I consider him my "agent sidekick" in what I am
+     doing on my websites and publications."
+   - Now in the persona: sidekick is the role, and each surface gives him a
+     job. He is the librarian on Ask Thingy and in Echoes, the builder and
+     record keeper on Things I've Built, the host of Supporting Membership and
+     the narrator in audio. This also settles disagreement 8: the workshop
+     vest is the builder's outfit, and the role is the same.
 6. **What the faces and the antenna mean.**
-   - Recommendation:
-     - found it only for a real find;
-     - oops only for failures;
-     - off never shown;
-     - the antenna lit while he is live (answering or speaking).
+   - Recommendation: found it only for a real find, oops only for failures,
+     off never shown, the antenna lit while he is live.
+   - Jamie: "makes sense, his face can be much more emotive in the current
+     model".
+   - Now in the persona: a proposed set of new faces, each with a meaning
+     first: delighted, curious, proud, eager, sympathetic and sheepish.
+     Drawing them is a thingy-character build of its own.
 7. **Publishing the persona.**
-   - The question: should the approved persona be public, as a page on this
-     site and as `/persona.md`?
-   - Recommendation: yes. It is the clearest promise of what Thingy will and
-     won't do.
-8. **The print model's license** (see below).
-   - Recommendation: CC BY-NC 4.0, so anyone can print and remix Thingy, but
-     not sell him.
+   - Recommendation: public, as a page on this site and as `/persona.md`.
+   - Jamie: "yes."
+8. **The print model's license.**
+   - Recommendation: CC BY-NC 4.0.
+   - Jamie: "Agree CC BY-NC 4.0".
+
+### Jamie's other comments
+
+- **What he knows.** Jamie: "I think Thingy should know about every project
+  in Things I've Built." The archive already holds all 61 things (the
+  `thing-index` source, November 3). His chat prompt names only three sources,
+  so the gap is in the prompt, and the persona now lists every project.
+- **The blog's size.** Jamie: the blog "is currently more like 10,500 posts."
+  The first draft said more than 12,000. The archive counts
+  10,502 posts on November 3, and the persona now says about 10,500 and tells
+  him to use the archive's count.
+- **Supporting Membership.** Jamie: "The surface of "Supporting Membership"
+  might be better as the Outdoor/Hiking outfit or the Music one. I also think
+  his tone and tenor should be more than the librarian sense when doing
+  supporting membership. He is trying to sell, but in a good way."
+  - The persona now gives him a host's job there and his most persuasive
+    register: enthusiastic, specific about where the money goes, a clear ask.
+    It is still never a plea, guilt or pressure, and never says the Weekly
+    Thing needs the money.
+  - "Sells" left the list of what he never does, and a plain ask is allowed.
+  - **Still Jamie's call:** the concert outfit or the trail outfit. The
+    proposal is the concert companion, because a benefit show is an old and
+    good way to ask for a cause and it carries more energy than the trail.
 
 ## Factual fixes found along the way
 
@@ -197,7 +226,7 @@ sections:
 2. **The character.** The viewer that exists today, moved from v0.10 to v0.13,
    with the screen faces, the tools and the heart-red beacon. The web export
    (`tools/export_character.py`) needs Blender 5.2 and the face atlas as a
-   texture it can switch.
+   texture it can switch. The new faces join the atlas once they are drawn.
 3. **Play.**
    - Today: dress him, pose him, turn him around.
    - Next: pick a face and a tool.
@@ -240,21 +269,24 @@ on my Bambu P2S!"
 - **Testing:** Jamie prints each step on the P2S. Each revision follows
   Jamie's print.
 - **On this site:** a Print Thingy page with the files, settings, a photo of
-  Jamie's print, and the license.
+  Jamie's print, and the license, CC BY-NC 4.0 (Jamie, November 3).
 
 ## Rolling it out
 
-After Jamie approves the persona:
+After Jamie approves the persona, and picks the Supporting Membership outfit:
 
-1. Merge it here, as the persona page and `/persona.md`.
+1. Merge it here, then publish it as the persona page and `/persona.md`.
 2. **librarian-thing.** Rebuild `thingy-persona.md` and the identity part of
-   `agent-system.md` from it, and fix the Ask Thingy items above. WT Builder
-   picks up the print half through `persona:sync`.
+   `agent-system.md` from it, name every source in the chat prompt, give
+   Supporting Membership its host register, and fix the Ask Thingy items
+   above. WT Builder picks up the print half through `persona:sync`.
 3. **thingelstad.xyz.** Point `docs/THINGY.md` here, bring the first-person
    front matter into Thingy's voice, and extend the quotation test to front
    matter.
-4. **WT Builder.** Run the voice audition if Jamie wants one, and fix the
-   items above.
+4. **WT Builder.** Run the voice audition (Jamie agreed) and fix the items
+   above.
 5. **This site.** Export v0.13, then the asset library, Play and Thingy at
    work.
 6. **The print model,** in parallel with step 5.
+7. **The new faces,** as a thingy-character build of their own, when Jamie
+   approves it.
