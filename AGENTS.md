@@ -8,6 +8,9 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - The approved Blender master lives in the sibling character-art repository:
   `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`.
   Never overwrite it. Export scripts operate in memory and write derivatives here.
+- `public/print/v0.13/` is published the same way: make it with
+  `tools/prepare_print.py` from the character-art repository's print build,
+  never by hand, and give a new print its own directory.
 - `public/character/v0.10/` is the versioned delivery contract. Preserve published
   addresses and pose names. Add a new version for future incompatible changes.
 - Keep Blender masters, raw bakes, logs, caches, secrets, and machine paths out of

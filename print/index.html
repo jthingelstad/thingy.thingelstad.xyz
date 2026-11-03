@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Print Thingy — Thingy</title>
+    <meta
+      name="description"
+      content="A 180 mm Thingy to print in one colour: the 3MF and STL, the settings for a Bambu Lab P2S, and the licence."
+    />
+    <meta name="theme-color" content="#faf8f2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link
+      rel="preload"
+      href="/shared/fonts/inter-tight-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="canonical" href="https://thingy.thingelstad.xyz/print/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Thingy" />
+    <meta property="og:title" content="Print Thingy" />
+    <meta
+      property="og:description"
+      content="A 180 mm Thingy to print in one colour: the 3MF and STL, the settings for a Bambu Lab P2S, and the licence."
+    />
+    <meta property="og:url" content="https://thingy.thingelstad.xyz/print/" />
+    <meta
+      property="og:image"
+      content="https://thingy.thingelstad.xyz/print/v0.13/front.png"
+    />
+    <meta property="og:image:width" content="800" />
+    <meta property="og:image:height" content="1000" />
+    <meta
+      property="og:image:alt"
+      content="The Thingy print model, rendered in ivory PLA"
+    />
+    <meta name="twitter:card" content="summary" />
+    <link rel="me" href="https://micro.blog/jthingelstad" />
+    <link rel="me" href="https://github.com/jthingelstad" />
+    <style>
+      .site-header nav a[aria-current="page"] {
+        color: var(--green);
+      }
+      .print-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+        gap: clamp(24px, 4vw, 64px);
+        align-items: center;
+        padding-block: 16px 40px;
+      }
+      .lede {
+        font-size: clamp(21px, 1.95vw, 30px);
+        line-height: 1.4;
+        color: #43484b;
+        max-width: 26ch;
+      }
+      .print-downloads {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .print-downloads .format {
+        font-weight: 400;
+        opacity: 0.8;
+      }
+      .print-note,
+      .print-copy p,
+      .print-copy li {
+        max-width: 60ch;
+        line-height: 1.6;
+      }
+      .print-note {
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .print-hero img,
+      .print-views img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .print-hero figure {
+        margin: 0;
+        justify-self: center;
+        max-width: 560px;
+      }
+      .print-views {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 2fr);
+        gap: 20px;
+        align-items: end;
+        border-top: 1px solid var(--line);
+        padding-block: 40px;
+      }
+      .print-views figure {
+        margin: 0;
+      }
+      .print-details {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: clamp(24px, 4vw, 64px);
+        border-top: 1px solid var(--line);
+        padding-block: 40px;
+      }
+      .print-details h2,
+      .print-licence h2 {
+        font-size: clamp(30px, 2.6vw, 40px);
+        margin-bottom: 18px;
+      }
+      .settings {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: 10px 24px;
+        margin: 0;
+      }
+      .settings dt {
+        font-weight: 600;
+      }
+      .settings dd {
+        margin: 0;
+      }
+      .print-copy ul {
+        padding-left: 20px;
+      }
+      .print-licence {
+        border-top: 1px solid var(--line);
+        padding-block: 40px 56px;
+      }
+      @media (max-width: 760px) {
+        .print-hero,
+        .print-details {
+          grid-template-columns: 1fr;
+        }
+        .print-hero figure {
+          max-width: 340px;
+        }
+        .print-views {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .print-views .face {
+          grid-column: 1 / -1;
+        }
+        .print-downloads .button {
+          flex: 1 1 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#print">Skip to the print files</a>
+    <header class="site-header frame">
+      <a class="brand" href="/" aria-label="Thingy home"
+        ><svg viewBox="0 0 28 48" aria-hidden="true">
+          <path d="M5 44Q14 29 23 44Z" fill="#252a26" />
+          <path d="m14 37 1-21" stroke="#252a26" stroke-width="4" />
+          <circle cx="15" cy="12" r="9" fill="#f28a28" />
+          <circle cx="12" cy="9" r="3" fill="#ffac50" opacity=".8" /></svg
+        ><span>Thingy</span></a
+      >
+      <nav aria-label="Main">
+        <a href="/#character">The character</a
+        ><a href="/#bring-along">Bring Thingy along</a
+        ><a href="/print/" aria-current="page">Print Thingy</a
+        ><a class="ask" href="https://thingy.thingelstad.com/"
+          >Ask Thingy
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M8 4h12v12M20 4 4 20" /></svg
+        ></a>
+      </nav>
+    </header>
+    <main class="frame">
+      <section class="print-hero" id="print" aria-labelledby="title">
+        <div>
+          <h1 id="title">Print Thingy.</h1>
+          <p class="lede">
+            A 180 mm Thingy for a desk or a shelf, in one colour, standing on
+            his own base.
+          </p>
+          <p class="print-note">
+            He keeps the pose of the original drawing, the librarian coat and
+            his first face, raised from the screen. The 3MF opens in Bambu
+            Studio and most other slicers; the STL is for the rest.
+          </p>
+          <div class="print-downloads">
+            <a
+              class="button primary"
+              href="/print/v0.13/Thingy-librarian-180mm-v0.13.3mf"
+              download
+              >Download the 3MF <span class="format">9.5 MB</span></a
+            ><a
+              class="button"
+              href="/print/v0.13/Thingy-librarian-180mm-v0.13-stl.zip"
+              download
+              >Download the STL <span class="format">ZIP, 19.3 MB</span></a
+            >
+          </div>
+        </div>
+        <figure>
+          <img
+            src="/print/v0.13/front.webp"
+            alt="The Thingy print model from the front, rendered in ivory PLA: one finger raised, a bow tie, THINGY on his badge"
+            width="1000"
+            height="1250"
+          />
+        </figure>
+      </section>
+      <section class="print-views" aria-label="More views">
+        <figure>
+          <img
+            src="/print/v0.13/three-quarter.webp"
+            alt="The print model from the front left"
+            width="640"
+            height="800"
+            loading="lazy"
+          />
+          <figcaption>Three-quarter</figcaption>
+        </figure>
+        <figure>
+          <img
+            src="/print/v0.13/side.webp"
+            alt="The print model from his left side"
+            width="640"
+            height="800"
+            loading="lazy"
+          />
+          <figcaption>Side</figcaption>
+        </figure>
+        <figure>
+          <img
+            src="/print/v0.13/back.webp"
+            alt="The print model from behind"
+            width="640"
+            height="800"
+            loading="lazy"
+          />
+          <figcaption>Back</figcaption>
+        </figure>
+        <figure class="face">
+          <img
+            src="/print/v0.13/face.webp"
+            alt="A close view of the face: a wink, a happy eye and a smile, raised from the screen"
+            width="1200"
+            height="880"
+            loading="lazy"
+          />
+          <figcaption>The face, raised</figcaption>
+        </figure>
+      </section>
+      <section class="print-details">
+        <div class="print-copy">
+          <h2>On a Bambu Lab P2S</h2>
+          <dl class="settings">
+            <dt>Nozzle</dt>
+            <dd>0.4 mm</dd>
+            <dt>Filament</dt>
+            <dd>Bambu PLA Basic, any one colour</dd>
+            <dt>Process</dt>
+            <dd>0.16mm High Quality @BBL P2S</dd>
+            <dt>Supports</dt>
+            <dd>On: tree (auto), organic</dd>
+            <dt>Infill</dt>
+            <dd>12%</dd>
+            <dt>Walls</dt>
+            <dd>3</dd>
+            <dt>Brim</dt>
+            <dd>Outer, 5 mm</dd>
+            <dt>Orientation</dt>
+            <dd>Upright on his base, as the file comes</dd>
+          </dl>
+          <p>
+            Any printer with a 0.4 mm nozzle and room for 120 × 62 × 180 mm will
+            do.
+          </p>
+        </div>
+        <div class="print-copy">
+          <h2>What’s in the shape</h2>
+          <ul>
+            <li>
+              One solid with no hollows: the coat and sleeves are filled down to
+              the body beneath.
+            </li>
+            <li>
+              The face strokes stand about 0.9 mm proud of the screen, and the
+              THINGY lettering 0.5 mm proud of the badge.
+            </li>
+            <li>
+              The antenna is a little thicker than on screen, so it survives a
+              desk.
+            </li>
+            <li>An oval base, 89 × 55 mm, keeps him standing.</li>
+          </ul>
+          <p>
+            This is the first version of the file, and he has not been printed
+            yet. Expect to check the supports under the coat hem and the head.
+          </p>
+        </div>
+      </section>
+      <section class="print-licence" aria-labelledby="licence-title">
+        <h2 id="licence-title">Yours to print.</h2>
+        <p class="print-note">
+          Thingy is by Jamie Thingelstad. The print model is licensed
+          <a href="https://creativecommons.org/licenses/by-nc/4.0/"
+            >CC BY-NC 4.0</a
+          >: print him, share him and change him, with credit, and not
+          commercially. The sizes and checksums are in
+          <a href="/print/v0.13/manifest.json">the print manifest</a>.
+        </p>
+      </section>
+    </main>
+    <footer class="frame">
+      <p>
+        A character by
+        <a class="h-card" href="https://www.thingelstad.com/" rel="author"
+          ><span class="p-name">Jamie Thingelstad</span></a
+        >.
+        <a href="https://thingelstad.xyz/things/thingy-model/"
+          >How Thingy was built</a
+        >.
+      </p>
+      <p>
+        <a href="https://thingy.thingelstad.com/"
+          >The librarian lives at .com</a
+        >
+        <span>·</span> The character lives at .xyz
+      </p>
+    </footer>
+  </body>
+</html>

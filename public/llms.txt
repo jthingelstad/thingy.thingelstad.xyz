@@ -8,6 +8,7 @@ The character is a rigged glTF 2.0 model derived from a Blender master. Every ou
 
 - [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit and pose, switch the antenna light, and copy embed code
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
+- [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0
 
 ## Use the character
 
@@ -15,6 +16,7 @@ The character is a rigged glTF 2.0 model derived from a Blender master. Every ou
 - Still images: `https://thingy.thingelstad.xyz/character/v0.10/poses/<outfit>-<pose>.webp` (transparent WebP; PNG beside each). Every outfit has a `present` image; the Workshop Builder has all four poses.
 - Iframe: `https://thingy.thingelstad.xyz/embed/?outfit=<outfit>&pose=<pose>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
 - Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character outfit="workshop" pose="thinking" light="off" motion="off">`. Events: `thingy-ready`, `thingy-change`, `thingy-fallback`.
+- Print model: [print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) lists the 3MF and zipped STL with sizes and SHA-256 sums, the print settings and the licence (CC BY-NC 4.0, credit Jamie Thingelstad). Not test-printed yet.
 - Models: `https://thingy.thingelstad.xyz/character/v0.10/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`).
 
 ## Related

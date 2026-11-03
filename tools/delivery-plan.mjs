@@ -17,6 +17,8 @@ export const mime = {
   ".gltf": "model/gltf+json",
   ".wasm": "application/wasm",
   ".woff2": "font/woff2",
+  ".3mf": "model/3mf",
+  ".zip": "application/zip",
 };
 
 const IMMUTABLE = "public, max-age=31536000, immutable";
@@ -33,6 +35,8 @@ export function cacheControl(key) {
   if (key === "thingy.js" || /^character\/[^/]+\/manifest\.json$/.test(key))
     return SHORT;
   if (key.startsWith("character/")) return "public, max-age=86400";
+  // Print files are versioned by directory too, and their manifest likewise.
+  if (/^print\/v[^/]+\//.test(key)) return "public, max-age=86400";
   if (key.startsWith("shared/fonts/")) return "public, max-age=2592000";
   if ([".html", ".txt", ".xml"].includes(extension) || key === "revision.json")
     return PAGE;

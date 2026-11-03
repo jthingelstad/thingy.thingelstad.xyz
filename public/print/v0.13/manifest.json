@@ -1,0 +1,71 @@
+{
+  "name": "Thingy, librarian, 180 mm (v0.13)",
+  "page": "https://thingy.thingelstad.xyz/print/",
+  "from": "thingy-character v0.13, pose \"Thingy v06 · Original\", librarian outfit, original face",
+  "license": {
+    "name": "CC BY-NC 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "credit": "Thingy by Jamie Thingelstad"
+  },
+  "test_printed": false,
+  "solid": {
+    "height_mm": 180.0,
+    "dimensions_mm": [119.85, 62.15, 180.0],
+    "volume_cm3": 425.0,
+    "triangles": 699648,
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "base_mm": {
+      "semi_axes": [44.51, 27.5],
+      "height": 6.14
+    }
+  },
+  "settings": {
+    "printer": "Bambu Lab P2S, 0.4 mm nozzle",
+    "filament": "Bambu PLA Basic, one colour",
+    "process": "0.16mm High Quality @BBL P2S",
+    "supports": "On: tree (auto), organic style, from the plate and on the model",
+    "infill": "12%",
+    "walls": 3,
+    "brim": "Outer, 5 mm",
+    "orientation": "Upright on his base, as the file comes"
+  },
+  "files": {
+    "Thingy-librarian-180mm-v0.13.3mf": {
+      "bytes": 9534611,
+      "sha256": "2a3aae6db74a7b25ce01c74d31b2f2847c0f16e0200148c5991ceef3d5f06e12"
+    },
+    "Thingy-librarian-180mm-v0.13-stl.zip": {
+      "bytes": 19283061,
+      "sha256": "c8d3d25d190036979fdf0114fdceeaa2ac8f9767409f3f937d94c314694ebe2f"
+    }
+  },
+  "stills": {
+    "front": {
+      "webp": "front.webp",
+      "width": 1000,
+      "height": 1250,
+      "png": "front.png"
+    },
+    "three-quarter": {
+      "webp": "three-quarter.webp",
+      "width": 640,
+      "height": 800
+    },
+    "side": {
+      "webp": "side.webp",
+      "width": 640,
+      "height": 800
+    },
+    "back": {
+      "webp": "back.webp",
+      "width": 640,
+      "height": 800
+    },
+    "face": {
+      "webp": "face.webp",
+      "width": 1200,
+      "height": 880
+    }
+  }
+}
