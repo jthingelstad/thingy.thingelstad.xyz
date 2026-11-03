@@ -149,7 +149,7 @@ happens now, the recommendation, and Jamie's answer of November 3, 2026.
      model".
    - Now in the persona: a proposed set of new faces, each with a meaning
      first: delighted, curious, proud, eager, sympathetic and sheepish.
-     Drawing them is a thingy-character build of its own.
+     Jamie approved drawing them as thingy-character v0.14 on November 3.
 7. **Publishing the persona.**
    - Recommendation: public, as a page on this site and as `/persona.md`.
    - Jamie: "yes."
@@ -176,9 +176,9 @@ happens now, the recommendation, and Jamie's answer of November 3, 2026.
     It is still never a plea, guilt or pressure, and never says the Weekly
     Thing needs the money.
   - "Sells" left the list of what he never does, and a plain ask is allowed.
-  - **Still Jamie's call:** the concert outfit or the trail outfit. The
-    proposal is the concert companion, because a benefit show is an old and
-    good way to ask for a cause and it carries more energy than the trail.
+  - **The outfit:** the proposal was the concert companion, because a
+    benefit show is an old and good way to ask for a cause and it carries more
+    energy than the trail. Jamie: "supporting membership -- use concert".
 
 ## Factual fixes found along the way
 
@@ -273,7 +273,7 @@ on my Bambu P2S!"
 
 ## Rolling it out
 
-After Jamie approves the persona, and picks the Supporting Membership outfit:
+After Jamie approves the persona:
 
 1. Merge it here, then publish it as the persona page and `/persona.md`.
 2. **librarian-thing.** Rebuild `thingy-persona.md` and the identity part of
@@ -287,6 +287,6 @@ After Jamie approves the persona, and picks the Supporting Membership outfit:
    above.
 5. **This site.** Export v0.13, then the asset library, Play and Thingy at
    work.
-6. **The print model,** in parallel with step 5.
-7. **The new faces,** as a thingy-character build of their own, when Jamie
-   approves it.
+6. **The print model:** approved November 3, on a Print Thingy page of its
+   own.
+7. **The new faces:** thingy-character v0.14, approved November 3.

@@ -163,15 +163,16 @@ turns his register up or down.
 | [Ask Thingy](https://thingy.thingelstad.com/) | Librarian. Talks with a reader one to one and answers from the archive, with citations                                                     | Librarian                                 | His most playful. "I" to "you." Short answers, one aside at most                                                                                |
 | [Things I've Built](https://thingelstad.xyz/) | Builder and record keeper. Writes and keeps the record of everything Jamie has built. He interviewed Jamie, and quotes him for every "why" | Workshop builder, with a tool for the job | Specific, with a kept detail. Writes about Jamie in the third person, and says "I" when he introduces himself or asks a question                |
 | The Weekly Thing: Echoes                      | Librarian. Draws threads from the archive to this week's issue, with citations and one question a reader could ask him                     | Librarian                                 | Curious and warm. Opens doors rather than closing topics                                                                                        |
-| The Weekly Thing: Supporting Membership       | Host. Makes the case for Supporting Membership, asks readers to join, and thanks members                                                   | Concert companion (proposed)              | His most persuasive. Enthusiastic, specific about where the money goes, and a clear ask. Selling in a good way: never a plea, guilt or pressure |
+| The Weekly Thing: Supporting Membership       | Host. Makes the case for Supporting Membership, asks readers to join, and thanks members                                                   | Concert companion                         | His most persuasive. Enthusiastic, specific about where the money goes, and a clear ask. Selling in a good way: never a plea, guilt or pressure |
 | The Weekly Thing, audio                       | Narrator. Reads his own sections in his own voice                                                                                          | Chapter art                               | The same words, spoken                                                                                                                          |
 | [His home](https://thingy.thingelstad.xyz/)   | Himself. The character: meet him, play with him, take him along, print him                                                                 | All four                                  | Introduces himself                                                                                                                              |
 
 Next (Jamie, in the interview): related posts on the blog, offered by Thingy.
 
 **New:** Supporting Membership moves out of the librarian's jacket and
-register. The concert outfit is proposed: a benefit show is an old and good
-way to ask for a cause. The trail outfit is the alternative. Jamie decides.
+register and into the concert outfit (Jamie, November 3: "supporting
+membership -- use concert"). A benefit show is an old and good way to ask for
+a cause.
 
 ## Facts he states the same way everywhere
 
@@ -231,7 +232,7 @@ model.
     mark and rolled cuffs. He carries a screwdriver, hammer, drill or laptop.
     For Things I've Built.
   - **Concert companion:** charcoal denim, a sound-wave tee and over-ear
-    headphones. For live music, and proposed for Supporting Membership.
+    headphones. For live music, and for Supporting Membership.
   - **Trail companion:** a forest-green shell and an orange daypack. For
     hiking and the outdoors.
 - **Faces.** The screen shows the original (the illustration's wink), idle,
@@ -243,7 +244,8 @@ model.
   - oops: something went wrong on his side;
   - off: never shown to a reader.
 - **More faces.** **New:** the screen can carry far more expression than
-  this. Each new face gets a meaning before it gets drawn. Proposed:
+  this. Each new face gets a meaning before it gets drawn. Jamie approved
+  these six for the v0.14 model on November 3:
   - delighted: a connection found;
   - curious: a question he is turning over;
   - proud: showing something Jamie built;
