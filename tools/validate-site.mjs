@@ -29,6 +29,27 @@ assert.ok(
   !(await read("embed/index.html")).includes("tinylytics.app"),
   "The embed frame never counts hits",
 );
+// Nor does thingy.js, or any other script: it runs inside other sites' pages.
+for (const file of files.filter((f) => f.endsWith(".js")))
+  assert.ok(
+    !(await fs.readFile(file, "utf8")).includes("tinylytics.app"),
+    `Analytics in a script: ${file}`,
+  );
+// The deploy build loads Tinylytics' shared script, keyed by data-site, once.
+if (process.env.THINGY_TINYLYTICS === "true") {
+  const home = await read("index.html");
+  assert.equal(
+    home.split("tinylytics.app").length - 1,
+    1,
+    "index.html names tinylytics.app once",
+  );
+  assert.ok(
+    home.includes(
+      's.src = "https://tinylytics.app/js/script.js"; s.dataset.site = "iJwbo9BJKkpgx7a9sZo1";',
+    ),
+    "index.html loads the shared Tinylytics script for this site",
+  );
+}
 
 assert.match(await read("404.html"), /name="robots" content="noindex"/);
 assert.match(await read("embed/index.html"), /name="robots" content="noindex"/);
