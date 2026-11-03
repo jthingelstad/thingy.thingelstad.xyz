@@ -1,16 +1,11 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "thingy.thingelstad.xyz static site: private S3 origin, CloudFront, certificate, DNS records, access log and 5xx alarm",
+  "Description": "thingy.thingelstad.xyz static site: private S3 origin, CloudFront, certificate, DNS records and access log",
   "Parameters": {
     "HostedZoneId": {
       "Type": "String",
       "Default": "Z00131847XOTS27DSIZF",
       "Description": "The thingelstad.xyz hosted zone (stack dns-thingelstad-xyz in projects-sysadmin)"
-    },
-    "AlarmTopicName": {
-      "Type": "String",
-      "Default": "weekly-thing-librarian-alarms",
-      "Description": "SNS topic the activity alarms Lambda routes by alarm name prefix"
     }
   },
   "Resources": {
@@ -426,46 +421,6 @@
           "x-edge-location",
           "cs-protocol",
           "cs(User-Agent)"
-        ]
-      }
-    },
-    "Distribution5xxAlarm": {
-      "Type": "AWS::CloudWatch::Alarm",
-      "Properties": {
-        "AlarmName": {
-          "Fn::Sub": "${AWS::StackName}-distribution-5xx"
-        },
-        "AlarmDescription": "CloudFront returned more than 5% 5xx responses for thingy.thingelstad.xyz in two of three five-minute windows.",
-        "Namespace": "AWS/CloudFront",
-        "MetricName": "5xxErrorRate",
-        "Dimensions": [
-          {
-            "Name": "DistributionId",
-            "Value": {
-              "Ref": "Distribution"
-            }
-          },
-          {
-            "Name": "Region",
-            "Value": "Global"
-          }
-        ],
-        "Statistic": "Average",
-        "Period": 300,
-        "EvaluationPeriods": 3,
-        "DatapointsToAlarm": 2,
-        "Threshold": 5,
-        "ComparisonOperator": "GreaterThanThreshold",
-        "TreatMissingData": "notBreaching",
-        "AlarmActions": [
-          {
-            "Fn::Sub": "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${AlarmTopicName}"
-          }
-        ],
-        "OKActions": [
-          {
-            "Fn::Sub": "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${AlarmTopicName}"
-          }
         ]
       }
     }
