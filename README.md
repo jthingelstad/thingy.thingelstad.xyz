@@ -146,7 +146,7 @@ S3 and CloudFront in Jamie's AWS account (999153317627, us-east-1), defined in
   zone; the distribution; the A and AAAA alias records for the hostname; the
   viewer-request function (`/x/` serves `/x/index.html`, `/x` redirects to `/x/`);
   the access log `/thingy-xyz/web-access` (14 days, no client IP, no query string);
-  the `thingy-xyz-site-distribution-5xx` alarm, which reaches #sites-log; and the
+  no CloudWatch alarm (the 5xx alarm was retired 2026-11-03); and the
   CNAME Bing Webmaster Tools verifies the site by. This stack owns the site's DNS
   names: they are not in projects-sysadmin's zone stack.
 - **`thingy-xyz-delivery`** (`infra/delivery.json`): the GitHub OIDC role the
@@ -203,7 +203,7 @@ The first deploy (`a1240b4`, 42 files) was checked against the live site:
 - The home page requests the Tinylytics script for this site; `/embed/` requests
   nothing outside this host.
 - DNS answers from 1.1.1.1 and 9.9.9.9 (A and AAAA); the access log records
-  requests without client IP or query string; the 5xx alarm is `OK`.
+  requests without client IP or query string (the 5xx alarm it then checked was retired 2026-11-03).
 - The sitemap is submitted to Google (through `sc-domain:thingelstad.xyz`) and
   Bing (verified site), and Tinylytics watches uptime.
 

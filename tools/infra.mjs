@@ -6,7 +6,7 @@
 // Run as the cloud-engineer identity in us-east-1. The site stack owns the
 // certificate (validated through its own record in the thingelstad.xyz zone),
 // the private bucket, the distribution, the A and AAAA alias records, the
-// access log and the 5xx alarm. The delivery stack owns the GitHub OIDC role
+// access log. The delivery stack owns the GitHub OIDC role
 // that publishes main. Each apply rewrites infra/deployment.json from the live
 // stack outputs. Infrastructure never changes through the delivery role.
 import {
