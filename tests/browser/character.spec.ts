@@ -293,8 +293,8 @@ test("what stands on the stage is what you copy, save and link", async ({
     await page.mouse.move(x + 180, y, { steps: 8 });
     await page.mouse.up();
     await expect(page.locator("#embed-code")).toContainText("&view=");
-    // Once he has settled, the address carries the angle too.
-    await expect.poll(() => page.url(), { timeout: 20000 }).toContain("view=");
+    // The address carries the angle too, without waiting for him to settle.
+    await expect.poll(() => page.url()).toContain("view=");
   }
 
   // Set to an exact angle, so the addresses below can be read exactly.

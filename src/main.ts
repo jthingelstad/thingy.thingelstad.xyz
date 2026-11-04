@@ -280,15 +280,16 @@ syncCharacter();
 syncMotionPreference();
 
 // Turning him changes what is taken. The code follows at once; the address
-// waits for him to settle, because browsers limit how often it may change.
-let settle = 0;
+// follows every 300 ms at most, because browsers limit how often it may change.
+// It doesn't wait for him to stop: on a slow machine he coasts for many seconds.
+let addressDue = 0;
 character.addEventListener("thingy-view", () => {
   syncTaken();
-  clearTimeout(settle);
-  settle = window.setTimeout(
-    () => history.replaceState(null, "", studioAddress() + location.hash),
-    300,
-  );
+  if (addressDue) return;
+  addressDue = window.setTimeout(() => {
+    addressDue = 0;
+    history.replaceState(null, "", studioAddress() + location.hash);
+  }, 300);
 });
 // He coasts for a moment after a drag, so a press is what marks a new turn.
 for (const start of ["pointerdown", "wheel", "keydown"])
