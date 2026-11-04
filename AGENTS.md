@@ -37,3 +37,10 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
   stack; rules count only until tuned).
 - Run `npm run check` and the relevant browser checks. No live analytics in QA:
   Tinylytics is injected only by the deploy build (`THINGY_TINYLYTICS=true`).
+
+## Browser tests
+
+Run them only when a change needs them, on this Mac or in CI (Jamie, 2026-11-04).
+A change needs them when it touches the stage, the component, the embed or a page's
+layout at phone width. Use `gh workflow run check.yml --ref <branch>`, and say on
+the pull request that they ran. Everything else in `npm run check` runs every time.

@@ -24,6 +24,9 @@ The development address is `http://127.0.0.1:4321`. `npm run build` produces
 `dist/`; `npm run preview` serves it. `npm run check` checks TypeScript, the
 delivery contract, the production build, GLB validation and asset budgets.
 `npm run test:browser` exercises desktop and phone views in isolated Chromium.
+It takes minutes on CI, so it runs only when a change needs it, with
+`gh workflow run check.yml --ref <branch>`. The other checks run on every pull
+request and on `main`, and a merge is live in about two minutes.
 Install the matching Chromium once with `npx playwright install chromium`.
 
 ## Bring Thingy into another project
