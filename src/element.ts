@@ -209,17 +209,25 @@ export class ThingyCharacter extends HTMLElement {
         },
         { signal: this.#abort.signal },
       );
+      // Once a press has moved it is a turn, even if it comes back to where it began.
       canvas.addEventListener(
-        "pointerup",
+        "pointermove",
         (event) => {
           const press = this.#press;
-          this.#press = undefined;
           if (
             press &&
-            Math.hypot(event.clientX - press.x, event.clientY - press.y) < 6 &&
-            performance.now() - press.at < 500
+            Math.hypot(event.clientX - press.x, event.clientY - press.y) >= 6
           )
-            this.#tap();
+            this.#press = undefined;
+        },
+        { signal: this.#abort.signal },
+      );
+      canvas.addEventListener(
+        "pointerup",
+        () => {
+          const press = this.#press;
+          this.#press = undefined;
+          if (press && performance.now() - press.at < 500) this.#tap();
         },
         { signal: this.#abort.signal },
       );

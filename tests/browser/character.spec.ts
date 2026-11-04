@@ -140,6 +140,14 @@ test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a
   await page.mouse.up();
   expect(await taps()).toBe(2);
 
+  // Out and back again is still a turn.
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.down();
+  await page.mouse.move(middle.x + 80, middle.y);
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.up();
+  expect(await taps()).toBe(2);
+
   await page.mouse.wheel(0, 300);
   await expect
     .poll(() => page.evaluate(() => window.scrollY))
