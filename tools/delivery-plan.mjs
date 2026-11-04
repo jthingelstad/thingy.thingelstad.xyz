@@ -28,12 +28,16 @@ const PAGE = "public, max-age=0, s-maxage=60, must-revalidate";
 
 // Vite's hashed bundles never change. Character files are versioned by
 // directory, but a version can still be re-exported before it settles, so
-// they get a day, not a year. thingy.js and each manifest are the stable
-// entry points other sites load, so they stay short.
+// they get a day, not a year. thingy.js, each manifest and character/latest/
+// are the stable entry points other sites load, so they stay short.
 export function cacheControl(key) {
   const extension = path.extname(key);
   if (key.startsWith("assets/")) return IMMUTABLE;
-  if (key === "thingy.js" || /^character\/[^/]+\/manifest\.json$/.test(key))
+  if (
+    key === "thingy.js" ||
+    key.startsWith("character/latest/") ||
+    /^character\/[^/]+\/manifest\.json$/.test(key)
+  )
     return SHORT;
   if (key.startsWith("character/")) return "public, max-age=86400";
   // Print files are versioned by directory too, and their manifest likewise.
@@ -45,6 +49,18 @@ export function cacheControl(key) {
   )
     return PAGE;
   return "public, max-age=3600";
+}
+
+/** The newest of a list of version directories, by number: v0.14 beats v0.9. */
+export function newestCharacterVersion(names) {
+  const number = (name) => name.slice(1).split(".").map(Number);
+  return names
+    .filter((name) => /^v\d+\.\d+$/.test(name))
+    .sort((a, b) => {
+      const [left, right] = [number(a), number(b)];
+      return left[0] - right[0] || left[1] - right[1];
+    })
+    .at(-1);
 }
 
 export function publicationOrder(files) {

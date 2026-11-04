@@ -91,8 +91,10 @@ The default is the `character/` directory beside `thingy.js`.
 
 More optional attributes, for a page that wants him as its centrepiece:
 
-- `version="v0.14"` picks a newer model; an outfit that version lacks stays on
-  v0.10. So far v0.14 has only the Librarian, with the v0.13 cloth pass.
+- `version="latest"` always takes the newest model of that outfit, and is what to
+  use unless a page needs one model forever. `version="v0.14"` pins one; an outfit
+  that version lacks stays on v0.10. So far v0.14 has only the Librarian, with the
+  v0.13 cloth pass. With no `version` it stays v0.10, for the pages that embed him already.
 - `face` shows a screen face on a model that has them (v0.14 on): `original`,
   `idle`, `thinking`, `found-it`, `oops`, `delighted`, `curious`, `proud`, `eager`,
   `sympathetic`, `sheepish`. `blink="on"` blinks the faces that can, never under
@@ -103,6 +105,9 @@ More optional attributes, for a page that wants him as its centrepiece:
 
 A press that barely moves, or Enter or Space on the focused canvas, emits
 `thingy-tap`, so a page can answer a tap without mistaking a turn for one.
+`hop({ height, direction, turns })` is one such answer: he jumps `height` CSS
+pixels and spins (`direction` 1 or -1, one turn by default), landing where he
+began. It does nothing under reduced motion.
 
 The iframe is the simplest integration when the consuming site has a strict
 content security policy. A native component needs its host in `script-src` and
@@ -123,8 +128,16 @@ laptop remains a separate skinned node so the runtime can hide it in other poses
 The beacon keeps a separately named material. A future incompatible revision
 gets a new directory instead of replacing these addresses.
 
+**The newest model has one address that never changes:**
+`https://thingy.thingelstad.xyz/character/latest/` is a copy of the newest version's
+directory, made at build time: `latest/librarian.glb`, `latest/manifest.json` and
+`latest/poses/librarian-<pose>.webp`. It is cached for five minutes, not a day, and
+holds what the newest version holds, so today only the Librarian. Use it to follow
+the model; use a numbered directory to keep one picture for good.
+
 `public/character/v0.14/manifest.json` is the same contract for the newer model,
-with its faces added. The screen is a separate skinned node, `Thingy_Screen`, lit
+with its faces added. Its `stills` list every published picture: the four poses, and
+pose-face pairs such as `librarian-rest-delighted.webp`. The screen is a separate skinned node, `Thingy_Screen`, lit
 by one cell of an atlas: material `Thingy_Face`, emissive map, 4 columns by 5 rows.
 
 ## Rebuild the v0.14 Librarian
@@ -142,11 +155,11 @@ It never saves the master. It bakes the full master on to a lighter body, so the
 cloth reaches the browser as colour and normal maps, and takes the faces from the
 master's atlas. Add `-- --reuse-bakes` after the script to change the grade, materials
 or actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
-repeats, so the saved maps still fit. The stills, `poses/librarian-present.webp` and
-`librarian-hello.webp`, are captures of this model in the component from its default
-camera, so each matches its first frame; `node tools/capture-poster-v014.mjs` makes
-them from a running preview. Ask Thingy's front page waves, and keeps its own copy of
-the hello still.
+repeats, so the saved maps still fit. The stills in `poses/` are captures of this
+model in the component from its default camera, so each matches its first frame;
+`node tools/capture-poster-v014.mjs` makes any that are missing from a running
+preview. Ask Thingy's pages load them from `character/latest/`, so they follow the
+model on their own.
 
 ## Rebuild the derivatives
 

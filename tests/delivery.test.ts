@@ -2,7 +2,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { cacheControl, mime, prepareObject } from "../tools/delivery-plan.mjs";
+import {
+  cacheControl,
+  mime,
+  newestCharacterVersion,
+  prepareObject,
+} from "../tools/delivery-plan.mjs";
 
 const json = (name: string) =>
   JSON.parse(
@@ -53,6 +58,12 @@ test("caching keeps entry points short and hashed bundles long", () => {
     "public, max-age=86400",
   );
   for (const file of [
+    "character/latest/librarian.glb",
+    "character/latest/manifest.json",
+    "character/latest/poses/librarian-hello.webp",
+  ])
+    assert.equal(cacheControl(file), "public, max-age=300", file);
+  for (const file of [
     "print/v0.13/Thingy-librarian-180mm-v0.13.3mf",
     "print/v0.13/manifest.json",
     "print/v0.13/front.webp",
@@ -69,6 +80,11 @@ test("caching keeps entry points short and hashed bundles long", () => {
     "llms.txt",
   ])
     assert.match(cacheControl(page), /max-age=0/);
+});
+
+test("the newest character version is the highest number", () => {
+  assert.equal(newestCharacterVersion(["v0.10", "v0.9", "v0.14"]), "v0.14");
+  assert.equal(newestCharacterVersion(["latest", "v1.2", "v0.14"]), "v1.2");
 });
 
 test("the bucket is private, encrypted, versioned and retained", () => {

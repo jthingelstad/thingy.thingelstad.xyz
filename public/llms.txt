@@ -14,6 +14,7 @@ The character is a rigged glTF 2.0 model derived from a Blender master. Every ou
 ## Use the character
 
 - [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): outfits (librarian, trail, workshop, concert), poses (hello, present, thinking, rest), model and image paths
+- Newest model: `https://thingy.thingelstad.xyz/character/latest/` is always the newest version's directory ([manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json); today the Librarian). In the web component, `version="latest"`.
 - Still images: `https://thingy.thingelstad.xyz/character/v0.10/poses/<outfit>-<pose>.webp` (transparent WebP; PNG beside each). Every outfit has a `present` image; the Workshop Builder has all four poses.
 - Iframe: `https://thingy.thingelstad.xyz/embed/?outfit=<outfit>&pose=<pose>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
 - Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character outfit="workshop" pose="thinking" light="off" motion="off">`. Events: `thingy-ready`, `thingy-change`, `thingy-fallback`.

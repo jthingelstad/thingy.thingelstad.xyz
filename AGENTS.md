@@ -17,11 +17,12 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
   never by hand, and give a new print its own directory.
 - `public/character/v0.10/` and `v0.14/` are the versioned delivery contract.
   Preserve published addresses and pose names. Add a new version for future
-  incompatible changes. `thingy.thingelstad.com`'s front page loads the component
-  and the v0.14 Librarian from here (2026-11-04), so `thingy.js` and those files are
-  live for another site; its copy of the hello still should follow a model change.
-  It uses `hello` because the `present` hand, turned to his side, reads as a rude
-  gesture. Check any page that lets people rotate him from every angle.
+  incompatible changes. `thingy.thingelstad.com` loads the component with
+  `version="latest"` and every page's still from `character/latest/` (2026-11-04),
+  so `thingy.js` and those files are live for another site. A new version must
+  publish every still that site names (`stills` in the manifest) or its pages lose
+  a picture. The front page uses `hello` because the `present` hand, turned to his
+  side, reads as a rude gesture. Check any page that lets people rotate him from every angle.
 - Keep Blender masters, raw bakes, logs, caches, secrets, and machine paths out of
   public assets. Never read `.env*`. Inspect export metadata before publication.
 - Respect reduced motion, provide still-image fallback, and dispose WebGL resources.

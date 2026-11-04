@@ -6,6 +6,7 @@
 // CI checks out full history so these dates are true.
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
+import { newestCharacterVersion } from "./delivery-plan.mjs";
 
 const ORIGIN = "https://thingy.thingelstad.xyz";
 export const PAGES = [
@@ -52,6 +53,13 @@ await fs.writeFile(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
 );
 await fs.copyFile("persona/THINGY.md", "dist/persona.md");
+// character/latest/ is the newest version's directory, so a page can name the
+// newest model or still at one address that never changes.
+await fs.cp(
+  `dist/character/${newestCharacterVersion(await fs.readdir("public/character"))}`,
+  "dist/character/latest",
+  { recursive: true },
+);
 await fs.writeFile(
   "dist/revision.json",
   JSON.stringify({
