@@ -8,6 +8,9 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - The approved Blender master lives in the sibling character-art repository:
   `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`.
   Never overwrite it. Export scripts operate in memory and write derivatives here.
+- `persona/THINGY.md` is Thingy's persona and the authority for him on every
+  surface (approved by Jamie, November 3, 2026). Edit it only on Jamie's word;
+  `/persona/` and `/persona.md` are built from it.
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.

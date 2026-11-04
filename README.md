@@ -136,6 +136,20 @@ uncompressed geometry too when local bakes are present. Khronos’s validator
 reports Meshopt as an unsupported extension; browser tests separately exercise
 its real decoder, every outfit, and animated poses.
 
+## Who Thingy is
+
+[`persona/THINGY.md`](persona/THINGY.md) is Thingy's persona, approved by Jamie
+on November 3, 2026: the authority for who he is, how he talks, where he works,
+how he looks and how he sounds, wherever he appears. Change him there first,
+then the surfaces (Ask Thingy, the Weekly Thing, Things I've built).
+[`docs/persona-review-2026-11.md`](docs/persona-review-2026-11.md) records how it
+was made.
+
+The site publishes it twice from that one file: [/persona/](persona/index.html),
+rendered at build time by a small Markdown renderer (`src/markdown.ts`, which
+knows only what the file uses), and `/persona.md`, the file as is, for agents.
+`validate-site.mjs` fails if either drifts from the source.
+
 ## The print model
 
 [/print/](print/index.html) offers a 180 mm one-colour print of Thingy, made for
@@ -228,10 +242,10 @@ The first deploy (`a1240b4`, 42 files) was checked against the live site:
 ## Search and machine-readable files
 
 `robots.txt` allows everything and names `sitemap.xml`. The sitemap lists the
-home page, the integration examples and the print page, each with the date of the last commit
+home page, the integration examples, the persona page and the print page, each with the date of the last commit
 that changed it (`tools/write-site-files.mjs`), never the build time. `/embed/`
 and the 404 page carry `noindex`. `llms.txt` describes the asset contract for
-agents. Google covers the site through the `sc-domain:thingelstad.xyz` property;
+agents and names `/persona.md`. Google covers the site through the `sc-domain:thingelstad.xyz` property;
 Bing tracks it as its own site. projects-sysadmin's `scripts/search-consoles`
 reconciles both.
 

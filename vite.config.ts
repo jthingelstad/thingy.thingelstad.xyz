@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { defineConfig, type Plugin } from "vite";
+import { inline, renderMarkdown, slug } from "./src/markdown";
 
 // Tinylytics, in the production deploy build only. The deploy job builds with
 // THINGY_TINYLYTICS=true; every other build (dev, preview, tests, a plain
@@ -26,8 +28,33 @@ function tinylytics(enabled: boolean): Plugin {
   };
 }
 
+// The persona page renders persona/THINGY.md at build time, so the page and
+// /persona.md (written by tools/write-site-files.mjs) are the same text.
+function persona(): Plugin {
+  return {
+    name: "thingy-persona",
+    transformIndexHtml: {
+      order: "pre",
+      handler(html) {
+        if (!html.includes("<!-- persona -->")) return html;
+        const source = readFileSync("persona/THINGY.md", "utf8");
+        const contents = [...source.matchAll(/^## (.+)$/gm)]
+          .map((m) => `<li><a href="#${slug(m[1])}">${inline(m[1])}</a></li>`)
+          .join("");
+        return html
+          .replace("<!-- persona-contents -->", contents)
+          .replace(
+            "<!-- persona -->",
+            renderMarkdown(source, { skipTitle: true }),
+          );
+      },
+    },
+  };
+}
+
 export default defineConfig(({ command }) => ({
   plugins: [
+    persona(),
     tinylytics(command === "build" && process.env.THINGY_TINYLYTICS === "true"),
   ],
   build: {
@@ -38,6 +65,7 @@ export default defineConfig(({ command }) => ({
         "embed/index.html",
         "examples/workshop.html",
         "print/index.html",
+        "persona/index.html",
       ],
     },
   },

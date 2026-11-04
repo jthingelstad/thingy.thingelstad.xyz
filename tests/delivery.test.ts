@@ -61,6 +61,8 @@ test("caching keeps entry points short and hashed bundles long", () => {
   for (const page of [
     "index.html",
     "print/index.html",
+    "persona/index.html",
+    "persona.md",
     "embed/index.html",
     "404.html",
     "sitemap.xml",

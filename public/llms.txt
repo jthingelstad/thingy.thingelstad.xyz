@@ -1,11 +1,12 @@
 # Thingy's character home
 
-> Thingy is the librarian behind Ask Thingy (https://thingy.thingelstad.com/), Jamie Thingelstad's assistant for his writing archive. This site is Thingy's character: a 3D viewer with four outfits and four poses, and the images, iframe and web component other pages use to show him.
+> Thingy is Jamie Thingelstad's agent sidekick. He is the librarian on Ask Thingy (https://thingy.thingelstad.com/), the builder and record keeper on Things I've built and the host of the Weekly Thing's Supporting Membership. This site is his home: who he is, a 3D viewer with four outfits and four poses, the images, iframe and web component other pages use to show him, and a model to print.
 
 The character is a rigged glTF 2.0 model derived from a Blender master. Every outfit and pose has a stable address under a versioned directory; a future incompatible revision gets a new directory instead of replacing these files.
 
 ## Pages
 
+- [Who Thingy is](https://thingy.thingelstad.xyz/persona/): his persona, the authority for how he talks, where he works, how he looks and sounds, and what he never does. The same text as Markdown: https://thingy.thingelstad.xyz/persona.md
 - [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit and pose, switch the antenna light, and copy embed code
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
 - [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0
@@ -21,6 +22,6 @@ The character is a rigged glTF 2.0 model derived from a Blender master. Every ou
 
 ## Related
 
-- [Ask Thingy](https://thingy.thingelstad.com/): the librarian itself, answering from Jamie's newsletter, blog and podcast
+- [Ask Thingy](https://thingy.thingelstad.com/): Thingy as the librarian, answering from everything Jamie has published
 - [How Thingy was built](https://thingelstad.xyz/things/thingy-model/): the project page on Things I've built
 - [Jamie Thingelstad](https://www.thingelstad.com/): the blog
