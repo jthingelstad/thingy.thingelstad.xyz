@@ -174,20 +174,84 @@ export function modelVersion(
     ? (value as Version)
     : VERSION;
 }
+/** Where the camera stands: degrees round him, degrees from straight above, zoom. */
+export type View = { azimuth: number; polar: number; zoom: number };
+export const VIEW_LIMITS = {
+  polar: [32.4, 113.4],
+  zoom: [0.65, 2.4],
+} as const;
+const clamp = (value: number, [low, high]: readonly [number, number]): number =>
+  Math.min(Math.max(value, low), high);
+/** A view as an address writes it, short enough to read: `40,83,1.2`. */
+export function viewValue({ azimuth, polar, zoom }: View): string {
+  const round = Math.round(azimuth);
+  const turned = ((((round + 180) % 360) + 360) % 360) - 180;
+  return `${turned},${Math.round(polar)},${Number(zoom.toFixed(2))}`;
+}
+/** Addresses are untrusted: anything else means no view, and limits always hold. */
+export function parseView(value: string | null | undefined): View | null {
+  const match =
+    /^(-?\d{1,3}(?:\.\d+)?),(\d{1,3}(?:\.\d+)?),(\d(?:\.\d+)?)$/.exec(
+      value ?? "",
+    );
+  if (!match) return null;
+  return {
+    azimuth: Number(match[1]),
+    polar: clamp(Number(match[2]), VIEW_LIMITS.polar),
+    zoom: clamp(Number(match[3]), VIEW_LIMITS.zoom),
+  };
+}
+/** Where he stands until someone turns him. */
+export const HOME_CAMERA = {
+  position: [3.5, 3, 12],
+  target: [0, 1.38, 0],
+} as const;
+export const HOME_VIEW = viewValue({
+  azimuth:
+    (Math.atan2(HOME_CAMERA.position[0], HOME_CAMERA.position[2]) * 180) /
+    Math.PI,
+  polar:
+    (Math.atan2(
+      Math.hypot(HOME_CAMERA.position[0], HOME_CAMERA.position[2]),
+      HOME_CAMERA.position[1] - HOME_CAMERA.target[1],
+    ) *
+      180) /
+    Math.PI,
+  zoom: 1,
+});
+/** What an embed can say. With no `version` it stays v0.10, as it always has. */
+export type EmbedState = Omit<CharacterState, "pose"> & {
+  pose: AnyPose;
+  version?: string;
+  tool?: Tool;
+  face?: string;
+  view?: string;
+};
+/** The published size of each outfit on the newest model, as a page offers it. */
+export const MODEL_WEIGHT: Record<Outfit, string> = {
+  librarian: "2.5 MB",
+  trail: "1.7 MB",
+  workshop: "2.1 MB",
+  concert: "1.8 MB",
+};
 export function embedURL(
-  state: CharacterState,
+  state: EmbedState,
   origin = "https://thingy.thingelstad.xyz",
 ): string {
   const url = new URL("/embed/", origin);
-  url.search = new URLSearchParams({
-    outfit: state.outfit,
-    pose: state.pose,
-    light: state.light ? "on" : "off",
-    motion: state.motion ? "on" : "off",
-  }).toString();
+  const search = new URLSearchParams();
+  if (state.version) search.set("version", state.version);
+  search.set("outfit", state.outfit);
+  if (state.tool && state.tool !== "none") search.set("tool", state.tool);
+  search.set("pose", state.pose);
+  if (state.face && state.face !== "original") search.set("face", state.face);
+  search.set("light", state.light ? "on" : "off");
+  search.set("motion", state.motion ? "on" : "off");
+  if (state.view && state.view !== HOME_VIEW) search.set("view", state.view);
+  url.search = search.toString();
   return url.href;
 }
-export function iframeCode(state: CharacterState): string {
+export function iframeCode(state: EmbedState): string {
   return `<iframe src="${embedURL(state)}" title="Thingy, ${OUTFITS[state.outfit].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>`;
 }
 export function posterPath(

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { newestCharacterVersion } from "../tools/delivery-plan.mjs";
 import {
   outfit,
@@ -12,12 +12,17 @@ import {
   FACE_ATLAS,
   FACES,
   FACE_CHOICES,
+  HOME_VIEW,
+  MODEL_WEIGHT,
+  parseView,
   stageOf,
   modelVersion,
   OUTFITS,
   POSES,
   posterPath,
   VERSIONS,
+  VIEW_LIMITS,
+  viewValue,
 } from "../src/config";
 
 test("untrusted embed parameters are limited to supported characters and poses", () => {
@@ -155,4 +160,70 @@ test("an embedded character keeps outfit, pose, beacon and motion independent", 
     motion: "off",
   });
   assert(iframeCode(state).includes('title="Thingy, Workshop Builder"'));
+});
+test("an embed says only what differs, and follows what it is told to", () => {
+  const url = new URL(
+    embedURL({
+      outfit: "workshop",
+      pose: "work",
+      tool: "hammer",
+      face: "proud",
+      version: "latest",
+      light: false,
+      motion: false,
+      view: "60,80,1.2",
+    }),
+  );
+  assert.deepEqual(Object.fromEntries(url.searchParams), {
+    version: "latest",
+    outfit: "workshop",
+    tool: "hammer",
+    pose: "work",
+    face: "proud",
+    light: "off",
+    motion: "off",
+    view: "60,80,1.2",
+  });
+  const plain = new URL(
+    embedURL({
+      outfit: "trail",
+      pose: "hello",
+      tool: "none",
+      face: "original",
+      version: "latest",
+      light: false,
+      motion: false,
+      view: HOME_VIEW,
+    }),
+  );
+  assert.deepEqual(
+    [...plain.searchParams.keys()],
+    ["version", "outfit", "pose", "light", "motion"],
+  );
+});
+test("a view from an address is checked, limited and written back the same", () => {
+  assert.deepEqual(parseView("60,80,1.2"), {
+    azimuth: 60,
+    polar: 80,
+    zoom: 1.2,
+  });
+  assert.deepEqual(parseView("-40,5,9"), {
+    azimuth: -40,
+    polar: VIEW_LIMITS.polar[0],
+    zoom: VIEW_LIMITS.zoom[1],
+  });
+  for (const bad of ["", "60", "a,b,c", "60,80", "60,80,1,2", "<script>", null])
+    assert.equal(parseView(bad), null);
+  assert.equal(
+    viewValue({ azimuth: 200.4, polar: 80.2, zoom: 1.004 }),
+    "-160,80,1",
+  );
+  assert.equal(HOME_VIEW, "16,83,1");
+});
+test("the weight a page offers is the weight of the newest model", () => {
+  const newest = Object.keys(VERSIONS).at(-1)!;
+  for (const [key, weight] of Object.entries(MODEL_WEIGHT)) {
+    const { size } = statSync(`public/character/${newest}/${key}.glb`);
+    assert.equal(weight, `${(size / 1e6).toFixed(1)} MB`, key);
+  }
 });

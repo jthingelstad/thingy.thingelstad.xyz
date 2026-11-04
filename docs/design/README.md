@@ -10,8 +10,8 @@ design reference; the live character is the Blender-derived mesh.
 The design system uses paper `#faf8f2`, ink `#171b1d`, green `#214f38`, soft green
 `#eaf0e6`, and fine neutral rules. Content stays open rather than nested in cards.
 The header pairs the character home with Ask Thingy. The primary screen is
-Thingy with the controls around him (see "The studio" below). The reuse section provides a character selection, pose previews, code, copy action,
-and transparent image download. A final row shows the four builder poses.
+Thingy with the controls around him (see "The studio" below), including what you
+can take away. A final row shows the four builder poses.
 
 The copy above the fold follows the concept. Intentional differences are the
 approved 3D character in place of the concept’s interpretation, a default Present
@@ -49,3 +49,22 @@ chosen now: Outfit, Hand (Workshop only), Pose, Face, More. One group opens at a
 time, and tapping the open tab closes it. The figure's height is capped at 112vw,
 which keeps the widest tool poses inside a phone's screen. The intro line and the
 drag hint are left out of the sheet layout.
+
+## Bring him along
+
+The first reuse section had its own character and pose pickers, and only ever
+showed stills, though its code was live 3D. A second Claude Design run compared a
+card, the rail and a section below the stage, and Jamie chose the rail, with a sheet
+on the phone (2026-11-04). What stands on the stage is what you take, so there are
+no pickers of its own: Copy embed, Download picture and Copy link sit under Play and
+Reset, one click each.
+
+Copied embeds say `version=latest` so they follow the newest model, and start at the
+angle you turned him. Which pose someone picks and how they turn him is theirs: Jamie
+asked that nothing manage the `present` pose here. The picture is drawn from the stage
+in the browser, because a still for every combination would be some 275 files.
+
+The faces are always three across now, to make room. In a short window the three ways
+sit side by side like the pose tiles. On the phone a Bring him button beside the title
+opens a sheet with Live, Picture and Link, and the stage shrinks so all of him stays
+in view while you choose.
