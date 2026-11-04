@@ -203,7 +203,16 @@ export class ThingyCharacter extends HTMLElement {
     else if (name === "pose" || name === "tool") this.#setPose();
   }
 
+  /** A spin still dying away from a drag would carry him off a set angle. */
+  #stopSpin(): void {
+    if (!this.#controls) return;
+    this.#controls.enableDamping = false;
+    this.#controls.update();
+    this.#controls.enableDamping = true;
+  }
+
   resetView(): void {
+    this.#stopSpin();
     this.#camera.position.set(...HOME_CAMERA.position);
     this.#camera.zoom = 1;
     this.#camera.updateProjectionMatrix();
@@ -215,6 +224,7 @@ export class ThingyCharacter extends HTMLElement {
   #setView(): void {
     const view = parseView(this.getAttribute("view"));
     if (!view || !this.#controls) return;
+    this.#stopSpin();
     const distance = this.#camera.position
       .clone()
       .sub(this.#controls.target)
