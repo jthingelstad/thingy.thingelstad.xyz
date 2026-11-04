@@ -1,6 +1,8 @@
 name: Check and deploy character home
 on:
+  # A branch runs as its pull request, not twice. Main has its own run to deploy.
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -27,8 +29,13 @@ jobs:
       - run: npm run format:check && npm run check
       - run: pipx run --spec cfn-lint==1.57.2 cfn-lint infra/site.json infra/delivery.json
       - run: npm audit --audit-level=high
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
+      # 3D on a CPU takes most of this job. The pull request has passed these by
+      # the time it reaches main, so a merge goes straight to Deploy. Run this
+      # workflow by hand for the full check on main.
+      - if: github.event_name != 'push'
+        run: npx playwright install --with-deps chromium
+      - if: github.event_name != 'push'
+        run: npm run test:browser
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: failure()
         with:

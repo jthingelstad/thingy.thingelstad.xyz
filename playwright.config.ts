@@ -2,6 +2,8 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   timeout: 90000,
   testDir: "tests/browser",
+  // Each test's time in the CI log, to see where the minutes go.
+  reporter: "list",
   fullyParallel: false,
   workers: 1,
   outputDir: "/tmp/thingy-character-browser-results",
