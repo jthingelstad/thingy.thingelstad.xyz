@@ -62,6 +62,7 @@ const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 assert.deepEqual(locs, [
   "https://thingy.thingelstad.xyz/",
   "https://thingy.thingelstad.xyz/examples/workshop.html",
+  "https://thingy.thingelstad.xyz/persona/",
   "https://thingy.thingelstad.xyz/print/",
 ]);
 for (const loc of locs) {
@@ -78,5 +79,30 @@ assert.match(
   llms,
   /^# .+\n\n> .+/,
   "llms.txt opens with a title and a summary",
+);
+// The persona page and /persona.md are the same file, rendered and as is.
+const persona = await fs.readFile("persona/THINGY.md", "utf8");
+assert.equal(
+  await read("persona.md"),
+  persona,
+  "persona.md is persona/THINGY.md",
+);
+const personaPage = await read("persona/index.html");
+assert.ok(!personaPage.includes("<!-- persona"), "persona page is rendered");
+for (const [, heading] of persona.matchAll(/^#{2,3} (.+)$/gm))
+  assert.ok(
+    personaPage.includes(
+      `>${heading.replace(/`([^`]+)`/g, "<code>$1</code>")}</h`,
+    ),
+    `persona page has the heading ${heading}`,
+  );
+assert.ok(
+  !/\*\*|\]\(/.test(personaPage.replace(/<[^>]+>/g, "")),
+  "no Markdown left in the persona page text",
+);
+assert.match(
+  llms,
+  /https:\/\/thingy\.thingelstad\.xyz\/persona\.md/,
+  "llms.txt names persona.md",
 );
 console.log(`Site OK: ${files.length} files, ${locs.length} sitemap URLs`);

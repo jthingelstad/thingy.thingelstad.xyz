@@ -1,4 +1,5 @@
-// After the Vite builds: write dist/sitemap.xml and dist/revision.json.
+// After the Vite builds: write dist/sitemap.xml, dist/revision.json and
+// dist/persona.md, the persona as agents read it.
 //
 // Each sitemap URL's lastmod is the last commit that touched the files the
 // page is made from, never the build time (search-consoles rule, 2026-10-28).
@@ -23,6 +24,15 @@ export const PAGES = [
     sources: ["examples/workshop.html", "public/character"],
   },
   {
+    path: "/persona/",
+    sources: [
+      "persona/index.html",
+      "persona/THINGY.md",
+      "src/markdown.ts",
+      "src/style.css",
+    ],
+  },
+  {
     path: "/print/",
     sources: ["print/index.html", "src/style.css", "public/print"],
   },
@@ -41,6 +51,7 @@ await fs.writeFile(
   "dist/sitemap.xml",
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
 );
+await fs.copyFile("persona/THINGY.md", "dist/persona.md");
 await fs.writeFile(
   "dist/revision.json",
   JSON.stringify({

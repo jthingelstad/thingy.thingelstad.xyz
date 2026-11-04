@@ -8,6 +8,7 @@ export const mime = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8",
   ".xml": "application/xml; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
@@ -38,7 +39,10 @@ export function cacheControl(key) {
   // Print files are versioned by directory too, and their manifest likewise.
   if (/^print\/v[^/]+\//.test(key)) return "public, max-age=86400";
   if (key.startsWith("shared/fonts/")) return "public, max-age=2592000";
-  if ([".html", ".txt", ".xml"].includes(extension) || key === "revision.json")
+  if (
+    [".html", ".txt", ".md", ".xml"].includes(extension) ||
+    key === "revision.json"
+  )
     return PAGE;
   return "public, max-age=3600";
 }

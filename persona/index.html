@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Who Thingy is — Thingy</title>
+    <meta
+      name="description"
+      content="Thingy is Jamie Thingelstad’s agent sidekick. Who he is, how he talks, where he works, how he looks and sounds, and what he never does."
+    />
+    <meta name="theme-color" content="#faf8f2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link
+      rel="preload"
+      href="/shared/fonts/inter-tight-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="alternate" type="text/markdown" href="/persona.md" />
+    <link rel="canonical" href="https://thingy.thingelstad.xyz/persona/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Thingy" />
+    <meta property="og:title" content="Who Thingy is" />
+    <meta
+      property="og:description"
+      content="Thingy is Jamie Thingelstad’s agent sidekick. Who he is, how he talks, where he works, how he looks and sounds, and what he never does."
+    />
+    <meta property="og:url" content="https://thingy.thingelstad.xyz/persona/" />
+    <meta
+      property="og:image"
+      content="https://thingy.thingelstad.xyz/character/v0.10/poses/librarian-present.png"
+    />
+    <meta property="og:image:width" content="1000" />
+    <meta property="og:image:height" content="1000" />
+    <meta property="og:image:alt" content="Thingy in his librarian outfit" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="me" href="https://micro.blog/jthingelstad" />
+    <link rel="me" href="https://github.com/jthingelstad" />
+    <style>
+      .site-header nav a[aria-current="page"] {
+        color: var(--green);
+      }
+      .persona-hero {
+        padding-block: 16px 32px;
+      }
+      .lede {
+        font-size: clamp(21px, 1.95vw, 30px);
+        line-height: 1.4;
+        color: #43484b;
+        max-width: 34ch;
+      }
+      .jobs {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin: 32px 0 0;
+        padding: 0;
+        list-style: none;
+        max-width: 760px;
+      }
+      .jobs figure {
+        margin: 0;
+      }
+      .jobs img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .jobs figcaption {
+        text-align: center;
+        font-weight: 600;
+      }
+      .persona {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.3fr) minmax(0, 1fr);
+        gap: clamp(24px, 4vw, 64px);
+        border-top: 1px solid var(--line);
+        padding-block: 40px 56px;
+      }
+      .persona-contents {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+        font-size: 15px;
+      }
+      .persona-contents ol {
+        padding-left: 20px;
+        line-height: 1.8;
+      }
+      .persona-contents p {
+        color: var(--muted);
+      }
+      .persona-copy {
+        max-width: 68ch;
+        line-height: 1.6;
+      }
+      .persona-copy h2 {
+        font-size: clamp(30px, 2.6vw, 40px);
+        margin: 48px 0 16px;
+      }
+      .persona-copy h3 {
+        font-size: 22px;
+        margin: 32px 0 12px;
+      }
+      .persona-copy > :first-child {
+        margin-top: 0;
+      }
+      .persona-copy li + li {
+        margin-top: 6px;
+      }
+      .persona-copy ul ul {
+        margin-top: 6px;
+      }
+      .persona-copy blockquote {
+        margin: 0;
+        padding-left: 20px;
+        border-left: 3px solid var(--line);
+        color: #43484b;
+      }
+      .persona-copy .table-wrap {
+        overflow-x: auto;
+        max-width: calc(100vw - 40px);
+      }
+      .persona-copy table {
+        border-collapse: collapse;
+        min-width: 640px;
+        font-size: 16px;
+      }
+      .persona-copy th,
+      .persona-copy td {
+        text-align: left;
+        vertical-align: top;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      @media (max-width: 760px) {
+        .jobs {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          max-width: 360px;
+        }
+        .persona {
+          grid-template-columns: 1fr;
+        }
+        .persona-contents {
+          position: static;
+        }
+        .persona-copy table,
+        .persona-copy tbody,
+        .persona-copy tr,
+        .persona-copy th,
+        .persona-copy td {
+          display: block;
+          min-width: 0;
+        }
+        .persona-copy thead {
+          display: none;
+        }
+        .persona-copy tr {
+          padding-block: 12px;
+          border-bottom: 1px solid var(--line);
+        }
+        .persona-copy th,
+        .persona-copy td {
+          padding: 4px 0;
+          border: 0;
+        }
+        .persona-copy th[scope="row"] {
+          font-size: 19px;
+        }
+        .persona-copy td::before {
+          content: attr(data-label) ": ";
+          font-weight: 600;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#persona">Skip to who Thingy is</a>
+    <header class="site-header frame">
+      <a class="brand" href="/" aria-label="Thingy home"
+        ><svg viewBox="0 0 28 48" aria-hidden="true">
+          <path d="M5 44Q14 29 23 44Z" fill="#252a26" />
+          <path d="m14 37 1-21" stroke="#252a26" stroke-width="4" />
+          <circle cx="15" cy="12" r="9" fill="#f28a28" />
+          <circle cx="12" cy="9" r="3" fill="#ffac50" opacity=".8" /></svg
+        ><span>Thingy</span></a
+      >
+      <nav aria-label="Main">
+        <a href="/#character">The character</a
+        ><a href="/persona/" aria-current="page">Who he is</a
+        ><a href="/#bring-along">Bring Thingy along</a
+        ><a href="/print/">Print Thingy</a
+        ><a class="ask" href="https://thingy.thingelstad.com/"
+          >Ask Thingy
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M8 4h12v12M20 4 4 20" /></svg
+        ></a>
+      </nav>
+    </header>
+    <main class="frame">
+      <section class="persona-hero" aria-labelledby="title">
+        <h1 id="title">Who Thingy is.</h1>
+        <p class="lede">
+          Jamie’s agent sidekick. He has read everything Jamie has published,
+          and each place he works gives him a job.
+        </p>
+        <ul class="jobs" aria-label="His jobs">
+          <li>
+            <figure>
+              <img
+                src="/character/v0.10/poses/librarian-present.webp"
+                alt="Thingy in his librarian outfit: navy felt jacket and an orange polka-dot bow tie"
+                width="1000"
+                height="1000"
+              />
+              <figcaption>Librarian</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <img
+                src="/character/v0.10/poses/workshop-present.webp"
+                alt="Thingy in his workshop builder outfit: an indigo canvas vest over a cream tee"
+                width="1000"
+                height="1000"
+              />
+              <figcaption>Builder</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <img
+                src="/character/v0.10/poses/concert-present.webp"
+                alt="Thingy in his concert outfit: charcoal denim, a sound-wave tee and over-ear headphones"
+                width="1000"
+                height="1000"
+              />
+              <figcaption>Host</figcaption>
+            </figure>
+          </li>
+          <li>
+            <figure>
+              <img
+                src="/character/v0.10/poses/trail-present.webp"
+                alt="Thingy in his trail outfit: a forest-green shell and an orange daypack"
+                width="1000"
+                height="1000"
+              />
+              <figcaption>Trail companion</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
+      <section class="persona" id="persona" aria-label="The persona">
+        <nav class="persona-contents" aria-label="On this page">
+          <ol>
+            <!-- persona-contents -->
+          </ol>
+          <p>
+            For agents, the same text is
+            <a href="/persona.md">persona.md</a>.
+          </p>
+        </nav>
+        <article class="persona-copy">
+          <!-- persona -->
+        </article>
+      </section>
+    </main>
+    <footer class="frame">
+      <p>
+        A character by
+        <a class="h-card" href="https://www.thingelstad.com/" rel="author"
+          ><span class="p-name">Jamie Thingelstad</span></a
+        >.
+        <a href="https://thingelstad.xyz/things/thingy-model/"
+          >How Thingy was built</a
+        >.
+      </p>
+      <p>
+        <a href="https://thingy.thingelstad.com/"
+          >The librarian lives at .com</a
+        >
+        <span>·</span> The character lives at .xyz
+      </p>
+    </footer>
+  </body>
+</html>
