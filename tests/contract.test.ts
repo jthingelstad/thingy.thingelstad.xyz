@@ -11,6 +11,8 @@ import {
   faceOffset,
   FACE_ATLAS,
   FACES,
+  FACE_CHOICES,
+  stageOf,
   modelVersion,
   OUTFITS,
   POSES,
@@ -76,10 +78,11 @@ test("the component's newest model is the newest published directory", () => {
 });
 test("a version an outfit lacks falls back, and nothing untrusted reaches a path", () => {
   assert.equal(modelVersion("v0.14", "librarian"), "v0.14");
-  assert.equal(modelVersion("v0.14", "trail"), "v0.10");
+  assert.equal(modelVersion("v0.14", "trail"), "v0.14");
+  assert.equal(modelVersion("v0.14", "unknown" as "trail"), "v0.10");
   assert.equal(modelVersion(null, "librarian"), "v0.10");
   assert.equal(modelVersion("latest", "librarian"), "v0.14");
-  assert.equal(modelVersion("latest", "trail"), "v0.10");
+  assert.equal(modelVersion("latest", "trail"), "v0.14");
   for (const input of ["../v0.14", "__proto__", "v9"])
     assert.equal(modelVersion(input, "librarian"), "v0.10");
 });
@@ -99,6 +102,42 @@ test("the faces match the published atlas, and a face picks its own cell", () =>
   assert.equal(face("sheepish"), "sheepish");
   for (const input of [null, "", "__proto__", "blink"])
     assert.equal(face(input), "original");
+});
+test("a person is never offered the screen turned off, and every offered face exists", () => {
+  assert(!Object.hasOwn(FACE_CHOICES, "off"));
+  for (const id of Object.keys(FACE_CHOICES)) assert(Object.hasOwn(FACES, id));
+});
+test("each tool keeps to the poses it was made for", () => {
+  const at = (held: string | null, asked: string | null) =>
+    stageOf("workshop", "v0.14", held, asked);
+  assert.equal(at("hammer", "work").clip, "hammer-work");
+  // A pose the tool has no grip for moves to the tool's first.
+  assert.equal(at("hammer", "hello").clip, "hammer-carry");
+  assert.equal(at("laptop", "work").clip, "present");
+  assert.equal(at("none", "carry").clip, "hello");
+  // An old address keeps its laptop, and asking for empty hands really is empty.
+  assert.deepEqual(at(null, "present").tool, "laptop");
+  assert.deepEqual(at("none", "present").tool, "none");
+  for (const input of ["__proto__", "<script>", "WRENCH"])
+    assert.equal(at(input, "hello").tool, "none");
+});
+test("tools stay where the model has them, and old hosts see what they always did", () => {
+  for (const key of ["librarian", "trail", "concert"] as const) {
+    const now = stageOf(key, "v0.14", "hammer", "work");
+    assert.equal(now.tool, "none");
+    assert.equal(now.clip, "present");
+  }
+  const old = stageOf("workshop", "v0.10", "hammer", "work");
+  assert.equal(old.tool, "none");
+  assert.equal(old.clip, "present");
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.14", "drill"),
+    "/character/v0.14/poses/workshop-drill-work.webp",
+  );
+  assert.equal(
+    posterPath("librarian", "hello", "/character/", "v0.14"),
+    "/character/v0.14/poses/librarian-present.webp",
+  );
 });
 test("an embedded character keeps outfit, pose, beacon and motion independent", () => {
   const state = {

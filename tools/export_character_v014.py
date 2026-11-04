@@ -1,7 +1,8 @@
-"""Export the Librarian web derivative from the v0.14 master, without saving the source.
+"""Export one outfit's web derivative from the v0.14 master, without saving the source.
 
     blender --background <thingy-character>/source/Thingy-wardrobe-v0.14.blend \
-      --python-exit-code 1 --python tools/export_character_v014.py [-- --reference-only | --reuse-bakes]
+      --python-exit-code 1 --python tools/export_character_v014.py \
+      [-- [--outfit librarian|trail|workshop|concert] [--reference-only | --reuse-bakes]]
 
 v0.10's export (tools/export_character.py, Blender 4.5) baked each material on
 to its own decimated copy, which is fine for a plain coat. From v0.13 the jacket's
@@ -14,7 +15,12 @@ the charcoal knuckle it sits against, or a lapel the shirt behind it. Only the
 contact shading sees the whole figure. --reuse-bakes skips the baking and starts
 from the raw channels of the last run, to change the grade without the wait.
 
-Writes raw files to local-only/bakes/v0.14/librarian/; tools/optimize-v014.mjs
+The workshop tools are chosen in the browser, so they cannot join the body. All of
+them share the body's atlas, and each stays its own mesh, Thingy_Tool_<name>. They
+overlap each other and the figure at rest, so a tool bakes with nothing else in the
+scene, and the figure with no tool in it.
+
+Writes raw files to local-only/bakes/v0.14/<outfit>/; tools/optimize-v014.mjs
 makes the delivery GLB from them.
 """
 import ast
@@ -30,7 +36,9 @@ from mathutils import Matrix, Quaternion, Vector  # noqa: F401  (the FK helpers 
 
 ROOT = Path(__file__).resolve().parents[1]
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-KEY = 'librarian'
+OUTFITS = ['librarian', 'trail', 'workshop', 'concert']
+KEY = ARGS[ARGS.index('--outfit') + 1] if '--outfit' in ARGS else 'librarian'
+INDEX = OUTFITS.index(KEY)
 RAW = ROOT / 'local-only/bakes/v0.14' / KEY
 RAW.mkdir(parents=True, exist_ok=True)
 ATLAS_SIZE = 2048
@@ -40,25 +48,57 @@ DEFAULT_FACE_SLOT = 0  # original, the face in reference/thingy-original.png
 AO_DISTANCE, AO_STRENGTH = 0.28, 0.75
 SAMPLES = {'color': 16, 'metallic': 4, 'roughness': 4, 'normal': 16, 'ao': 96}
 # Families that must not see each other in the bake, by the part's first material.
+DARK = ('Reference · worn charcoal limbs', 'Soft charcoal joint material', 'Graphite inner body')
+IVORY = ('v04 · warm ivory hand shells', 'Reference · warm ivory foot shells', 'Painted warm ivory',
+         'v04 · warm ivory painted housing')
+TANGERINE = ('v04 · tangerine enamel', 'v06 · bow tie printed cotton image', 'v06 · switchable antenna lens')
+# The order is the atlas's group numbering: --reuse-bakes reads it back from raw-groups.
 FAMILIES = {
-    'navy': ('v13 · brushed navy felt', 'v13 · sunken navy seam', 'v13 · navy topstitch thread'),
-    'dark': ('Reference · worn charcoal limbs', 'Soft charcoal joint material', 'Graphite inner body'),
-    'ivory': ('v04 · warm ivory hand shells', 'Reference · warm ivory foot shells', 'Painted warm ivory',
-              'v04 · warm ivory painted housing'),
-    'badge': (),
-    'shirt': ('v04 · warm linen shirt',),
-    'paper': ('v04 · paper wrapped pocket tools',),
-    'brass': ('v04 · brushed brass buttons',),
-    'tangerine': ('v04 · tangerine enamel', 'v06 · bow tie printed cotton image', 'v06 · switchable antenna lens'),
-}
+    'librarian': {
+        'navy': ('v13 · brushed navy felt', 'v13 · sunken navy seam', 'v13 · navy topstitch thread'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'shirt': ('v04 · warm linen shirt',),
+        'paper': ('v04 · paper wrapped pocket tools',),
+        'brass': ('v04 · brushed brass buttons',),
+        'tangerine': TANGERINE,
+    },
+    'trail': {
+        'shell': ('v07 · forest technical twill', 'v07 · forest reinforced panels'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'webbing': ('v07 · dark woven webbing',),
+        'ripstop': ('v07 · ochre orange ripstop',),
+        'map': ('v07 · map packed artwork',),
+        'tangerine': TANGERINE,
+    },
+    'workshop': {
+        'canvas': ('v13 · worn indigo canvas', 'v13 · tan workwear topstitch thread'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'jersey': ('v07 · cream cotton jersey',),
+        'tangerine': TANGERINE,
+        'tool_screwdriver': (), 'tool_hammer': (), 'tool_drill': (), 'tool_laptop': (),
+    },
+    'concert': {
+        'denim': ('v07 · charcoal denim', 'v07 · quiet gray denim thread'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'tee': ('v07 · burnt orange cotton jersey',),
+        'wristband': ('v07 · ochre orange ripstop',),
+        'program': ('v07 · program packed artwork',),
+        'phones': ('v09 · graphite headphone headband', 'v09 · satin graphite headphone shells',
+                   'v09 · headphone hinge metal', 'v09 · orange headphone inlay'),
+        'cushions': ('v09 · soft charcoal headphone cushions',),
+        'tangerine': TANGERINE,
+    },
+}[KEY]
 GROUPS = list(FAMILIES)
 # A delivery grade in linear light, per family, toward reference/thingy-original.png.
 # The master's felt gets its dusty lift from a viewing-angle term a bake cannot keep.
 GRADE = {'navy': (1.8, 1.8, 1.85), 'ivory': (.95, 1.05, 1.25), 'badge': (1, .93, .62)}
+PRESENT = ['Thingy v06 · Original', 'Thingy v07 · Trail lookout',
+           'Thingy v07 · Workshop present', 'Thingy v07 · Concert listen'][INDEX]
 
 scene = bpy.context.scene
 rig = bpy.data.objects['Thingy_Body_Rig']
-rig['outfit'] = 0
+rig['outfit'] = INDEX
 rig['antenna_on'] = False
 rig['tool'] = 0
 rig['face'] = DEFAULT_FACE_SLOT
@@ -90,7 +130,9 @@ def use_action(action):
 
 if '--reference-only' in ARGS:
     # The same camera as the web component: what the browser is compared with.
-    use_action(bpy.data.actions['Thingy v06 · Original'])
+    use_action(bpy.data.actions[PRESENT])
+    rig['tool'] = 4 if KEY == 'workshop' else 0  # the laptop goes with this one's present
+    rig.update_tag()
     scene.frame_set(1)
     bpy.context.view_layer.update()
     cam = scene.camera
@@ -152,14 +194,48 @@ for frame in range(1, 98, 12):
         for path in ['rotation_quaternion', 'location', 'scale']:
             bone.keyframe_insert(path, frame=frame, group=bone.name)
 source_actions = {
-    'hello': 'Thingy v06 · Hello', 'present': 'Thingy v06 · Original',
+    'hello': 'Thingy v06 · Hello', 'present': PRESENT,
     'thinking': thinking.name, 'rest': 'Thingy v06 · Neutral',
 }
 
 # The master at rest is the bake source.
-visible = [o for o in bpy.data.objects if o.type == 'MESH' and not o.hide_render
-           and any(c.name.startswith('Thingy ·') and 'optional' not in c.name
-                   and 'source reference' not in c.name for c in o.users_collection)]
+def showing():
+    return [o for o in bpy.data.objects if o.type == 'MESH' and not o.hide_render
+            and any(c.name.startswith('Thingy ·') and 'optional' not in c.name
+                    and 'source reference' not in c.name for c in o.users_collection)]
+
+
+visible = showing()
+# The rig's tool switch says which parts belong to which tool, and each tool's own
+# poses become clips named <tool>-<pose>. The laptop's one pose is `present`.
+TOOL_OF = {}
+if KEY == 'workshop':
+    tool_names = [t.strip() for t in rig['tools'].split(',')]
+    tool_poses = json.loads(rig['tool_poses'])
+    figure = {o.name for o in visible}
+    for number, tool in enumerate(tool_names):
+        if tool == 'none':
+            continue
+        rig['tool'] = number
+        rig.update_tag()
+        bpy.context.view_layer.update()
+        parts = [o for o in showing() if o.name not in figure]
+        assert parts, tool
+        TOOL_OF.update({o.name: tool for o in parts})
+        visible += parts
+        for action in tool_poses[tool]:
+            if tool != 'laptop':
+                source_actions[f"{tool}-{action.rsplit(' ', 1)[1]}"] = action
+    rig['tool'] = 0
+    rig.update_tag()
+    bpy.context.view_layer.update()
+    # Each bake chooses what is in the scene, so the switches must let go.
+    for ob in visible:
+        ob.driver_remove('hide_render')
+        ob.driver_remove('hide_viewport')
+        ob.hide_render = False
+        ob.hide_viewport = False
+    print('WEB_TOOL_PARTS', json.dumps(TOOL_OF, ensure_ascii=False), flush=True)
 use_action(bpy.data.actions['Thingy v06 · Neutral'])
 scene.frame_set(1)
 rig.data.pose_position = 'REST'
@@ -168,14 +244,19 @@ bpy.context.view_layer.update()
 # Sealed inside the sleeves and jacket in every pose: they cost atlas and
 # vertices and stay in the scene only to shade what is around them.
 HIDDEN = ('Core · rounded thorax', 'Core · chest plate', 'Core · abdomen bearing',
-          'Shoulder ·', 'Upper arm ·', 'Elbow ·', 'Forearm ·', 'Ankle · L internal', 'Ankle · R internal')
+          'Ankle · L internal', 'Ankle · R internal')
+# Only the librarian's long sleeves seal the arms in every pose.
+if KEY == 'librarian':
+    HIDDEN += ('Shoulder ·', 'Upper arm ·', 'Elbow ·', 'Forearm ·')
 # Thin strips riding on the cloth. They reach the browser through the bake.
 BAKED_ONLY = ('topstitch', ' seam')
 
 
 def family(ob):
     # The name plate shares the head's paint but carries its own printed face.
-    if ob.name == 'Badge · v04 warm ivory plate':
+    if ob.name in TOOL_OF:
+        return 'tool_' + TOOL_OF[ob.name]
+    if ob.name == 'Badge · v04 warm ivory plate' or 'printed name badge plate' in ob.name:
         return 'badge'
     first = next(m.name for m in ob.data.materials if m)
     return next(name for name, members in FAMILIES.items() if first in members)
@@ -185,6 +266,11 @@ def atlas_share(name):
     """Relative texel density: the coat is most of the picture, and plenty is out of sight."""
     for needle, share in [
         ('continuous open-front coat', 1.7), ('continuous wool', 1.7), ('notched lapel', 1.7), ('rolled collar', 1.7),
+        ('open indigo canvas vest', 1.7), ('technical shell', 1.7), ('open charcoal denim jacket', 1.7),
+        ('printed cotton tee', 1.7), ('sound tee', 1.7), ('name badge plate', 1.6), ('articulated sleeve', 1.5),
+        ('fitted shell pocket', 1.5), ('canvas pocket', 1.5), ('breast pocket', 1.5), ('daypack', 1.3),
+        ('folded route map', 1.6), ('folded show program', 1.6), ('keyboard image', 1.6), ('screen artwork', 1.6),
+        ('Tool ·', 1.4), ('laptop', 1.2), ('Headphones ·', 1.2),
         ('Pocket ·', 1.7), ('centre overlap', 1.7), ('warm ivory plate', 1.6), ('shaped orange wing', 1.5),
         ('central knot', 1.5), ('Ear ·', 1.4), ('dark underlay', .25), ('pelvis', .35), ('concealed', .35),
         ('cuff lining', .4), ('flat black sole', .4), ('Neck ·', .5), ('fitted beneath jacket', .6), ('Knee ·', .6),
@@ -199,6 +285,14 @@ def web_vertices(name, count):
     """A delivery budget per part: most of it where the silhouette and folds are."""
     for needle, target in [
         ('continuous open-front coat', 14000), ('continuous wool', 8000), ('rolled notched lapel', 3000),
+        ('open indigo canvas vest', 12000), ('articulated sleeve', 3200), ('printed cotton tee', 3200),
+        ('sound tee', 3200), ('technical shell', 5000), ('open charcoal denim jacket', 5000),
+        ('trouser waist', 1600), ('shorts waist', 1600), ('denim waist', 1600), ('rolled cotton cuff', 500),
+        ('fitted cuff', 500), ('wristband', 400), ('canvas pocket', 700), ('fitted shell pocket', 700),
+        ('breast pocket', 700), ('daypack', 1000), ('pack outer pocket', 700), ('zipper', 300),
+        ('name badge', 520), ('tapered ear cup', 2600), ('over-ear cushion', 2200), ('full headband', 1800),
+        ('headband underside', 1200), ('hinge carrier', 500), ('orange adjuster', 500), ('hinge pin', 200),
+        ('Tool ·', 900), ('laptop', 900),
         ('CRT housing', 7000), ('Ear ·', 5000), ('shaped orange wing', 1400), ('central knot', 350),
         ('fitted beneath jacket', 1600), ('recessed charcoal screen', 1100), ('dark underlay', 1200),
         ('toe cap', 1600), ('heel quarter', 1000), ('flat black sole', 350), ('grip band', 50),
@@ -211,6 +305,7 @@ def web_vertices(name, count):
     return 320
 
 
+TOOLS = sorted(set(TOOL_OF.values()))
 source_vertices = sum(len(o.data.vertices) for o in visible)
 low_objects, screen = [], None
 for source in visible:
@@ -249,6 +344,8 @@ for source in visible:
     if source.name != SCREEN:
         low.data.attributes.new('web_group', 'INT', 'FACE').data.foreach_set(
             'value', [GROUPS.index(family(source))] * len(low.data.polygons))
+        low.data.attributes.new('web_tool', 'INT', 'FACE').data.foreach_set(
+            'value', [TOOLS.index(TOOL_OF[source.name]) + 1 if source.name in TOOL_OF else 0] * len(low.data.polygons))
         low.data.attributes.new('web_share', 'FLOAT', 'FACE').data.foreach_set(
             'value', [atlas_share(source.name)] * len(low.data.polygons))
     matrix = low.matrix_world.copy()
@@ -258,7 +355,7 @@ for source in visible:
         screen = low
     else:
         low_objects.append(low)
-assert screen is not None and len(low_objects) > 80
+assert screen is not None and len(low_objects) > 50
 
 bpy.ops.object.select_all(action='DESELECT')
 for ob in low_objects:
@@ -311,6 +408,8 @@ body.data.materials.clear()
 body.data.materials.append(target_material)
 sources = [o for o in visible if o.name != SCREEN and not any(o.name.startswith(p) for p in HIDDEN)]
 materials = list({m for o in sources for m in o.data.materials if m})
+for mat in materials:
+    assert any(n.type == 'BSDF_PRINCIPLED' for n in mat.node_tree.nodes), mat.name
 scene.world.light_settings.distance = AO_DISTANCE
 face_groups = np.zeros(len(body.data.polygons), np.int32)
 body.data.attributes['web_group'].data.foreach_get('value', face_groups)
@@ -396,6 +495,13 @@ def bake_all():
         assert low.data.polygons, group
         lows[group] = low
     members = {group: [o for o in sources if family(o) == group] for group in GROUPS}
+
+    def stage(group):
+        """A tool alone with itself; the figure with no tool in its hand."""
+        for ob in visible if TOOL_OF else ():
+            tool = TOOL_OF.get(ob.name)
+            ob.hide_render = ('tool_' + str(tool) != group) if group.startswith('tool_') else tool is not None
+
     print('WEB_FAMILIES', {group: len(parts) for group, parts in members.items()}, flush=True)
     body.hide_render = screen.hide_render = True
     claimed = np.zeros((ATLAS_SIZE, ATLAS_SIZE), np.int32)
@@ -408,6 +514,7 @@ def bake_all():
             # write over a neighbouring family's islands. The finished atlas grows one.
             # A bake takes one ray a texel, so a hard colour edge stairsteps. Colour
             # bakes at twice the size and comes down, for the ears and the bow tie.
+            stage(group)
             size = ATLAS_SIZE * 2 if channel == 'color' else ATLAS_SIZE
             image = bpy.data.images.new(f'{KEY}_{channel}_{group}', width=size, height=size, alpha=True)
             image.colorspace_settings.name = 'sRGB' if channel == 'color' else 'Non-Color'
@@ -492,7 +599,8 @@ color = read_png('raw-color')
 linear = linear_from_srgb(color[..., :3])
 linear *= (1 - AO_STRENGTH + AO_STRENGTH * read_png('raw-ao')[..., 0:1])
 for group, factors in GRADE.items():
-    linear[claimed == GROUPS.index(group) + 1] *= np.array(factors, np.float32)
+    if group in GROUPS:
+        linear[claimed == GROUPS.index(group) + 1] *= np.array(factors, np.float32)
 color[..., :3] = srgb_from_linear(np.minimum(linear, 1))
 images = {'color': write_png('color', grow_margin(color, reached), 'sRGB'),
           'normal': write_png('normal', grow_margin(read_png('raw-normal'), reached))}
@@ -610,7 +718,34 @@ if slivers:
     mesh.to_mesh(body.data)
     mesh.free()
 
-# The performances, then only the rig and the two delivery meshes.
+# Each tool leaves the body with its share of the atlas, to be shown on its own.
+tool_meshes = []
+
+
+def keep_faces(ob, number):
+    values = np.zeros(len(ob.data.polygons), np.int32)
+    ob.data.attributes['web_tool'].data.foreach_get('value', values)
+    mesh = bmesh.new()
+    mesh.from_mesh(ob.data)
+    mesh.faces.ensure_lookup_table()
+    bmesh.ops.delete(mesh, geom=[f for f, v in zip(mesh.faces, values) if v != number], context='FACES')
+    mesh.to_mesh(ob.data)
+    mesh.free()
+    ob.data.attributes.remove(ob.data.attributes['web_tool'])
+    assert ob.data.polygons, ob.name
+
+
+for number, tool in enumerate(TOOLS, 1):
+    part = body.copy()
+    part.data = body.data.copy()
+    part.name = 'Thingy_Tool_' + tool
+    part.data.name = part.name + '_geometry'
+    scene.collection.objects.link(part)
+    keep_faces(part, number)
+    tool_meshes.append(part)
+keep_faces(body, 0)
+
+# The performances, then only the rig and the delivery meshes.
 for ob in sources:
     ob.hide_render = True
     ob.hide_set(True)
@@ -638,7 +773,7 @@ rig.data.pose_position = 'POSE'
 scene.frame_set(1)
 bpy.context.view_layer.update()
 bpy.ops.object.select_all(action='DESELECT')
-for ob in (rig, body, screen):
+for ob in (rig, body, screen, *tool_meshes):
     ob.hide_set(False)
     ob.select_set(True)
 bpy.context.view_layer.objects.active = rig
@@ -651,8 +786,9 @@ params = dict(filepath=str(RAW / (KEY + '.glb')), export_format='GLB', use_selec
 valid = bpy.ops.export_scene.gltf.get_rna_type().properties.keys()
 bpy.ops.export_scene.gltf(**{key: value for key, value in params.items() if key in valid})
 report = {'source_version': '0.14', 'outfit': KEY, 'source_vertices': source_vertices,
-          'web_vertices': len(body.data.vertices) + len(screen.data.vertices),
-          'polygons': len(body.data.polygons) + len(screen.data.polygons),
+          'web_vertices': sum(len(o.data.vertices) for o in (body, screen, *tool_meshes)),
+          'polygons': sum(len(o.data.polygons) for o in (body, screen, *tool_meshes)),
+          'tools': {o.name: len(o.data.vertices) for o in tool_meshes},
           'bones': len(rig.data.bones), 'clips': list(actions), 'atlas_size': ATLAS_SIZE,
           'source_master_saved': False}
 (RAW / 'report.json').write_text(json.dumps(report, indent=2))

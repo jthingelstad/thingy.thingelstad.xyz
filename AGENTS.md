@@ -22,7 +22,10 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
   so `thingy.js` and those files are live for another site. A new version must
   publish every still that site names (`stills` in the manifest) or its pages lose
   a picture. The front page uses `hello` because the `present` hand, turned to his
-  side, reads as a rude gesture. Check any page that lets people rotate him from every angle.
+  side, reads as a rude gesture. Check any page that lets people rotate him from
+  every angle. Never remake `v0.14/librarian.glb` by accident: the other three
+  outfits were exported later, by the same script. The viewer never offers the
+  `off` face (the persona says it is never shown to a reader).
 - Keep Blender masters, raw bakes, logs, caches, secrets, and machine paths out of
   public assets. Never read `.env*`. Inspect export metadata before publication.
 - Respect reduced motion, provide still-image fallback, and dispose WebGL resources.

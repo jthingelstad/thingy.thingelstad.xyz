@@ -7,10 +7,22 @@
   "animationFps": 24,
   "defaultPose": "present",
   "poses": {
-    "hello": { "label": "Hello", "stillFrame": 49 },
-    "present": { "label": "Present", "stillFrame": 1 },
-    "thinking": { "label": "Thinking", "stillFrame": 37 },
-    "rest": { "label": "At rest", "stillFrame": 1 }
+    "hello": {
+      "label": "Hello",
+      "stillFrame": 49
+    },
+    "present": {
+      "label": "Present",
+      "stillFrame": 1
+    },
+    "thinking": {
+      "label": "Thinking",
+      "stillFrame": 37
+    },
+    "rest": {
+      "label": "At rest",
+      "stillFrame": 1
+    }
   },
   "outfits": {
     "librarian": {
@@ -18,34 +30,217 @@
       "model": "librarian.glb",
       "poster": "poses/librarian-present.webp",
       "stills": {
-        "hello": { "webp": "poses/librarian-hello.webp" },
-        "present": { "webp": "poses/librarian-present.webp" },
-        "thinking": { "webp": "poses/librarian-thinking.webp" },
-        "rest": { "webp": "poses/librarian-rest.webp" },
-        "hello-idle": { "webp": "poses/librarian-hello-idle.webp" },
-        "present-idle": { "webp": "poses/librarian-present-idle.webp" },
-        "present-proud": { "webp": "poses/librarian-present-proud.webp" },
-        "rest-delighted": { "webp": "poses/librarian-rest-delighted.webp" },
-        "rest-idle": { "webp": "poses/librarian-rest-idle.webp" },
-        "thinking-curious": { "webp": "poses/librarian-thinking-curious.webp" }
+        "hello": {
+          "webp": "poses/librarian-hello.webp"
+        },
+        "present": {
+          "webp": "poses/librarian-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/librarian-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/librarian-rest.webp"
+        },
+        "hello-idle": {
+          "webp": "poses/librarian-hello-idle.webp"
+        },
+        "present-idle": {
+          "webp": "poses/librarian-present-idle.webp"
+        },
+        "present-proud": {
+          "webp": "poses/librarian-present-proud.webp"
+        },
+        "rest-delighted": {
+          "webp": "poses/librarian-rest-delighted.webp"
+        },
+        "rest-idle": {
+          "webp": "poses/librarian-rest-idle.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/librarian-thinking-curious.webp"
+        }
       }
+    },
+    "trail": {
+      "label": "Trail companion",
+      "model": "trail.glb",
+      "poster": "poses/trail-present.webp"
+    },
+    "workshop": {
+      "label": "Workshop Builder",
+      "model": "workshop.glb",
+      "poster": "poses/workshop-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/workshop-hello.webp"
+        },
+        "present": {
+          "webp": "poses/workshop-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/workshop-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/workshop-rest.webp"
+        },
+        "screwdriver-carry": {
+          "webp": "poses/workshop-screwdriver-carry.webp"
+        },
+        "screwdriver-show": {
+          "webp": "poses/workshop-screwdriver-show.webp"
+        },
+        "screwdriver-work": {
+          "webp": "poses/workshop-screwdriver-work.webp"
+        },
+        "hammer-carry": {
+          "webp": "poses/workshop-hammer-carry.webp"
+        },
+        "hammer-show": {
+          "webp": "poses/workshop-hammer-show.webp"
+        },
+        "hammer-work": {
+          "webp": "poses/workshop-hammer-work.webp"
+        },
+        "drill-carry": {
+          "webp": "poses/workshop-drill-carry.webp"
+        },
+        "drill-show": {
+          "webp": "poses/workshop-drill-show.webp"
+        },
+        "drill-work": {
+          "webp": "poses/workshop-drill-work.webp"
+        }
+      },
+      "toolClips": [
+        "screwdriver-carry",
+        "screwdriver-show",
+        "screwdriver-work",
+        "hammer-carry",
+        "hammer-show",
+        "hammer-work",
+        "drill-carry",
+        "drill-show",
+        "drill-work"
+      ]
+    },
+    "concert": {
+      "label": "Concert companion",
+      "model": "concert.glb",
+      "poster": "poses/concert-present.webp"
     }
   },
-  "faceAtlas": { "material": "Thingy_Face", "map": "emissive", "columns": 4, "rows": 5 },
-  "faces": {
-    "original": { "cell": 0, "blink": 5 },
-    "idle": { "cell": 1, "blink": 6 },
-    "thinking": { "cell": 2 },
-    "found-it": { "cell": 3 },
-    "oops": { "cell": 4 },
-    "off": { "cell": 7 },
-    "delighted": { "cell": 8 },
-    "curious": { "cell": 9, "blink": 14 },
-    "proud": { "cell": 10 },
-    "eager": { "cell": 11, "blink": 15 },
-    "sympathetic": { "cell": 12, "blink": 16 },
-    "sheepish": { "cell": 13 }
+  "faceAtlas": {
+    "material": "Thingy_Face",
+    "map": "emissive",
+    "columns": 4,
+    "rows": 5
   },
-  "runtimeMaterials": { "beacon": "Thingy_Beacon", "face": "Thingy_Face" },
-  "notes": "A web derivative of the v0.14 character: the cloth pass is baked on to a lighter body, and the screen shows one cell of the face atlas. Only the Librarian so far. This is not a printable model."
+  "faces": {
+    "original": {
+      "cell": 0,
+      "blink": 5
+    },
+    "idle": {
+      "cell": 1,
+      "blink": 6
+    },
+    "thinking": {
+      "cell": 2
+    },
+    "found-it": {
+      "cell": 3
+    },
+    "oops": {
+      "cell": 4
+    },
+    "off": {
+      "cell": 7
+    },
+    "delighted": {
+      "cell": 8
+    },
+    "curious": {
+      "cell": 9,
+      "blink": 14
+    },
+    "proud": {
+      "cell": 10
+    },
+    "eager": {
+      "cell": 11,
+      "blink": 15
+    },
+    "sympathetic": {
+      "cell": 12,
+      "blink": 16
+    },
+    "sheepish": {
+      "cell": 13
+    }
+  },
+  "runtimeMaterials": {
+    "beacon": "Thingy_Beacon",
+    "face": "Thingy_Face"
+  },
+  "notes": "A web derivative of the v0.14 character: the cloth pass is baked on to a lighter body, the screen shows one cell of the face atlas, and the Workshop Builder's tools are separate meshes, one shown at a time. faces.webp is the same atlas, small, for a page that offers the faces. This is not a printable model.",
+  "toolPoses": {
+    "carry": {
+      "label": "Carry",
+      "stillFrame": 1
+    },
+    "show": {
+      "label": "Show",
+      "stillFrame": 1
+    },
+    "work": {
+      "label": "Work",
+      "stillFrame": 1
+    }
+  },
+  "tools": {
+    "none": {
+      "label": "Empty hands",
+      "poses": [
+        "hello",
+        "thinking",
+        "rest"
+      ]
+    },
+    "screwdriver": {
+      "label": "Screwdriver",
+      "node": "Thingy_Tool_screwdriver",
+      "poses": [
+        "carry",
+        "show",
+        "work"
+      ]
+    },
+    "hammer": {
+      "label": "Hammer",
+      "node": "Thingy_Tool_hammer",
+      "poses": [
+        "carry",
+        "show",
+        "work"
+      ]
+    },
+    "drill": {
+      "label": "Drill",
+      "node": "Thingy_Tool_drill",
+      "poses": [
+        "carry",
+        "show",
+        "work"
+      ]
+    },
+    "laptop": {
+      "label": "Laptop",
+      "node": "Thingy_Tool_laptop",
+      "poses": [
+        "present"
+      ]
+    }
+  },
+  "faceSheet": "faces.webp"
 }

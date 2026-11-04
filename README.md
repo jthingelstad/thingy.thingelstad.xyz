@@ -92,13 +92,20 @@ The default is the `character/` directory beside `thingy.js`.
 More optional attributes, for a page that wants him as its centrepiece:
 
 - `version="latest"` always takes the newest model of that outfit, and is what to
-  use unless a page needs one model forever. `version="v0.14"` pins one; an outfit
-  that version lacks stays on v0.10. So far v0.14 has only the Librarian, with the
-  v0.13 cloth pass. With no `version` it stays v0.10, for the pages that embed him already.
+  use unless a page needs one model forever. `version="v0.14"` pins the newer model,
+  in all four outfits, with the v0.13 cloth pass. This site's own viewer uses it; with
+  no `version` it stays v0.10, so a page already using the component does not change.
 - `face` shows a screen face on a model that has them (v0.14 on): `original`,
   `idle`, `thinking`, `found-it`, `oops`, `delighted`, `curious`, `proud`, `eager`,
   `sympathetic`, `sheepish`. `blink="on"` blinks the faces that can, never under
   reduced motion.
+  `off` also exists, but it is never shown to a reader, so the viewer leaves it out.
+- `tool` puts something in the v0.14 Workshop Builder's hand: `none`, `screwdriver`,
+  `hammer`, `drill` or `laptop`. Each tool has its own poses, and asking for another
+  moves to the tool's first: `carry`, `show` and `work` for the three hand tools,
+  `present` for the laptop, and `hello`, `thinking` and `rest` for empty hands. With
+  no `tool`, `pose="present"` is the laptop, as it is on v0.10. Tool poses are single
+  frames, so `motion` has nothing to play; the element's `moves` property says so.
 - `zoom="off"` leaves the mouse wheel to the page and drops the zoom keys.
 - `poster` replaces the pose image shown until the model is ready, and
   `view-label` replaces the canvas's accessible name.
@@ -130,36 +137,43 @@ gets a new directory instead of replacing these addresses.
 
 **The newest model has one address that never changes:**
 `https://thingy.thingelstad.xyz/character/latest/` is a copy of the newest version's
-directory, made at build time: `latest/librarian.glb`, `latest/manifest.json` and
-`latest/poses/librarian-<pose>.webp`. It is cached for five minutes, not a day, and
-holds what the newest version holds, so today only the Librarian. Use it to follow
-the model; use a numbered directory to keep one picture for good.
+directory, made at build time: `latest/<outfit>.glb`, `latest/manifest.json` and
+`latest/poses/<outfit>-<pose>.webp`. It is cached for five minutes, not a day, and
+holds what the newest version holds. Use it to follow the model; use a numbered
+directory to keep one picture for good.
 
 `public/character/v0.14/manifest.json` is the same contract for the newer model,
-with its faces added. Its `stills` list every published picture: the four poses, and
-pose-face pairs such as `librarian-rest-delighted.webp`. The screen is a separate skinned node, `Thingy_Screen`, lit
-by one cell of an atlas: material `Thingy_Face`, emissive map, 4 columns by 5 rows.
+with its faces and tools added. The screen is a separate skinned node,
+`Thingy_Screen`, lit by one cell of an atlas: material `Thingy_Face`, emissive map,
+4 columns by 5 rows. `faces.webp` is that atlas, small, for a page offering the
+faces. In `workshop.glb` each tool is its own skinned node, `Thingy_Tool_<name>`,
+with clips named `<tool>-<pose>`; show one node at a time. The Librarian's `stills`
+add the pose-face pairs Ask Thingy's pages show, such as
+`librarian-rest-delighted.webp`.
 
-## Rebuild the v0.14 Librarian
+## Rebuild the v0.14 models
 
 Blender 5.2 LTS, from the character-art repository's master:
 
 ```sh
 blender --background \
   ../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.14.blend \
-  --python-exit-code 1 --python tools/export_character_v014.py
-node tools/optimize-v014.mjs
+  --python-exit-code 1 --python tools/export_character_v014.py -- --outfit workshop
+node tools/optimize-v014.mjs workshop
 ```
 
 It never saves the master. It bakes the full master on to a lighter body, so the
 cloth reaches the browser as colour and normal maps, and takes the faces from the
-master's atlas. Add `-- --reuse-bakes` after the script to change the grade, materials
-or actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
-repeats, so the saved maps still fit. The stills in `poses/` are captures of this
-model in the component from its default camera, so each matches its first frame;
-`node tools/capture-poster-v014.mjs` makes any that are missing from a running
-preview. Ask Thingy's pages load them from `character/latest/`, so they follow the
-model on their own.
+master's atlas. Add `--reuse-bakes` after `--outfit` to change the grade, materials or
+actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
+repeats, so the saved maps still fit. `--reference-only` renders the master from the
+component's camera, to compare a grade against. The stills in `poses/` are captures
+of each model in the component from its default camera, so each matches its first
+frame; `node tools/capture-poster-v014.mjs [outfit ...]` makes them from a running
+preview. Ask Thingy's pages load the Librarian's from `character/latest/`, so they
+follow the model on their own. With no `--outfit` the export makes the Librarian,
+which Ask Thingy loads live: the same bakes rebuild the published file byte for
+byte, so check that it still does.
 
 ## Rebuild the derivatives
 

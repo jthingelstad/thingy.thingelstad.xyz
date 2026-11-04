@@ -1,35 +1,36 @@
 // The v0.14 stills: the model itself in the component, from its default camera, so
-// a still and the first frame are the same picture. `present` is the published
-// poster; `hello` stands in on Ask Thingy's front page; the pose-face pairs are the
-// other pages there. An existing file is kept, so a published still never changes
-// by accident; delete it to make it again. Needs a running preview
-// (npm run preview -- --port 4399).
-import { existsSync } from "node:fs";
+// a still and the first frame are the same picture. Name the outfits to capture, or
+// none for all but the published Librarian's, whose `stills` are Ask Thingy's pages:
+// a pose, or a pose and a face. Needs a running preview (npm run preview -- --port 4399).
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const base = process.env.THINGY_PREVIEW || "http://127.0.0.1:4399";
+const manifest = JSON.parse(
+  readFileSync(`${root}public/character/v0.14/manifest.json`, "utf8"),
+);
+const names = process.argv.slice(2);
+const wanted = names.length ? names : ["trail", "workshop", "concert"];
+const shots = wanted.flatMap((outfit) => {
+  if (outfit === "librarian")
+    return Object.keys(manifest.outfits.librarian.stills).map((clip) => {
+      const [pose, face] = clip.split("-");
+      return { outfit, clip, pose, face };
+    });
+  if (outfit !== "workshop")
+    return [{ outfit, clip: "present", pose: "present" }];
+  return Object.keys(manifest.outfits.workshop.stills).map((clip) => {
+    const [tool, pose] = clip.includes("-") ? clip.split("-") : [null, clip];
+    return { outfit, clip, pose, tool };
+  });
+});
 const browser = await chromium.launch({
   args: ["--use-angle=metal", "--enable-gpu"],
 });
-const stills = [
-  ["present", "original"],
-  ["hello", "original"],
-  ["thinking", "original"],
-  ["rest", "original"],
-  ["hello", "idle"],
-  ["present", "idle"],
-  ["present", "proud"],
-  ["rest", "delighted"],
-  ["rest", "idle"],
-  ["thinking", "curious"],
-];
-for (const [pose, face] of stills) {
-  const name = face === "original" ? pose : `${pose}-${face}`;
-  const file = `${root}public/character/v0.14/poses/librarian-${name}.webp`;
-  if (existsSync(file)) continue;
+for (const { outfit, clip, pose, tool, face = "original" } of shots) {
   const page = await browser.newPage({
     viewport: { width: 500, height: 500 },
     deviceScaleFactor: 2,
@@ -38,7 +39,7 @@ for (const [pose, face] of stills) {
     route.fulfill({
       contentType: "text/html",
       body: `<!doctype html><html><body style="margin:0;background:transparent">
-        <thingy-character outfit="librarian" version="v0.14" pose="${pose}" face="${face}" zoom="off" style="width:500px;height:500px"></thingy-character>
+        <thingy-character outfit="${outfit}" version="v0.14" pose="${pose}" ${tool ? `tool="${tool}"` : ""} face="${face}" zoom="off" style="width:500px;height:500px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );
@@ -52,6 +53,6 @@ for (const [pose, face] of stills) {
   // sharp writes no metadata unless asked.
   await sharp(png)
     .webp({ quality: 88, alphaQuality: 90, effort: 6 })
-    .toFile(file);
+    .toFile(`${root}public/character/v0.14/poses/${outfit}-${clip}.webp`);
 }
 await browser.close();

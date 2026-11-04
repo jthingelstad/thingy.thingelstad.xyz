@@ -6,6 +6,18 @@ const paths: Record<string, string> = {
   thinking:
     '<path d="M5 16c-5-4-1-11 4-10 3-5 11-2 10 3 5 4 0 9-4 8H9l-3 3Z"/>',
   rest: '<path d="M3 17a9 9 0 0 1 18 0M8 15h.01M16 15h.01"/>',
+  none: '<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-7a1.5 1.5 0 0 1 3 0v7m0-5.5a1.5 1.5 0 0 1 3 0V12m0-3a1.5 1.5 0 0 1 3 0v6c0 3.9-3 7-7 7-3.2 0-5-1.3-6.6-4L4 15c-.8-1.5 1.2-2.7 2.3-1.4L8 15.5"/>',
+  screwdriver:
+    '<path d="m3 21 1-3.5 7-7 3.5 3.5-7 7Z"/><path d="M12.75 12 20 4.75M18 3l3 3"/>',
+  hammer:
+    '<path d="m13.5 8.5-9.800 9.800a1.700 1.700 0 0 0 2.400 2.400l9.800-9.800"/><path d="m11 6 3-3h3.5L22 7.5V11l-2 2Z"/>',
+  drill:
+    '<path d="M3 5h12v8H3Z"/><path d="M15 7h3l4 2-4 2h-3M6 13l-1 8h5l2-8"/>',
+  laptop:
+    '<rect x="5" y="4" width="14" height="11" rx="1.5"/><path d="M2 20h20l-3-5H5Z"/>',
+  carry: '<path d="M12 3v14M6 11l6 6 6-6M5 21h14"/>',
+  show: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  work: '<path d="m13 3-8 11h6l-1 7 9-12h-6Z"/>',
   play: '<path d="m8 5 11 7-11 7Z"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
   reset: '<path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/>',
