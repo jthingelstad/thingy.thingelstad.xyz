@@ -1,5 +1,13 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { createServer } from "node:http";
+
+/** On a phone one group of controls is open at a time: open the one a step needs. */
+async function open(page: Page, tab: string): Promise<void> {
+  const button = page.locator(`[data-sheet-tab="${tab}"]`);
+  if (!(await button.isVisible())) return;
+  if ((await button.getAttribute("aria-expanded")) !== "true")
+    await button.click();
+}
 
 test("outfits, poses, playback, light and keyboard camera work on a real WebGL character", async ({
   page,
@@ -26,6 +34,7 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
     path: `/tmp/thingy-home-${info.project.name}.png`,
     fullPage: true,
   });
+  await open(page, "outfit");
   for (const name of [
     "Trail companion",
     "Workshop Builder",
@@ -41,11 +50,20 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
     .getByRole("radio", { name: "Workshop Builder", exact: true })
     .check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  // Present is the laptop's, and it comes with that one pose.
+  await expect(character).toHaveAttribute("tool", "laptop");
+  await expect(page.locator('[data-pose="thinking"]')).toHaveCount(0);
+  await open(page, "tool");
+  await page.locator('[data-tool="none"]').click();
+  await open(page, "pose");
   await page.locator('[data-pose="thinking"]').click();
   await expect(character).toHaveAttribute("pose", "thinking");
+  await open(page, "more");
   await page.locator("#light").check();
   await expect(character).toHaveAttribute("light", "on");
+  await open(page, "pose");
   await page.locator('[data-pose="hello"]').click();
+  await open(page, "more");
   await page.locator("#play").click();
   await expect(character).toHaveAttribute("motion", "on");
   await page.waitForTimeout(350);
@@ -244,4 +262,100 @@ test("the standalone component finds its assets when used by another origin", as
       server.close((error) => (error ? reject(error) : resolve())),
     );
   }
+});
+
+test("the studio offers every face and, for the builder, every tool", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(character).toHaveAttribute("version", "v0.14");
+  // The stage reaches up behind the header, and must not take its links.
+  await page.locator(".site-header .ask").click({ trial: true });
+  const shot = async () => {
+    await page.waitForTimeout(250);
+    return character.screenshot();
+  };
+
+  // Faces change the picture without loading anything, and "off" is never offered.
+  await expect(page.locator("[data-face]")).toHaveCount(11);
+  await expect(page.locator('[data-face="off"]')).toHaveCount(0);
+  const original = await shot();
+  await open(page, "face");
+  await page.locator('[data-face="curious"]').click();
+  await expect(character).toHaveAttribute("face", "curious");
+  await expect(page.locator("#face-note")).toContainText("turning over");
+  expect(original.equals(await shot())).toBe(false);
+  expect(page.url()).toContain("face=curious");
+
+  // No tools outside the workshop; the face stays through a change of clothes.
+  await expect(page.locator("#tools")).toBeHidden();
+  await expect(page.locator('[data-sheet-tab="tool"]')).toBeHidden();
+  await open(page, "outfit");
+  await page
+    .getByRole("radio", { name: "Workshop Builder", exact: true })
+    .check();
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await open(page, "tool");
+  await expect(page.locator("#tools")).toBeVisible();
+  await expect(character).toHaveAttribute("face", "curious");
+
+  // Each tool is its own picture, with its own poses, and a tool pose holds still.
+  const seen: Buffer[] = [await shot()];
+  for (const tool of ["screwdriver", "hammer", "drill"]) {
+    await open(page, "tool");
+    await page.locator(`[data-tool="${tool}"]`).click();
+    await expect(character).toHaveAttribute("tool", tool);
+    // The first tool starts at Carry; after that the pose stays through a swap.
+    await expect(character).toHaveAttribute(
+      "pose",
+      tool === "screwdriver" ? "carry" : "work",
+    );
+    await expect(page.locator("[data-pose]")).toHaveCount(3);
+    await expect(page.locator("#play")).toBeDisabled();
+    await open(page, "pose");
+    for (const kind of ["carry", "show", "work"]) {
+      await page.locator(`[data-pose="${kind}"]`).click();
+      const picture = await shot();
+      for (const earlier of seen) expect(picture.equals(earlier)).toBe(false);
+      seen.push(picture);
+    }
+  }
+  expect(page.url()).toContain("tool=drill");
+  expect(page.url()).toContain("pose=work");
+
+  // Leaving the workshop puts the tool down, and an address brings him back.
+  await open(page, "outfit");
+  await page.getByRole("radio", { name: "Librarian", exact: true }).check();
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(character).toHaveAttribute("tool", "none");
+  await expect(character).toHaveAttribute("pose", "present");
+  await page.goto("/?outfit=workshop&tool=hammer&pose=show&face=proud");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(page.locator('[data-tool="hammer"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator('[data-face="proud"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.goto("/?face=off");
+  await expect(character).toHaveAttribute("face", "original");
+  // On a phone the open group closes again, leaving him the whole stage.
+  const faceTab = page.locator('[data-sheet-tab="face"]');
+  if (await faceTab.isVisible()) {
+    await faceTab.click();
+    await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
+    await expect(page.locator("#faces")).toBeHidden();
+  }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(errors).toEqual([]);
 });

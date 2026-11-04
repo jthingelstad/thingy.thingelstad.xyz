@@ -6,6 +6,8 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 for (const version of ["v0.10", "v0.14"]) {
   const publicRoot = `${root}public/character/${version}/`;
   const manifest = JSON.parse(readFileSync(`${publicRoot}manifest.json`));
+  if (manifest.faceSheet)
+    assert(statSync(`${publicRoot}${manifest.faceSheet}`).size > 100);
   for (const [key, outfit] of Object.entries(manifest.outfits)) {
     const bytes = readFileSync(`${publicRoot}${outfit.model}`);
     assert(bytes.length < 6 * 1024 * 1024, `${key}: delivery budget exceeded`);
@@ -18,8 +20,16 @@ for (const version of ["v0.10", "v0.14"]) {
     );
     assert.deepEqual(
       json.animations.map((a) => a.name).sort(),
-      Object.keys(manifest.poses).sort(),
+      [...Object.keys(manifest.poses), ...(outfit.toolClips ?? [])].sort(),
     );
+    if (outfit.toolClips) {
+      // Each tool is its own mesh, so a page can show one at a time.
+      for (const tool of Object.values(manifest.tools).filter((t) => t.node))
+        assert(
+          json.nodes.some((n) => n.name === tool.node && n.mesh !== undefined),
+          `${key}: ${tool.node}`,
+        );
+    }
     assert.equal(json.skins[0].joints.length, 40, `${key}: shared skeleton`);
     assert(
       json.materials.some((m) => m.name === "Thingy_Beacon"),
@@ -87,7 +97,7 @@ for (const version of ["v0.10", "v0.14"]) {
       assert(statSync(`${publicRoot}${path}`).size > 100, path);
     }
     console.log(
-      `${version} ${key}: ${(bytes.length / 1e6).toFixed(2)} MB, 40 joints, four clips, valid GLB, reviewed metadata`,
+      `${version} ${key}: ${(bytes.length / 1e6).toFixed(2)} MB, 40 joints, ${json.animations.length} clips, valid GLB, reviewed metadata`,
     );
   }
 }
