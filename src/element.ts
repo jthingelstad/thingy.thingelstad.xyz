@@ -55,6 +55,16 @@ function dispose(root: THREE.Object3D): void {
   }
 }
 
+const TURN = Math.PI * 2;
+
+export type HopOptions = {
+  /** How high he goes, in CSS pixels. The host moves, so he can leave his frame. */
+  height?: number;
+  /** 1 turns him to his left as seen from the front, -1 the other way. */
+  direction?: 1 | -1;
+  turns?: number;
+};
+
 /** A framework-independent character. All model and decoder requests stay local. */
 export class ThingyCharacter extends HTMLElement {
   static observedAttributes = [
@@ -96,6 +106,16 @@ export class ThingyCharacter extends HTMLElement {
   #press?: { x: number; y: number; at: number };
   #head?: THREE.Object3D;
   #beacon = new THREE.PointLight(0xff933f, 0, 1.2, 2);
+  #shadow?: THREE.MeshBasicMaterial;
+  #hop?: {
+    start: number;
+    duration: number;
+    from: number;
+    to: number;
+    height: number;
+    lift: number;
+  };
+  #lift = 0;
   #reduced = matchMedia("(prefers-reduced-motion: reduce)");
 
   get outfit(): Outfit {
@@ -170,6 +190,42 @@ export class ThingyCharacter extends HTMLElement {
     this.#camera.updateProjectionMatrix();
     this.#controls?.target.set(0, 1.38, 0);
     this.#controls?.update();
+    this.#dirty = true;
+  }
+
+  /**
+   * A jump with a spin, for a host page to answer a tap with. A second call
+   * takes over from wherever he is. Never under reduced motion.
+   */
+  hop({ height = 40, direction = 1, turns = 1 }: HopOptions = {}): void {
+    if (!this.#model || this.#reduced.matches) return;
+    const peak = Math.min(Math.max(height, 0), 240);
+    const from = this.#model.rotation.y;
+    this.#hop = {
+      start: performance.now(),
+      // Higher takes longer, so a big jump has the weight of one.
+      duration: 560 + peak * 3.2,
+      from,
+      to: (Math.round(from / TURN) + (direction < 0 ? -1 : 1) * turns) * TURN,
+      height: peak,
+      lift: this.#lift,
+    };
+    this.#dirty = true;
+  }
+
+  #stepHop(): void {
+    const hop = this.#hop;
+    if (!hop || !this.#model) return;
+    const t = Math.min((performance.now() - hop.start) / hop.duration, 1);
+    this.#model.rotation.y =
+      t === 1 ? 0 : hop.from + (hop.to - hop.from) * (t * t * (3 - 2 * t));
+    this.#lift = hop.height * 4 * t * (1 - t) + hop.lift * (1 - t) ** 2;
+    this.style.translate = t === 1 ? "" : `0 ${-this.#lift}px`;
+    // The canvas rises with him and the shadow is in it, so it fades instead
+    // of following him up.
+    if (this.#shadow)
+      this.#shadow.opacity = 1 - Math.min(this.#lift / 40, 1) * 0.85;
+    if (t === 1) this.#hop = undefined;
     this.#dirty = true;
   }
 
@@ -290,6 +346,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#reduced.addEventListener(
         "change",
         () => {
+          if (this.#hop) this.#hop.duration = 0;
           this.#setPose();
           this.#scheduleBlink();
         },
@@ -324,13 +381,14 @@ export class ThingyCharacter extends HTMLElement {
       context.fillStyle = gradient;
       context.fillRect(0, 0, 128, 128);
       const shadow = new THREE.CanvasTexture(shadowCanvas);
+      this.#shadow = new THREE.MeshBasicMaterial({
+        map: shadow,
+        transparent: true,
+        depthWrite: false,
+      });
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(2.4, 1.4),
-        new THREE.MeshBasicMaterial({
-          map: shadow,
-          transparent: true,
-          depthWrite: false,
-        }),
+        this.#shadow,
       );
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = 0.005;
@@ -400,6 +458,9 @@ export class ThingyCharacter extends HTMLElement {
       }
       this.#model = gltf.scene;
       this.#faceMap = undefined;
+      this.#hop = undefined;
+      this.#lift = 0;
+      this.style.translate = "";
       const anisotropy = Math.min(
         8,
         this.#renderer?.capabilities.getMaxAnisotropy() ?? 1,
@@ -580,6 +641,8 @@ export class ThingyCharacter extends HTMLElement {
   #loop = (): void => {
     this.#frame = requestAnimationFrame(this.#loop);
     this.#clock.update();
+    // Before the guard: a hop can carry him out of view, and he must still land.
+    this.#stepHop();
     if (!this.#visible || document.hidden || !this.#renderer) return;
     this.#controls?.update();
     if (this.playing) {
@@ -620,6 +683,10 @@ export class ThingyCharacter extends HTMLElement {
     this.#currentOutfit = undefined;
     this.#currentVersion = undefined;
     this.#faceMap = undefined;
+    this.#shadow = undefined;
+    this.#hop = undefined;
+    this.#lift = 0;
+    this.style.translate = "";
     this.removeAttribute("data-ready");
   }
 }

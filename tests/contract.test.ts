@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { newestCharacterVersion } from "../tools/delivery-plan.mjs";
 import {
   outfit,
   pose,
@@ -67,11 +68,21 @@ test("each model version publishes what the component asks of it", () => {
       );
   }
 });
+test("the component's newest model is the newest published directory", () => {
+  assert.equal(
+    Object.keys(VERSIONS).at(-1),
+    newestCharacterVersion(
+      readdirSync(new URL("../public/character/", import.meta.url)),
+    ),
+  );
+});
 test("a version an outfit lacks falls back, and nothing untrusted reaches a path", () => {
   assert.equal(modelVersion("v0.14", "librarian"), "v0.14");
   assert.equal(modelVersion("v0.14", "trail"), "v0.14");
   assert.equal(modelVersion("v0.14", "unknown" as "trail"), "v0.10");
   assert.equal(modelVersion(null, "librarian"), "v0.10");
+  assert.equal(modelVersion("latest", "librarian"), "v0.14");
+  assert.equal(modelVersion("latest", "trail"), "v0.14");
   for (const input of ["../v0.14", "__proto__", "v9"])
     assert.equal(modelVersion(input, "librarian"), "v0.10");
 });

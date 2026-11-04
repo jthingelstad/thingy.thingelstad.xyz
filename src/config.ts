@@ -5,6 +5,8 @@ export const VERSIONS = {
   "v0.14": ["librarian", "trail", "workshop", "concert"],
 } as const;
 export type Version = keyof typeof VERSIONS;
+/** `version="latest"` asks for the newest model that outfit has. */
+export const LATEST = "latest";
 export const OUTFITS = {
   librarian: {
     label: "Librarian",
@@ -160,6 +162,12 @@ export function modelVersion(
   value: string | null | undefined,
   key: Outfit,
 ): Version {
+  if (value === LATEST)
+    return (Object.keys(VERSIONS) as Version[])
+      .filter((version) =>
+        (VERSIONS[version] as readonly string[]).includes(key),
+      )
+      .at(-1) as Version;
   return value &&
     Object.hasOwn(VERSIONS, value) &&
     (VERSIONS[value as Version] as readonly string[]).includes(key)

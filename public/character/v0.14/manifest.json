@@ -28,7 +28,39 @@
     "librarian": {
       "label": "Librarian",
       "model": "librarian.glb",
-      "poster": "poses/librarian-present.webp"
+      "poster": "poses/librarian-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/librarian-hello.webp"
+        },
+        "present": {
+          "webp": "poses/librarian-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/librarian-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/librarian-rest.webp"
+        },
+        "hello-idle": {
+          "webp": "poses/librarian-hello-idle.webp"
+        },
+        "present-idle": {
+          "webp": "poses/librarian-present-idle.webp"
+        },
+        "present-proud": {
+          "webp": "poses/librarian-present-proud.webp"
+        },
+        "rest-delighted": {
+          "webp": "poses/librarian-rest-delighted.webp"
+        },
+        "rest-idle": {
+          "webp": "poses/librarian-rest-idle.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/librarian-thinking-curious.webp"
+        }
+      }
     },
     "trail": {
       "label": "Trail companion",

@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { mime } from "./delivery-plan.mjs";
+import { mime, newestCharacterVersion } from "./delivery-plan.mjs";
 
 async function walk(dir) {
   const out = [];
@@ -17,6 +17,29 @@ const files = await walk("dist");
 for (const file of files)
   assert.ok(mime[path.extname(file)], `No MIME type for ${file}`);
 const read = (name) => fs.readFile(path.join("dist", name), "utf8");
+
+// character/latest/ is the newest version, whole and byte for byte.
+const newest = path.join(
+  "dist/character",
+  newestCharacterVersion(await fs.readdir("public/character")),
+);
+const newestFiles = await walk(newest);
+assert.deepEqual(
+  (await walk("dist/character/latest"))
+    .map((file) => path.relative("dist/character/latest", file))
+    .sort(),
+  newestFiles.map((file) => path.relative(newest, file)).sort(),
+  "character/latest is not the newest version's files",
+);
+for (const file of newestFiles)
+  assert.ok(
+    (await fs.readFile(file)).equals(
+      await fs.readFile(
+        path.join("dist/character/latest", path.relative(newest, file)),
+      ),
+    ),
+    `character/latest differs from ${file}`,
+  );
 
 // Analytics only in the deploy build (THINGY_TINYLYTICS=true).
 if (process.env.THINGY_TINYLYTICS !== "true")

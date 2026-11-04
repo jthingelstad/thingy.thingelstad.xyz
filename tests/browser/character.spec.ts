@@ -105,6 +105,99 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
   expect(errors).toEqual([]);
 });
 
+test("version latest loads the newest model, and hop jumps, spins and lands where he began", async ({
+  page,
+}) => {
+  const models: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().endsWith(".glb")) models.push(request.url());
+  });
+  await page.route("**/__hop", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<!doctype html><html lang="en"><head><title>hop</title></head><body style="margin:0;padding-top:200px">
+        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
+        <script type="module" src="/thingy.js"></script></body></html>`,
+    }),
+  );
+  await page.goto("/__hop");
+  const character = page.locator("#librarian");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(models).toEqual([expect.stringContaining("/character/v0.14/")]);
+  await page.waitForTimeout(300);
+  const before = await character.screenshot();
+
+  const peak = await character.evaluate(async (el) => {
+    (el as HTMLElement & { hop(o: object): void }).hop({
+      height: 100,
+      direction: -1,
+    });
+    // Frames are far apart under software rendering, so sample until he lands
+    // and only hold the height he must never pass.
+    let highest = 0;
+    const end = performance.now() + 15000;
+    while (performance.now() < end) {
+      await new Promise(requestAnimationFrame);
+      const { translate } = (el as HTMLElement).style;
+      if (!translate && highest) break;
+      highest = Math.max(highest, -parseFloat(translate.split(" ")[1] || "0"));
+    }
+    return { highest, landed: (el as HTMLElement).style.translate === "" };
+  });
+  expect(peak.highest).toBeGreaterThan(0);
+  expect(peak.highest).toBeLessThanOrEqual(100);
+  expect(peak.landed).toBe(true);
+  await page.waitForTimeout(300);
+  expect((await character.screenshot()).equals(before)).toBe(true);
+});
+
+test("a hop that carries him out of view still lands", async ({ page }) => {
+  await page.route("**/__hop-away", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<!doctype html><html lang="en"><head><title>hop away</title></head><body style="margin:0">
+        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:160px;height:160px"></thingy-character>
+        <script type="module" src="/thingy.js"></script></body></html>`,
+    }),
+  );
+  await page.goto("/__hop-away");
+  const character = page.locator("#librarian");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await character.evaluate((el) =>
+    (el as HTMLElement & { hop(o: object): void }).hop({ height: 240 }),
+  );
+  await expect
+    .poll(() => character.evaluate((el) => (el as HTMLElement).style.translate))
+    .not.toBe("");
+  await expect
+    .poll(
+      () => character.evaluate((el) => (el as HTMLElement).style.translate),
+      { timeout: 5000 },
+    )
+    .toBe("");
+});
+
+test("hop stays still under reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/__still", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<!doctype html><html lang="en"><head><title>still</title></head><body style="margin:0">
+        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
+        <script type="module" src="/thingy.js"></script></body></html>`,
+    }),
+  );
+  await page.goto("/__still");
+  const character = page.locator("#librarian");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const moved = await character.evaluate(async (el) => {
+    (el as HTMLElement & { hop(o: object): void }).hop({ height: 100 });
+    await new Promise((done) => setTimeout(done, 200));
+    return (el as HTMLElement).style.translate;
+  });
+  expect(moved).toBe("");
+});
+
 test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a tap but not a turn", async ({
   page,
 }) => {
