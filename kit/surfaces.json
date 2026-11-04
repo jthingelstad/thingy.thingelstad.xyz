@@ -1,0 +1,87 @@
+{
+  "about": "Every place Thingy appears, what it takes from his home, and what it keeps of its own. tests/contract.test.ts holds the newest model to the stills named here, and tools/persona-rollout.mjs turns this file into the checklist for a persona change.",
+  "surfaces": [
+    {
+      "name": "Ask Thingy",
+      "url": "https://thingy.thingelstad.com/",
+      "repo": "jthingelstad/thingy.thingelstad.com",
+      "job": "Librarian",
+      "follows": [
+        "the component with version=\"latest\"",
+        "stills from character/latest/"
+      ],
+      "stills": [
+        "librarian-hello",
+        "librarian-hello-idle",
+        "librarian-present-idle",
+        "librarian-present-proud",
+        "librarian-rest-delighted",
+        "librarian-rest-idle",
+        "librarian-thinking-curious"
+      ],
+      "keeps": [
+        "AGENTS.md: what each face means here, and which faces a tap may show",
+        "web/src/react/components/ThingyFace.tsx: the small drawn screen face, four moods",
+        "web/src/react/components/answer-mood.ts: when he has really found something",
+        "web/public/img/thingy.png: the illustration, for og:image and the app icons",
+        "Copy on the home, About and Connect pages"
+      ]
+    },
+    {
+      "name": "Ask Thingy's chat, and his print persona",
+      "url": "https://librarian.thingelstad.com/",
+      "repo": "jthingelstad/librarian-thing",
+      "job": "Librarian, and host of Supporting Membership in print",
+      "follows": [],
+      "stills": [],
+      "keeps": [
+        "apps/librarian/lambda/prompts/thingy-identity.md: who he is, condensed for every chat turn",
+        "apps/librarian/lambda/prompts/words-he-does-not-use.md: the one list his prompts render",
+        "apps/librarian/lambda/prompts/answer-style.md: his register in chat",
+        "apps/librarian/prompts/thingy-persona.md: the print persona that WT Builder vendors"
+      ]
+    },
+    {
+      "name": "WT Builder",
+      "url": "https://github.com/jthingelstad/wt-builder",
+      "repo": "jthingelstad/wt-builder",
+      "job": "Librarian in Echoes, host of Supporting Membership, narrator of the audio edition",
+      "follows": [],
+      "stills": [],
+      "keeps": [
+        "prompts/thingy-persona.md: vendored from librarian-thing with npm run persona:sync, so change librarian-thing first",
+        "The audio hand-offs and his voice"
+      ]
+    },
+    {
+      "name": "The Weekly Thing site",
+      "url": "https://weekly.thingelstad.com/",
+      "repo": "jthingelstad/weekly.thingelstad.com",
+      "job": "Host of Supporting Membership",
+      "follows": [],
+      "stills": [],
+      "keeps": [
+        "apps/site/img/: its own copies of his pictures, including the concert one",
+        "FAQ, support and confirm pages that name him"
+      ]
+    },
+    {
+      "name": "Things I've Built",
+      "url": "https://thingelstad.xyz/",
+      "repo": "jthingelstad/thingelstad.xyz",
+      "job": "Builder and record keeper",
+      "follows": ["stills from character/latest/"],
+      "stills": [
+        "workshop-hello",
+        "workshop-present",
+        "workshop-rest",
+        "workshop-thinking"
+      ],
+      "keeps": [
+        "docs/THINGY.md: his job, outfit and register on this site",
+        "public/img/thingy-96.png: the illustration, for the footer byline",
+        "Pages in his voice, written by the agents that keep the site"
+      ]
+    }
+  ]
+}

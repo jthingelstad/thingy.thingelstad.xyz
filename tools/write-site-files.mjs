@@ -63,6 +63,7 @@ await fs.writeFile(
 );
 await fs.copyFile("persona/THINGY.md", "dist/persona.md");
 await fs.copyFile("kit/KIT.md", "dist/kit.md");
+await fs.copyFile("kit/surfaces.json", "dist/kit/surfaces.json");
 // character/latest/ is the newest version's directory, so a page can name the
 // newest model or still at one address that never changes.
 await fs.cp(

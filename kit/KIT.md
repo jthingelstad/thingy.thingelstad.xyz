@@ -12,16 +12,17 @@ he changes here, a project that follows these addresses changes with him.
 
 ## What is in the kit
 
-| Part             | What it is                                                            | Where                                                                                                            |
-| ---------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| His persona      | Who he is, how he talks, and what he never does. The authority on him | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
-| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
-| His pictures     | Transparent stills, with no code to run                               | `https://thingy.thingelstad.xyz/character/latest/poses/`                                                         |
-| A frame          | An iframe with him in it, with no code to run                         | `https://thingy.thingelstad.xyz/embed/`                                                                          |
-| A component      | The `<thingy-character>` web component, for any framework             | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
-| His voice        | The one spoken voice he has                                           | [How he sounds](https://thingy.thingelstad.xyz/persona/#how-he-sounds), in the persona                           |
-| What he knows    | Jamie's published work, through the Librarian MCP server              | [Connect your AI](https://thingy.thingelstad.com/connect/) on Ask Thingy                                         |
-| A model to print | A 180 mm figure, as 3MF and zipped STL                                | [Print Thingy](https://thingy.thingelstad.xyz/print/)                                                            |
+| Part             | What it is                                                                               | Where                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| His persona      | Who he is, how he talks, and what he never does. The authority on him                    | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
+| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                                   | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
+| His pictures     | Transparent stills, with no code to run                                                  | `https://thingy.thingelstad.xyz/character/latest/poses/`                                                         |
+| A frame          | An iframe with him in it, with no code to run                                            | `https://thingy.thingelstad.xyz/embed/`                                                                          |
+| A component      | The `<thingy-character>` web component, for any framework                                | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
+| His voice        | The one spoken voice he has                                                              | [How he sounds](https://thingy.thingelstad.xyz/persona/#how-he-sounds), in the persona                           |
+| What he knows    | Jamie's published work, through the Librarian MCP server                                 | [Connect your AI](https://thingy.thingelstad.com/connect/) on Ask Thingy                                         |
+| A model to print | A 180 mm figure, as 3MF and zipped STL                                                   | [Print Thingy](https://thingy.thingelstad.xyz/print/)                                                            |
+| His illustration | The original drawing, the authority on how he looks. A PNG, for `og:image` and app icons | `https://thingy.thingelstad.xyz/thingy-original.png`                                                             |
 
 To try him without writing anything, use [the stage](https://thingy.thingelstad.xyz/).
 Dress him and turn him, then **Bring him along** gives you the code, a picture
@@ -45,12 +46,14 @@ Jamie what he does there before inventing a role, and add it to the persona firs
 
 ## Give him words
 
-Whichever model writes as Thingy follows the persona. Give that model all of
-[persona.md](https://thingy.thingelstad.xyz/persona.md) rather than a summary.
-It is about 17 KB, and it is meant to be read whole.
+Whichever model writes as Thingy follows the persona. An agent writing pages or
+code for a project reads all of
+[persona.md](https://thingy.thingelstad.xyz/persona.md) first. It is about 17 KB,
+and it is meant to be read whole.
 
-- **Load it, or vendor it with a check.** Fetch it at build time, or keep a copy
-  with a test that fails when the copy falls behind. Never rewrite it or fork it.
+- **A prompt that runs on every turn can carry less.** Ask Thingy's chat keeps a
+  condensed identity for its model. Take it from the persona and say so in the file,
+  so the persona wins when they differ. Never fork him, and never add to him there.
 - **Your surface adds mechanics, not character.** Citations, lengths and formats
   belong to your project. Who he is does not.
 - **Facts have owners.** He reads a figure from where it lives and never states
@@ -104,7 +107,9 @@ has `present`. The Librarian and the Workshop Builder have more, with tools and
 faces such as `librarian-rest-delighted.webp`. Each outfit's `stills` in the
 [manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
 what exists. For a combination with no still, **Download picture** on the stage
-draws one for you.
+draws one for you. A strict content security policy needs the host in `img-src`.
+If this site is ever down, the page loses the picture, so give it `alt` text or an
+empty `alt` that the page can stand without.
 
 ### The frame
 
@@ -119,11 +124,11 @@ draws one for you.
 ></iframe>
 ```
 
-It is transparent, with no controls around him, and it needs nothing from your
-page, so it suits a strict content security policy. It takes `version`, `outfit`,
-`pose`, `tool`, `face`, `light`, `motion` and `view`. Always pass `version=latest`
-or a numbered version: with none, the frame stays on v0.10, which has no faces or
-tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
+It is transparent, with no controls around him, and runs nothing on your page, so
+a strict content security policy needs only the host in `frame-src`. It takes
+`version`, `outfit`, `pose`, `tool`, `face`, `light`, `motion` and `view`. Always
+pass `version=latest` or a numbered version: with none, the frame stays on v0.10,
+which has no faces or tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
 degrees down from straight above, and zoom, as `view=60,80,1.2`.
 
 ### The component
@@ -170,6 +175,51 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 - **Content security policy:** the host needs to be in `script-src` and
   `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,
   and `blob:` in `connect-src` and `img-src` for the textures.
+
+### A still that becomes him
+
+For a page that should stay light, show a still first and bring him in when the
+page is up. Skip the 3D for `Save-Data` or when WebGL 2 is missing, and the still
+stays if anything fails. Ask Thingy's front page does this, in
+[thingy-3d.ts](https://github.com/jthingelstad/thingy.thingelstad.com/blob/main/web/src/shared/thingy-3d.ts).
+
+```html
+<div style="position:relative;width:240px;height:240px">
+  <img
+    id="thingy-still"
+    src="https://thingy.thingelstad.xyz/character/latest/poses/librarian-hello.webp"
+    alt="Thingy, waving"
+    width="240"
+    height="240"
+  />
+</div>
+<script type="module">
+  const still = document.querySelector("#thingy-still");
+  const saving = navigator.connection?.saveData === true;
+  const canDraw = !!document.createElement("canvas").getContext("webgl2");
+  const later = window.requestIdleCallback ?? setTimeout;
+  if (!saving && canDraw) {
+    later(async () => {
+      await import("https://thingy.thingelstad.xyz/thingy.js");
+      const thingy = document.createElement("thingy-character");
+      thingy.setAttribute("version", "latest");
+      thingy.setAttribute("outfit", "librarian");
+      thingy.setAttribute("pose", "hello");
+      thingy.setAttribute("zoom", "off");
+      thingy.setAttribute("poster", still.src);
+      thingy.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
+      thingy.addEventListener("thingy-ready", () => {
+        still.style.visibility = "hidden";
+      });
+      thingy.addEventListener("thingy-fallback", () => {
+        thingy.remove();
+        still.style.visibility = "";
+      });
+      still.after(thingy);
+    });
+  }
+</script>
+```
 
 ### The model
 
@@ -239,6 +289,19 @@ poses are single frames, so `motion` has nothing to play.
 
 Use `latest` unless a page needs one model forever.
 
+Change him here, and this is how it reaches a project:
+
+- **On its own:** the model, the stills, the component and the frame, for anything
+  following `latest`. Nothing to do.
+- **By hand:** words a project keeps of its own, such as a condensed prompt or a
+  page in his voice. Each change to the persona opens
+  [an issue](https://github.com/jthingelstad/thingy.thingelstad.xyz/issues) listing
+  what to reread, drawn from
+  [surfaces.json](https://thingy.thingelstad.xyz/kit/surfaces.json).
+
+Add a new project to `surfaces.json`, with every still it names. A new model cannot
+ship without those stills, because the site's own checks fail first.
+
 What this site keeps to:
 
 - Published addresses stay. A numbered version's files are never replaced, and an
@@ -247,6 +310,19 @@ What this site keeps to:
 - `character/latest/` holds what the newest version holds, at the same names.
 - `https://thingy.thingelstad.xyz/revision.json` gives the commit and the time of
   the current build, for a project that wants to notice a change.
+
+## Where he works now
+
+Two sites to read as examples:
+
+- **Ask Thingy** ([code](https://github.com/jthingelstad/thingy.thingelstad.com))
+  follows `latest` with the component on its front page and a still on every other
+  page. The rules it keeps are in its
+  [AGENTS.md](https://github.com/jthingelstad/thingy.thingelstad.com/blob/main/AGENTS.md).
+- **Things I've Built** ([code](https://github.com/jthingelstad/thingelstad.xyz))
+  follows `latest` with stills alone, and keeps its job, outfit and register in
+  [docs/THINGY.md](https://github.com/jthingelstad/thingelstad.xyz/blob/main/docs/THINGY.md),
+  a good pattern for a new project to copy.
 
 ## Terms
 

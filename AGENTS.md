@@ -18,7 +18,9 @@ projects take him from here, starting with the librarian at
   project, published as `/kit/` and `/kit.md`. Anything a consumer can use (an
   attribute, event, method, outfit, pose, face, tool or address) goes in it, and
   `llms.txt` stays an index that leads to it. It repeats persona lines but never
-  defines him: `persona/THINGY.md` wins.
+  defines him: `persona/THINGY.md` wins. `kit/surfaces.json` lists every place he
+  appears: the stills each names, which a new model must publish, and the text each
+  keeps, which a change to the persona opens as an issue to reread.
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.
