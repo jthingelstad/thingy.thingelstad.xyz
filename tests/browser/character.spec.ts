@@ -12,6 +12,9 @@ async function open(page: Page, tab: string): Promise<void> {
 test("outfits, poses, playback, light and keyboard camera work on a real WebGL character", async ({
   page,
 }, info) => {
+  // Four outfits on the larger stage take longer than the default under CI's
+  // software rendering.
+  test.setTimeout(180000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => {
