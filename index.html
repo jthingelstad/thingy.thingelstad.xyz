@@ -6,7 +6,7 @@
     <title>Thingy — The character</title>
     <meta
       name="description"
-      content="Meet Thingy in three dimensions. Choose an outfit and a pose, turn him around, and bring Jamie’s sidekick into your own pages."
+      content="Meet Thingy in three dimensions. Choose an outfit, a pose, a face and a tool, turn him around, and bring Jamie’s sidekick into your own pages."
     />
     <meta name="theme-color" content="#faf8f2" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -31,7 +31,7 @@
     <meta property="og:title" content="Thingy — The character" />
     <meta
       property="og:description"
-      content="Meet Thingy in three dimensions. Choose an outfit and a pose, turn him around, and bring Jamie’s sidekick into your own pages."
+      content="Meet Thingy in three dimensions. Choose an outfit, a pose, a face and a tool, turn him around, and bring Jamie’s sidekick into your own pages."
     />
     <meta property="og:url" content="https://thingy.thingelstad.xyz/" />
     <meta
@@ -69,13 +69,17 @@
       <section class="studio" id="character" aria-labelledby="title">
         <div class="introduction">
           <h1 id="title">Meet Thingy.</h1>
-          <p>A librarian. A trail companion.<br />A builder. Always Thingy.</p>
+          <p>
+            A librarian. A trail companion.<br />
+            A builder. Always Thingy.
+          </p>
         </div>
         <div class="turntable">
           <div class="ground-ring" aria-hidden="true"></div>
           <thingy-character
             id="main-thingy"
             asset-base="/character/"
+            version="v0.14"
             outfit="librarian"
             pose="present"
             light="off"
@@ -89,35 +93,98 @@
           /></thingy-character>
           <p class="hint">Drag to turn <span>·</span> Scroll to zoom</p>
         </div>
-        <aside class="controls" aria-labelledby="controls-title">
-          <h2 id="controls-title">Make yourself at home</h2>
-          <fieldset class="outfits">
-            <legend>Outfit</legend>
-            <div id="outfit-options"></div>
-          </fieldset>
-          <fieldset class="expressions">
-            <legend>A little expression</legend>
-            <div id="pose-options"></div>
-          </fieldset>
-          <label class="light-control"
-            ><span>Antenna light</span
-            ><input id="light" type="checkbox" role="switch" /><span
-              class="switch"
-              aria-hidden="true"
-            ></span
-            ><span id="light-label">Light off</span></label
-          >
-          <div class="playback">
-            <button class="button primary" id="play" aria-pressed="false">
-              <span data-icon="play"></span
-              ><span id="play-label">Play</span></button
-            ><button class="button" id="reset">
-              <span data-icon="reset"></span>Reset view
+        <aside
+          class="controls"
+          id="controls"
+          data-tab="face"
+          aria-labelledby="controls-title"
+        >
+          <h2 id="controls-title" class="sr-only">Make yourself at home</h2>
+          <div class="sheet-tabs" id="sheet-tabs">
+            <button
+              class="sheet-tab"
+              data-sheet-tab="outfit"
+              aria-controls="outfits"
+              aria-expanded="false"
+            >
+              <small>Outfit</small><b id="tab-outfit"></b>
+            </button>
+            <button
+              class="sheet-tab"
+              data-sheet-tab="tool"
+              aria-controls="tools"
+              aria-expanded="false"
+              hidden
+            >
+              <small>Hand</small><b id="tab-tool"></b>
+            </button>
+            <button
+              class="sheet-tab"
+              data-sheet-tab="pose"
+              aria-controls="poses"
+              aria-expanded="false"
+            >
+              <small>Pose</small><b id="tab-pose"></b>
+            </button>
+            <button
+              class="sheet-tab"
+              data-sheet-tab="face"
+              aria-controls="faces"
+              aria-expanded="false"
+            >
+              <small>Face</small><b id="tab-face"></b>
+            </button>
+            <button
+              class="sheet-tab"
+              data-sheet-tab="more"
+              aria-controls="more"
+              aria-expanded="false"
+            >
+              <small>More</small><b>Light, play</b>
             </button>
           </div>
-          <p id="motion-note" class="motion-note" hidden>
-            Your reduced-motion setting is on. Poses stay still.
-          </p>
+          <div class="controls-left">
+            <fieldset class="outfits" id="outfits" data-panel="outfit">
+              <legend>Outfit</legend>
+              <div id="outfit-options"></div>
+            </fieldset>
+            <fieldset class="tools" id="tools" data-panel="tool" hidden>
+              <legend>In his hand</legend>
+              <div id="tool-options"></div>
+            </fieldset>
+          </div>
+          <fieldset class="expressions" id="poses" data-panel="pose">
+            <legend class="sr-only">Pose</legend>
+            <div id="pose-options"></div>
+          </fieldset>
+          <div class="controls-right">
+            <fieldset class="faces" id="faces" data-panel="face">
+              <legend>Face</legend>
+              <div id="face-options"></div>
+              <p id="face-note" class="face-note" aria-live="polite"></p>
+            </fieldset>
+            <div class="more" id="more">
+              <label class="light-control"
+                ><span>Antenna light</span
+                ><input id="light" type="checkbox" role="switch" /><span
+                  class="switch"
+                  aria-hidden="true"
+                ></span
+                ><span id="light-label">Light off</span></label
+              >
+              <div class="playback">
+                <button class="button primary" id="play" aria-pressed="false">
+                  <span data-icon="play"></span
+                  ><span id="play-label">Play</span></button
+                ><button class="button" id="reset">
+                  <span data-icon="reset"></span>Reset view
+                </button>
+              </div>
+              <p id="motion-note" class="motion-note" hidden>
+                Your reduced-motion setting is on. Poses stay still.
+              </p>
+            </div>
+          </div>
         </aside>
       </section>
       <section

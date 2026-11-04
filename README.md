@@ -91,12 +91,20 @@ The default is the `character/` directory beside `thingy.js`.
 
 More optional attributes, for a page that wants him as its centrepiece:
 
-- `version="v0.14"` picks a newer model; an outfit that version lacks stays on
-  v0.10. So far v0.14 has only the Librarian, with the v0.13 cloth pass.
+- `version="v0.14"` picks the newer model, in all four outfits, with the v0.13
+  cloth pass. This site's own viewer uses it; the default stays v0.10 so a page
+  already using the component does not change.
 - `face` shows a screen face on a model that has them (v0.14 on): `original`,
   `idle`, `thinking`, `found-it`, `oops`, `delighted`, `curious`, `proud`, `eager`,
   `sympathetic`, `sheepish`. `blink="on"` blinks the faces that can, never under
   reduced motion.
+  `off` also exists, but it is never shown to a reader, so the viewer leaves it out.
+- `tool` puts something in the v0.14 Workshop Builder's hand: `none`, `screwdriver`,
+  `hammer`, `drill` or `laptop`. Each tool has its own poses, and asking for another
+  moves to the tool's first: `carry`, `show` and `work` for the three hand tools,
+  `present` for the laptop, and `hello`, `thinking` and `rest` for empty hands. With
+  no `tool`, `pose="present"` is the laptop, as it is on v0.10. Tool poses are single
+  frames, so `motion` has nothing to play; the element's `moves` property says so.
 - `zoom="off"` leaves the mouse wheel to the page and drops the zoom keys.
 - `poster` replaces the pose image shown until the model is ready, and
   `view-label` replaces the canvas's accessible name.
@@ -124,29 +132,34 @@ The beacon keeps a separately named material. A future incompatible revision
 gets a new directory instead of replacing these addresses.
 
 `public/character/v0.14/manifest.json` is the same contract for the newer model,
-with its faces added. The screen is a separate skinned node, `Thingy_Screen`, lit
-by one cell of an atlas: material `Thingy_Face`, emissive map, 4 columns by 5 rows.
+with its faces and tools added. The screen is a separate skinned node,
+`Thingy_Screen`, lit by one cell of an atlas: material `Thingy_Face`, emissive map,
+4 columns by 5 rows. `faces.webp` is that atlas, small, for a page offering the
+faces. In `workshop.glb` each tool is its own skinned node, `Thingy_Tool_<name>`,
+with clips named `<tool>-<pose>`; show one node at a time.
 
-## Rebuild the v0.14 Librarian
+## Rebuild the v0.14 models
 
 Blender 5.2 LTS, from the character-art repository's master:
 
 ```sh
 blender --background \
   ../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.14.blend \
-  --python-exit-code 1 --python tools/export_character_v014.py
-node tools/optimize-v014.mjs
+  --python-exit-code 1 --python tools/export_character_v014.py -- --outfit workshop
+node tools/optimize-v014.mjs workshop
 ```
 
 It never saves the master. It bakes the full master on to a lighter body, so the
 cloth reaches the browser as colour and normal maps, and takes the faces from the
-master's atlas. Add `-- --reuse-bakes` after the script to change the grade, materials
-or actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
-repeats, so the saved maps still fit. The stills, `poses/librarian-present.webp` and
-`librarian-hello.webp`, are captures of this model in the component from its default
-camera, so each matches its first frame; `node tools/capture-poster-v014.mjs` makes
-them from a running preview. Ask Thingy's front page waves, and keeps its own copy of
-the hello still.
+master's atlas. Add `--reuse-bakes` after `--outfit` to change the grade, materials or
+actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
+repeats, so the saved maps still fit. `--reference-only` renders the master from the
+component's camera, to compare a grade against. The stills in `poses/` are captures
+of each model in the component from its default camera, so each matches its first
+frame; `node tools/capture-poster-v014.mjs [outfit ...]` makes them from a running
+preview. Ask Thingy's front page waves, and keeps its own copy of the hello still.
+With no `--outfit` the export makes the Librarian, which Ask Thingy loads live: the
+same bakes rebuild the published file byte for byte, so check that it still does.
 
 ## Rebuild the derivatives
 

@@ -4,17 +4,20 @@ import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import {
+  ALL_POSES,
   FACES,
   OUTFITS,
-  POSES,
+  TOOLS,
+  anyPose,
   face,
   faceOffset,
   modelVersion,
   outfit,
-  pose,
+  stageOf,
   posterPath,
+  type AnyPose,
   type Outfit,
-  type Pose,
+  type Tool,
   type Version,
 } from "./config";
 
@@ -57,6 +60,7 @@ export class ThingyCharacter extends HTMLElement {
   static observedAttributes = [
     "outfit",
     "pose",
+    "tool",
     "light",
     "motion",
     "asset-base",
@@ -97,8 +101,15 @@ export class ThingyCharacter extends HTMLElement {
   get outfit(): Outfit {
     return outfit(this.getAttribute("outfit"));
   }
-  get pose(): Pose {
-    return pose(this.getAttribute("pose"));
+  get pose(): AnyPose {
+    return this.#stage().pose;
+  }
+  get tool(): Tool {
+    return this.#stage().tool;
+  }
+  /** Whether the current pose has any motion to play. Some are a single frame. */
+  get moves(): boolean {
+    return (this.#action?.getClip().duration ?? 0) > 0.1;
   }
   get playing(): boolean {
     return this.getAttribute("motion") === "on" && !this.#reduced.matches;
@@ -114,6 +125,15 @@ export class ThingyCharacter extends HTMLElement {
       this.getAttribute("asset-base") || defaultAssets,
       location.href,
     ).href;
+  }
+
+  #stage() {
+    return stageOf(
+      this.outfit,
+      this.version,
+      this.getAttribute("tool"),
+      anyPose(this.getAttribute("pose")),
+    );
   }
 
   connectedCallback(): void {
@@ -141,7 +161,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#scheduleBlink();
     } else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
-    else if (name === "pose") this.#setPose();
+    else if (name === "pose" || name === "tool") this.#setPose();
   }
 
   resetView(): void {
@@ -154,15 +174,22 @@ export class ThingyCharacter extends HTMLElement {
   }
 
   #updatePoster(): void {
+    const now = this.#stage();
     this.setAttribute(
       "aria-label",
-      `Thingy, ${OUTFITS[this.outfit].label}, ${POSES[this.pose].label}`,
+      `Thingy, ${OUTFITS[this.outfit].label}, ${ALL_POSES[now.pose].label}${now.tool === "none" ? "" : `, with ${TOOLS[now.tool].label.toLowerCase()}`}`,
     );
     const poster = this.#root.querySelector("img");
     if (poster)
       poster.src =
         this.getAttribute("poster") ||
-        posterPath(this.outfit, this.pose, this.assetBase, this.version);
+        posterPath(
+          this.outfit,
+          now.pose,
+          this.assetBase,
+          this.version,
+          this.getAttribute("tool"),
+        );
   }
 
   #initialize(): void {
@@ -424,23 +451,28 @@ export class ThingyCharacter extends HTMLElement {
 
   #setPose(): void {
     if (!this.#mixer || !this.#model) return;
-    const clip = this.#clips.find((item) => item.name === this.pose);
+    const now = this.#stage();
+    const clip = this.#clips.find((item) => item.name === now.clip);
     if (!clip) return;
     this.#mixer.stopAllAction();
     const action = this.#mixer.clipAction(clip);
     action.reset().setLoop(THREE.LoopRepeat, Infinity).play();
     action.time = this.playing
       ? 0
-      : Math.min((POSES[this.pose].frame - 1) / 24, clip.duration);
+      : Math.min((now.frame - 1) / 24, clip.duration);
     action.paused = !this.playing;
     this.#mixer.update(0);
     this.#action = action;
     const laptop = this.#model.getObjectByName("Thingy_Laptop");
-    if (laptop) laptop.visible = this.pose === "present";
+    if (laptop) laptop.visible = now.pose === "present";
+    for (const name of Object.keys(TOOLS)) {
+      const part = this.#model.getObjectByName(`Thingy_Tool_${name}`);
+      if (part) part.visible = name === now.tool;
+    }
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
-        detail: { pose: this.pose, motion: this.playing },
+        detail: { pose: now.pose, tool: now.tool, motion: this.playing },
         bubbles: true,
         composed: true,
       }),
@@ -516,7 +548,7 @@ export class ThingyCharacter extends HTMLElement {
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
-        detail: { pose: this.pose, motion: this.playing },
+        detail: { pose: this.pose, tool: this.tool, motion: this.playing },
         bubbles: true,
         composed: true,
       }),
