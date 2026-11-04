@@ -317,8 +317,9 @@ Change him here, and this is how it reaches a project:
 - **On its own:** the model, the stills, the component and the frame, for anything
   following `latest`. Nothing to do.
 - **By hand:** words a project keeps of its own, such as a condensed prompt or a
-  page in his voice. Each change to the persona opens an issue for Jamie, listing
-  what to reread, drawn from
+  page in his voice. Each change to the persona opens an
+  [issue](https://github.com/jthingelstad/thingy.thingelstad.xyz/issues) for Jamie,
+  listing what to reread, drawn from
   [surfaces.json](https://thingy.thingelstad.xyz/kit/surfaces.json).
 
 Tell Jamie about a new project, so it can join `surfaces.json` with every still it
@@ -349,14 +350,31 @@ Two sites to read as examples:
 
 ## Terms
 
-Thingy is by Jamie Thingelstad. Credit Jamie where he appears.
+Everything here is licensed
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): the persona, this
+kit, the model, the faces, the stills, the print files and the code. Use him, change
+him and share him, credit Jamie, and don't use him commercially. The whole licence
+is in [LICENSE](https://github.com/jthingelstad/thingy.thingelstad.xyz/blob/main/LICENSE).
 
-The print files are licensed
-[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): print him, paint
-him and remix him, credit Jamie, and don't sell him. That licence covers the print
-files. The rest of the kit has no licence of its own yet, so ask
-[Jamie](https://www.thingelstad.com/) before using him in something beyond showing
-him on a page.
+[![CC BY-NC 4.0](https://thingy.thingelstad.xyz/shared/cc/by-nc.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+Credit him like this, linked where you can:
+
+> [Thingy](https://thingy.thingelstad.xyz/) by [Jamie Thingelstad](https://www.thingelstad.com/), [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+
+The code that Bring Thingy along gives you already carries that line. For a use the
+licence doesn't cover, ask [Jamie](https://www.thingelstad.com/).
+
+Jamie has supported Creative Commons for years. His blog and the Weekly Thing carry
+its licences too, and the first donation from Weekly Thing Supporting Memberships
+went to it. In [his words](https://weekly.thingelstad.com/archive/318/): "Copyright
+law can strangle creativity and culture. Creative Commons is doing good work to
+enable an alternative path."
+
+A few things here have licences of their own, which
+[NOTICE.md](https://github.com/jthingelstad/thingy.thingelstad.xyz/blob/main/NOTICE.md)
+lists: the Inter fonts, Three.js inside the component, and the Creative Commons
+marks.
 
 ## For agents
 

@@ -47,6 +47,13 @@ projects take him from here, starting with the librarian at
 - Run `npm run check` and the relevant browser checks. No live analytics in QA:
   Tinylytics is injected only by the deploy build (`THINGY_TINYLYTICS=true`).
 
+## Licence
+
+Everything here is CC BY-NC 4.0 (Jamie, November 4, 2026), and this repository is
+public. A new page gets `<link rel="license">` and the footer's Creative Commons
+markup; `tools/validate-site.mjs` checks them. A new model states the licence in its
+manifest and in each glTF's `asset.copyright`. Third-party parts go in `NOTICE.md`.
+
 ## Browser tests
 
 Run them only when a change needs them, on this Mac or in CI (Jamie, 2026-11-04).

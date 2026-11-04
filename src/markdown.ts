@@ -1,7 +1,7 @@
 // A small Markdown renderer for persona/THINGY.md and kit/KIT.md, run at build
 // time so each page and its .md address come from the same file. It knows only
 // what those files use: headings, paragraphs, nested lists, tables, block quotes,
-// fenced code, links, code, bold and emphasis. Anything else stays as escaped text.
+// fenced code, links, a linked image, code, bold and emphasis. Anything else stays as escaped text.
 
 const escape = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -25,6 +25,11 @@ export function inline(text: string): string {
     return `${MARK}${code.length - 1}${MARK}`;
   });
   return escape(held)
+    .replace(
+      /\[!\[([^\]]*)\]\(([^)\s]+)\)\]\(([^)\s]+)\)/g,
+      (_, alt: string, src: string, href: string) =>
+        `<a href="${attribute(href)}"><img src="${attribute(src)}" alt="${attribute(alt)}"></a>`,
+    )
     .replace(
       /\[([^\]]+)\]\(([^)\s]+)\)/g,
       (_, label: string, href: string) =>

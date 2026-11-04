@@ -1,4 +1,5 @@
 {
+  "license": "https://creativecommons.org/licenses/by-nc/4.0/",
   "about": "Every place Thingy appears, what it takes from his home, and what it keeps of its own. tests/contract.test.ts holds the newest model to the stills named here, and tools/persona-rollout.mjs turns this file into the checklist for a persona change.",
   "surfaces": [
     {
