@@ -136,6 +136,24 @@ uncompressed geometry too when local bakes are present. Khronos’s validator
 reports Meshopt as an unsupported extension; browser tests separately exercise
 its real decoder, every outfit, and animated poses.
 
+## The print model
+
+[/print/](print/index.html) offers a 180 mm one-colour print of Thingy, made for
+a Bambu Lab P2S and licensed CC BY-NC 4.0 (Jamie, November 3, 2026). The
+character-art repository builds it (`source/export_print_v013.py` there, from the
+v0.13 master); this site only publishes it. `public/print/v0.13/` holds the 3MF as
+built, the STL zipped beside a short read-me, web stills and a manifest with each
+file's size and SHA-256:
+
+```sh
+uv run --python 3.12 --with pillow python tools/prepare_print.py ../thingelstad.com/thingy-character
+```
+
+The zip has fixed timestamps, so the same inputs give the same bytes, and
+`validate-assets.mjs` checks every download against the manifest and a 25 MB
+budget. Like the character, a published print version keeps its address; a new
+print gets a new directory. Print files are cached for a day.
+
 ## Hosting
 
 S3 and CloudFront in Jamie's AWS account (999153317627, us-east-1), defined in
@@ -210,7 +228,7 @@ The first deploy (`a1240b4`, 42 files) was checked against the live site:
 ## Search and machine-readable files
 
 `robots.txt` allows everything and names `sitemap.xml`. The sitemap lists the
-home page and the integration examples, each with the date of the last commit
+home page, the integration examples and the print page, each with the date of the last commit
 that changed it (`tools/write-site-files.mjs`), never the build time. `/embed/`
 and the 404 page carry `noindex`. `llms.txt` describes the asset contract for
 agents. Google covers the site through the `sc-domain:thingelstad.xyz` property;

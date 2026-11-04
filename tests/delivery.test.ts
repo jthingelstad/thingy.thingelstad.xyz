@@ -25,6 +25,20 @@ test("every public file has a MIME type", () => {
     "model/gltf-binary",
   );
   assert.throws(() => prepareObject("../secret.txt", Buffer.from("x")));
+  assert.equal(
+    prepareObject(
+      "print/v0.13/Thingy-librarian-180mm-v0.13.3mf",
+      Buffer.from("x"),
+    ).ContentType,
+    "model/3mf",
+  );
+  assert.equal(
+    prepareObject(
+      "print/v0.13/Thingy-librarian-180mm-v0.13-stl.zip",
+      Buffer.from("x"),
+    ).ContentType,
+    "application/zip",
+  );
 });
 
 test("caching keeps entry points short and hashed bundles long", () => {
@@ -38,8 +52,15 @@ test("caching keeps entry points short and hashed bundles long", () => {
     cacheControl("character/v0.10/workshop.glb"),
     "public, max-age=86400",
   );
+  for (const file of [
+    "print/v0.13/Thingy-librarian-180mm-v0.13.3mf",
+    "print/v0.13/manifest.json",
+    "print/v0.13/front.webp",
+  ])
+    assert.equal(cacheControl(file), "public, max-age=86400", file);
   for (const page of [
     "index.html",
+    "print/index.html",
     "embed/index.html",
     "404.html",
     "sitemap.xml",

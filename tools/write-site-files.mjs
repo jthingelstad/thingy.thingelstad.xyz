@@ -22,6 +22,10 @@ export const PAGES = [
     path: "/examples/workshop.html",
     sources: ["examples/workshop.html", "public/character"],
   },
+  {
+    path: "/print/",
+    sources: ["print/index.html", "src/style.css", "public/print"],
+  },
 ];
 
 const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();

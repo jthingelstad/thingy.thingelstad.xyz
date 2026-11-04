@@ -62,11 +62,11 @@ const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 assert.deepEqual(locs, [
   "https://thingy.thingelstad.xyz/",
   "https://thingy.thingelstad.xyz/examples/workshop.html",
+  "https://thingy.thingelstad.xyz/print/",
 ]);
 for (const loc of locs) {
-  const page = loc.endsWith("/")
-    ? "index.html"
-    : new URL(loc).pathname.slice(1);
+  const pathname = new URL(loc).pathname.slice(1);
+  const page = loc.endsWith("/") ? `${pathname}index.html` : pathname;
   assert.match(
     (await read(page)).replace(/\s+/g, " "),
     new RegExp(`<link rel="canonical" href="${loc}"`),

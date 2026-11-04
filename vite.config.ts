@@ -37,6 +37,7 @@ export default defineConfig(({ command }) => ({
         "404.html",
         "embed/index.html",
         "examples/workshop.html",
+        "print/index.html",
       ],
     },
   },
