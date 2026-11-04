@@ -269,43 +269,168 @@ test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a
   expect(errors).toEqual([]);
 });
 
-test("pose images, copied embed, download, and transparent iframe share the same choice", async ({
+test("what stands on the stage is what you copy, save and link", async ({
   page,
   context,
-}) => {
+}, info) => {
+  test.setTimeout(180000);
   await context.grantPermissions(["clipboard-write", "clipboard-read"]);
-  await page.goto("/");
-  await page.locator('#reuse-poses [data-reuse-pose="thinking"]').click();
-  await expect(page.locator("#reuse-preview")).toHaveAttribute(
-    "src",
-    "/character/v0.10/poses/workshop-thinking.webp",
+  await page.goto("/?outfit=workshop&tool=hammer&pose=work&face=proud");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await open(page, "bring");
+  // No pickers of its own: the section has only these three things to do.
+  await expect(page.locator("#bring-along select")).toHaveCount(0);
+
+  // A real drag turns him, and the code follows. A phone swipe across him is
+  // the page's to scroll, so the drag belongs to the desktop run.
+  if (info.project.name === "desktop") {
+    const box = (await character.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 180, y, { steps: 8 });
+    await page.mouse.up();
+    await expect(page.locator("#embed-code")).toContainText("&view=");
+    // Once he has settled, the address carries the angle too.
+    await expect.poll(() => page.url(), { timeout: 20000 }).toContain("view=");
+  }
+
+  // Set to an exact angle, so the addresses below can be read exactly.
+  await page.evaluate(() =>
+    document.querySelector("#main-thingy")!.setAttribute("view", "60,80,1"),
   );
+  await expect
+    .poll(() =>
+      page
+        .locator("#main-thingy")
+        .evaluate((el) => (el as never as { view: string }).view),
+    )
+    .toBe("60,80,1");
+
   await page.locator("#copy").click();
-  await expect(page.locator("#copy-label")).toHaveText("Copied");
+  await expect(page.locator("#copy-label")).toHaveText("Embed copied");
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied).toContain("outfit=workshop&pose=thinking");
+  expect(copied).toContain(
+    "/embed/?version=latest&outfit=workshop&tool=hammer&pose=work&face=proud&light=off&motion=off&view=60%2C80%2C1",
+  );
+
+  // Changing him changes what is taken, and the words forget the last copy.
+  await open(page, "face");
+  await page.locator('[data-face="eager"]').click();
+  await open(page, "bring");
+  await expect(page.locator("#copy-label")).toHaveText("Copy embed");
+  await expect(page.locator("#embed-code")).toContainText("face=eager");
+
+  // The picture comes from the stage: square, a real PNG, transparent corners.
+  if (info.project.name === "phone")
+    await page.locator('#bring-ways [data-way="picture"]').click();
   const download = page.waitForEvent("download");
   await page.locator("#download").click();
-  expect((await download).suggestedFilename()).toBe("workshop-thinking.png");
-  await page.locator("#example-link").click();
-  await expect(page.locator("thingy-character")).toHaveAttribute(
-    "data-ready",
-    "",
-    { timeout: 30000 },
+  const saved = await download;
+  expect(saved.suggestedFilename()).toBe(
+    "thingy-workshop-hammer-work-eager.png",
   );
-  await expect(page.locator("thingy-character")).toHaveAttribute(
-    "outfit",
-    "workshop",
+  const facts = await page.evaluate(async () => {
+    const blob = await (
+      document.querySelector("#main-thingy") as never as {
+        picture(): Promise<Blob>;
+      }
+    ).picture();
+    const bitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext("2d")!;
+    context.drawImage(bitmap, 0, 0);
+    const middle = context.getImageData(
+      bitmap.width / 2,
+      bitmap.height / 2,
+      1,
+      1,
+    );
+    return {
+      type: blob.type,
+      width: bitmap.width,
+      height: bitmap.height,
+      corner: context.getImageData(0, 0, 1, 1).data[3],
+      middle: middle.data[3],
+    };
+  });
+  expect(facts).toEqual({
+    type: "image/png",
+    width: 1000,
+    height: 1000,
+    corner: 0,
+    middle: 255,
+  });
+  // The stage is back as it was.
+  await expect(character).toHaveAttribute("data-ready", "");
+
+  // The link opens this page set up the same way, at the same angle.
+  if (info.project.name === "phone")
+    await page.locator('#bring-ways [data-way="link"]').click();
+  await page.locator("#copy-link").click();
+  await expect(page.locator("#copy-link-label")).toHaveText("Link copied");
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+  expect(link).toContain("face=eager");
+  expect(link).toContain("view=60%2C80%2C1");
+  await page.goto(link);
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(character).toHaveAttribute("face", "eager");
+  expect(
+    await character.evaluate((el) => (el as never as { view: string }).view),
+  ).toBe("60,80,1");
+
+  // An address can ask for the section, and the sheet opens for it.
+  await page.goto("/#bring-along");
+  await expect(page.locator("#copy")).toBeVisible();
+});
+
+test("the embed follows latest with the face, tool and angle it was given, on a transparent page", async ({
+  page,
+}) => {
+  await page.goto(
+    "/embed/?version=latest&outfit=workshop&tool=drill&pose=show&face=curious&light=on&motion=off&view=-40,70,1.2",
   );
-  await expect(page.locator("thingy-character")).toHaveAttribute(
-    "pose",
-    "thinking",
-  );
+  const character = page.locator("thingy-character");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const facts = await character.evaluate((el) => {
+    const thingy = el as never as {
+      version: string;
+      tool: string;
+      pose: string;
+      view: string;
+    };
+    return {
+      version: thingy.version,
+      tool: thingy.tool,
+      pose: thingy.pose,
+      view: thingy.view,
+    };
+  });
+  expect(facts).toEqual({
+    version: "v0.14",
+    tool: "drill",
+    pose: "show",
+    view: "-40,70,1.2",
+  });
+  await expect(character).toHaveAttribute("face", "curious");
   expect(
     await page
       .locator("body")
       .evaluate((el) => getComputedStyle(el).backgroundColor),
   ).toBe("rgba(0, 0, 0, 0)");
+  // A published address that names none of this still gets v0.10, as it was.
+  await page.goto("/embed/?outfit=workshop&pose=thinking");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(
+    await character.evaluate(
+      (el) => (el as never as { version: string }).version,
+    ),
+  ).toBe("v0.10");
+  // `off` is never shown to a reader, whatever the address says.
+  await page.goto("/embed/?version=latest&outfit=librarian&face=off");
+  await expect(character).not.toHaveAttribute("face", "off");
 });
 
 test("reduced motion stays still and a missing 3D asset leaves a useful pose image", async ({

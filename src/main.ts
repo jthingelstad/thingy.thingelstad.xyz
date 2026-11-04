@@ -5,6 +5,9 @@ import {
   FACES,
   FACE_ATLAS,
   FACE_CHOICES,
+  HOME_VIEW,
+  LATEST,
+  MODEL_WEIGHT,
   OUTFITS,
   POSES,
   TOOLS,
@@ -13,9 +16,8 @@ import {
   iframeCode,
   stageOf,
   outfit,
-  pose,
+  parseView,
   posterPath,
-  embedURL,
   type AnyPose,
   type CharacterState,
   type Tool,
@@ -52,13 +54,10 @@ const state: Omit<CharacterState, "pose"> & {
   light: params.get("light") === "on",
   motion: false,
 };
-const reuse: CharacterState = {
-  outfit: "workshop",
-  pose: "present",
-  light: false,
-  motion: false,
-};
 const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
+// A shared link brings the angle with it. Set before the element starts.
+if (parseView(params.get("view")))
+  character.setAttribute("view", params.get("view")!);
 $("#outfit-options").innerHTML = Object.entries(OUTFITS)
   .map(
     ([id, item]) =>
@@ -103,6 +102,55 @@ function syncSheet(): void {
   $("#tab-pose").textContent = ALL_POSES[state.pose].label;
   $("#tab-face").textContent = FACE_CHOICES[state.face]!.label;
 }
+/** The angle he has been turned to, unless it is where he starts. */
+function turnedTo(): string | undefined {
+  const view = character.view;
+  return view && view !== HOME_VIEW ? view : undefined;
+}
+/** This page, set up as he stands now. */
+function studioAddress(): string {
+  const url = new URL(location.href);
+  url.hash = "";
+  url.searchParams.set("outfit", state.outfit);
+  url.searchParams.set("pose", state.pose);
+  if (state.tool === "none") url.searchParams.delete("tool");
+  else url.searchParams.set("tool", state.tool);
+  if (state.face === "original") url.searchParams.delete("face");
+  else url.searchParams.set("face", state.face);
+  if (state.light) url.searchParams.set("light", "on");
+  else url.searchParams.delete("light");
+  const view = turnedTo();
+  if (view) url.searchParams.set("view", view);
+  else url.searchParams.delete("view");
+  return url.href;
+}
+function embedCode(): string {
+  return iframeCode({ ...state, version: LATEST, view: turnedTo() });
+}
+/** The code and the link are always what stands on the stage right now. */
+function syncTaken(): void {
+  $("#embed-code").textContent = embedCode();
+  $("#link-code").textContent = studioAddress();
+}
+const IDLE_WORDS = {
+  "#copy-label": "Copy embed",
+  "#download-label": "Download picture",
+  "#copy-link-label": "Copy link",
+};
+/** He has changed, so "copied" and "saved" no longer describe him. */
+function syncBring(): void {
+  syncTaken();
+  const bits: string[] = [OUTFITS[state.outfit].label];
+  if (state.tool !== "none") bits.push(TOOLS[state.tool].label.toLowerCase());
+  bits.push(ALL_POSES[state.pose].label, FACE_CHOICES[state.face]!.label);
+  $("#bring-summary").textContent = `${bits.join(", ")}.`;
+  for (const node of document.querySelectorAll(".bring-weight"))
+    node.textContent = MODEL_WEIGHT[state.outfit];
+  for (const [selector, words] of Object.entries(IDLE_WORDS))
+    $(selector).textContent = words;
+  for (const way of document.querySelectorAll<HTMLElement>(".way"))
+    delete way.dataset.shown;
+}
 function syncCharacter(): void {
   for (const [name, value] of Object.entries(state))
     character.setAttribute(
@@ -144,30 +192,23 @@ function syncCharacter(): void {
   $("#play-label").textContent = state.motion ? "Pause" : "Play";
   $("#play [data-icon]").innerHTML = icon(state.motion ? "pause" : "play");
   $("#play").setAttribute("aria-pressed", String(state.motion));
-  const url = new URL(location.href);
-  url.searchParams.set("outfit", state.outfit);
-  url.searchParams.set("pose", state.pose);
-  if (state.tool === "none") url.searchParams.delete("tool");
-  else url.searchParams.set("tool", state.tool);
-  if (state.face === "original") url.searchParams.delete("face");
-  else url.searchParams.set("face", state.face);
-  if (state.light) url.searchParams.set("light", "on");
-  else url.searchParams.delete("light");
-  history.replaceState(null, "", url);
+  history.replaceState(null, "", studioAddress() + location.hash);
+  syncBring();
 }
 $("#sheet-tabs").addEventListener("click", (event) => {
   const tab = (event.target as Element).closest<HTMLElement>(
     "[data-sheet-tab]",
   );
   if (tab) {
-    const controls = $("#controls");
-    controls.dataset.tab =
-      controls.dataset.tab === tab.dataset.sheetTab
-        ? "none"
-        : tab.dataset.sheetTab;
-    syncSheet();
+    toggleSheet(tab.dataset.sheetTab!);
   }
 });
+function toggleSheet(tab: string): void {
+  const controls = $("#controls");
+  controls.dataset.tab = controls.dataset.tab === tab ? "none" : tab;
+  syncSheet();
+}
+$("#bring-toggle").addEventListener("click", () => toggleSheet("bring"));
 $("#outfit-options").addEventListener("change", (event) => {
   state.outfit = outfit((event.target as HTMLInputElement).value);
   const now = stageOf(state.outfit, MODEL, null, state.pose);
@@ -231,63 +272,83 @@ $("#play").addEventListener("click", () => {
   state.motion = !state.motion;
   syncCharacter();
 });
-$("#reset").addEventListener("click", () => character.resetView());
+$("#reset").addEventListener("click", () => {
+  character.resetView();
+  syncBring();
+});
 syncCharacter();
 syncMotionPreference();
 
-$("#reuse-outfit").innerHTML = Object.entries(OUTFITS)
-  .map(
-    ([id, item]) =>
-      `<option value="${id}" ${id === "workshop" ? "selected" : ""}>${item.label}</option>`,
-  )
-  .join("");
-function syncReuse(): void {
-  const selected = reuse.outfit;
-  const options =
-    selected === "workshop"
-      ? Object.entries(POSES)
-      : [["present", POSES.present] as const];
-  $("#reuse-poses").innerHTML = options
-    .map(
-      ([id, item]) =>
-        `<button class="preview-option" data-reuse-pose="${id}" aria-label="${item.label}" aria-pressed="${id === reuse.pose}"><img src="${posterPath(selected, pose(id))}" alt="" width="90" height="90" loading="lazy"></button>`,
-    )
-    .join("");
-  $<HTMLImageElement>("#reuse-preview").src = posterPath(selected, reuse.pose);
-  $<HTMLImageElement>("#reuse-preview").alt =
-    `Thingy, ${OUTFITS[selected].label}, ${POSES[reuse.pose].label}`;
-  $("#reuse-description").textContent = OUTFITS[selected].description;
-  $("#embed-code").textContent = iframeCode(reuse);
-  $<HTMLAnchorElement>("#download").href = posterPath(
-    selected,
-    reuse.pose,
-  ).replace(".webp", ".png");
-  $<HTMLAnchorElement>("#example-link").href = embedURL(reuse, location.origin);
-  $("#copy-label").textContent = "Copy embed";
-}
-$("#reuse-outfit").addEventListener("change", () => {
-  reuse.outfit = outfit($<HTMLSelectElement>("#reuse-outfit").value);
-  reuse.pose = "present";
-  syncReuse();
-});
-$("#reuse-poses").addEventListener("click", (event) => {
-  const button = (event.target as Element).closest<HTMLElement>(
-    "[data-reuse-pose]",
+// Turning him changes what is taken. The code follows at once; the address
+// waits for him to settle, because browsers limit how often it may change.
+let settle = 0;
+character.addEventListener("thingy-view", () => {
+  syncTaken();
+  clearTimeout(settle);
+  settle = window.setTimeout(
+    () => history.replaceState(null, "", studioAddress() + location.hash),
+    300,
   );
-  if (button) {
-    reuse.pose = pose(button.dataset.reusePose);
-    syncReuse();
-  }
 });
-$("#copy").addEventListener("click", async () => {
+// He coasts for a moment after a drag, so a press is what marks a new turn.
+for (const start of ["pointerdown", "wheel", "keydown"])
+  character.addEventListener(start, syncBring, { passive: true });
+/** An address may arrive asking for this section, which the sheet keeps closed. */
+function showBringIfAsked(): void {
+  if (location.hash === "#bring-along") {
+    $("#controls").dataset.tab = "bring";
+    syncSheet();
+  }
+}
+addEventListener("hashchange", showBringIfAsked);
+showBringIfAsked();
+$("#bring-ways").addEventListener("click", (event) => {
+  const button = (event.target as Element).closest("button");
+  if (!button) return;
+  $("#bring-along").dataset.way = button.dataset.way;
+  for (const item of $("#bring-ways").children)
+    item.setAttribute("aria-pressed", String(item === button));
+});
+async function copy(
+  text: string,
+  button: HTMLElement,
+  words: string,
+): Promise<void> {
+  const label = button.querySelector("b")!;
+  const way = button.closest(".way")!;
   try {
-    await navigator.clipboard.writeText(iframeCode(reuse));
-    $("#copy-label").textContent = "Copied";
+    await navigator.clipboard.writeText(text);
+    label.textContent = words;
   } catch {
-    $("#copy-label").textContent = "Select the code above to copy";
+    label.textContent = "Select the text below to copy";
+    way.setAttribute("data-shown", "");
+  }
+}
+$("#copy").addEventListener("click", async () => {
+  // What was copied stays readable under the button.
+  $("#copy").closest(".way")!.setAttribute("data-shown", "");
+  await copy(embedCode(), $("#copy"), "Embed copied");
+});
+$("#copy-link").addEventListener("click", () =>
+  copy(studioAddress(), $("#copy-link"), "Link copied"),
+);
+$("#download").addEventListener("click", async () => {
+  const label = $("#download-label");
+  try {
+    const picture = await character.picture();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(picture);
+    const name = [state.outfit, state.tool, state.pose, state.face].filter(
+      (word) => word !== "none" && word !== "original",
+    );
+    link.download = `thingy-${name.join("-")}.png`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+    label.textContent = "Picture saved";
+  } catch {
+    label.textContent = "The picture needs the 3D view";
   }
 });
-syncReuse();
 $("#builder-lineup").innerHTML = (
   ["hello", "present", "thinking", "rest"] as const
 )

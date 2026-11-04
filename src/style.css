@@ -328,8 +328,8 @@ h1 {
 }
 #face-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 .face-option {
   min-width: 0;
@@ -356,7 +356,7 @@ h1 {
   outline-color: var(--green);
 }
 .face-note {
-  margin: 11px 0 0;
+  margin: 9px 0 0;
   min-height: 3em;
   font-size: 13px;
   line-height: 1.45;
@@ -468,98 +468,6 @@ h1 {
   color: var(--muted);
   margin-bottom: 0;
 }
-.bring-along {
-  border-top: 1px solid #a9ada2;
-  margin-top: 20px;
-  padding: 38px 0 54px;
-  display: grid;
-  grid-template-columns: 43% 23% minmax(0, 1fr);
-  gap: 30px;
-}
-.bring-intro {
-  position: relative;
-  min-height: 245px;
-  padding-right: 160px;
-}
-.bring-along h2 {
-  font-size: clamp(32px, 3.15vw, 49px);
-  font-weight: 800;
-  line-height: 1.06;
-  white-space: nowrap;
-}
-.bring-intro p {
-  font-size: 23px;
-  line-height: 1.4;
-  letter-spacing: -0.025em;
-  margin: 18px 0 0;
-  white-space: nowrap;
-  color: #43484b;
-}
-.bring-intro > img {
-  position: absolute;
-  right: -2%;
-  top: -15px;
-  width: 225px;
-  height: 260px;
-  object-fit: contain;
-}
-.reuse-options {
-  padding-top: 2px;
-}
-.reuse-options label,
-.field-label,
-.embed-code h3 {
-  font-family: var(--jt-font-body);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0;
-  display: block;
-  margin: 0 0 9px;
-}
-.reuse-options select {
-  width: 100%;
-  height: 42px;
-  border: 1px solid #c3c8bc;
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: var(--ink);
-  background: transparent;
-  font-size: 14px;
-}
-.field-label {
-  margin-top: 18px;
-}
-.pose-previews {
-  display: flex;
-  gap: 7px;
-}
-.preview-option {
-  border: 1px solid #d1d4c9;
-  border-radius: 6px;
-  background: transparent;
-  min-width: 0;
-  flex: 1;
-  padding: 0;
-}
-.preview-option[aria-pressed="true"] {
-  border: 1.5px solid var(--green);
-  background: var(--soft);
-}
-.preview-option img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.reuse-description,
-.embed-note {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.reuse-description {
-  min-height: 44px;
-  margin: 12px 0;
-}
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -572,49 +480,120 @@ h1 {
   width: 14px;
   height: 14px;
 }
-.embed-code {
-  padding-top: 2px;
-  min-width: 0;
+.bring-toggle,
+.bring-summary,
+.bring-ways,
+.way > p {
+  display: none;
 }
-.embed-code pre {
-  background: #eeece3;
-  margin: 0 0 10px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  font-size: 12px;
-  line-height: 1.6;
-  max-height: 125px;
-  overflow: auto;
+.bring {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 16px;
 }
-.embed-code code {
-  font-family: var(--jt-font-mono);
+.bring h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
 }
-.copy-button {
-  width: 100%;
-  padding-block: 13px;
-  min-height: 48px;
+.bring:target h2 {
+  color: var(--green);
 }
-.download {
+.way + .way {
+  margin-top: 7px;
+}
+.take {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-  color: var(--green);
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 12px;
+  border: 1px solid #c9ccc2;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
   font-size: 14px;
-  font-weight: 500;
-  flex-wrap: wrap;
+  text-align: left;
+  cursor: pointer;
 }
-.download .format {
-  font-weight: 400;
+.take:hover {
+  background: #f0f0e9;
 }
-.download svg {
+.take > [data-icon] {
+  display: flex;
+  flex-shrink: 0;
+}
+.take svg {
   width: 20px;
   height: 20px;
 }
-.embed-note {
-  margin-bottom: 0;
+.take b {
+  display: block;
+  font-weight: 600;
+}
+.take small {
+  display: block;
+  margin-top: 1px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.way pre {
+  display: none;
+  margin: 7px 0 0;
+  padding: 10px;
+  max-height: 104px;
+  overflow: auto;
+  border-radius: 8px;
+  background: #eeece3;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.way code {
+  font-family: var(--jt-font-mono);
+}
+.way[data-shown] pre {
+  display: block;
+}
+/* A short window: the three ways sit side by side, like the pose tiles, so
+   Thingy and everything in the rail still fit. */
+@media (min-width: 1001px) and (max-height: 860px) {
+  .bring {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .bring h2,
+  .way pre {
+    grid-column: 1 / -1;
+  }
+  .bring h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .way {
+    display: contents;
+  }
+  .take {
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .take small {
+    display: none;
+  }
+  .way pre {
+    margin: 0;
+    order: 1;
+  }
 }
 .builder-example {
   border-top: 1px solid var(--line);
@@ -666,13 +645,6 @@ footer p {
 footer span {
   padding: 0 8px;
 }
-/* A short window: the faces go three across so they, the switch and the buttons fit. */
-@media (min-width: 1001px) and (max-height: 850px) {
-  #face-options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-}
 @media (max-width: 1240px) {
   .studio {
     --rail: 232px;
@@ -682,27 +654,6 @@ footer span {
   }
 }
 @media (max-width: 1180px) {
-  .bring-along {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-  .bring-intro {
-    grid-column: 1/-1;
-    min-height: 150px;
-    padding-right: 250px;
-  }
-  .bring-intro > img {
-    right: 10%;
-    top: -30px;
-    height: 205px;
-    width: 205px;
-  }
-  .bring-along h2 {
-    font-size: 40px;
-  }
-  .bring-intro p {
-    font-size: 23px;
-  }
   .builder-example {
     grid-template-columns: 1fr 1.5fr;
     gap: 20px;
@@ -799,6 +750,117 @@ footer span {
   }
   .controls[data-tab="more"] .more {
     display: flex;
+  }
+  .bring {
+    display: none;
+    margin: 0;
+    padding: 8px 5px 10px;
+    border: 0;
+  }
+  .controls[data-tab="bring"] .bring {
+    display: block;
+  }
+  .bring h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .bring-summary {
+    display: block;
+    margin: 0 0 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #43484b;
+  }
+  .bring-ways {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 10px;
+    background: #f0efe7;
+  }
+  .bring-ways button {
+    flex: 1;
+    min-height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #43484b;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .bring-ways button[aria-pressed="true"] {
+    background: #fff;
+    color: var(--green);
+  }
+  .way {
+    display: none;
+    margin: 0;
+  }
+  .way + .way {
+    margin: 0;
+  }
+  .bring[data-way="live"] .way[data-way="live"],
+  .bring[data-way="picture"] .way[data-way="picture"],
+  .bring[data-way="link"] .way[data-way="link"] {
+    display: flex;
+    flex-direction: column;
+  }
+  .way > p {
+    display: block;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .way pre {
+    display: block;
+    order: 1;
+    margin: 0 0 10px;
+  }
+  .take {
+    order: 2;
+    justify-content: center;
+    min-height: 48px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--green);
+    color: #fff;
+    font-size: 15px;
+  }
+  .take:hover {
+    background: #173f2b;
+  }
+  .take > [data-icon],
+  .take small {
+    display: none;
+  }
+  .bring-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--green);
+    border-radius: 22px;
+    background: #fff;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 2;
+  }
+  .bring-toggle[aria-expanded="true"] {
+    background: var(--green);
+    color: #fff;
+  }
+  .way pre {
+    max-height: 72px;
+  }
+  .studio:has(.controls[data-tab="bring"]) .turntable {
+    bottom: 342px;
+    height: min(calc(100% - 386px), 112vw);
   }
   .controls legend {
     position: absolute;
@@ -923,70 +985,6 @@ footer span {
   }
   .site-header nav .ask {
     margin-left: 0;
-  }
-  .bring-along {
-    margin-top: 32px;
-    padding-top: 30px;
-    display: block;
-  }
-  .bring-intro {
-    min-height: 230px;
-    padding: 0 120px 0 0;
-  }
-  .bring-along h2 {
-    font-size: 36px;
-    white-space: normal;
-    width: 70%;
-  }
-  .bring-intro p {
-    font-size: 18px;
-    white-space: normal;
-    width: 70%;
-    line-height: 1.5;
-  }
-  .bring-intro > img {
-    right: -25px;
-    top: 0;
-    width: 190px;
-    height: 225px;
-  }
-  .reuse-options {
-    margin-top: 6px;
-  }
-  .reuse-options label,
-  .field-label,
-  .embed-code h3 {
-    font-size: 15px;
-  }
-  .reuse-options select {
-    font-size: 16px;
-    height: 46px;
-  }
-  .pose-previews {
-    max-width: 360px;
-    gap: 10px;
-  }
-  .reuse-description {
-    min-height: 0;
-    font-size: 15px;
-    margin: 15px 0;
-  }
-  .reuse-options .text-link {
-    font-size: 15px;
-  }
-  .embed-code {
-    margin-top: 28px;
-  }
-  .embed-code pre {
-    font-size: 13px;
-    max-height: none;
-  }
-  .download {
-    font-size: 15px;
-    gap: 8px;
-  }
-  .embed-note {
-    font-size: 14px;
   }
   .builder-example {
     display: block;

@@ -6,15 +6,19 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import {
   ALL_POSES,
   FACES,
+  HOME_CAMERA,
   OUTFITS,
   TOOLS,
+  VIEW_LIMITS,
   anyPose,
   face,
   faceOffset,
   modelVersion,
   outfit,
+  parseView,
   stageOf,
   posterPath,
+  viewValue,
   type AnyPose,
   type Outfit,
   type Tool,
@@ -80,6 +84,7 @@ export class ThingyCharacter extends HTMLElement {
     "zoom",
     "poster",
     "view-label",
+    "view",
   ];
   #root = this.attachShadow({ mode: "open" });
   #renderer?: THREE.WebGLRenderer;
@@ -147,6 +152,19 @@ export class ThingyCharacter extends HTMLElement {
     ).href;
   }
 
+  /** Where he has been turned to, as the `view` attribute would say it. */
+  get view(): string {
+    if (!this.#controls) return "";
+    const where = new THREE.Spherical().setFromVector3(
+      this.#camera.position.clone().sub(this.#controls.target),
+    );
+    return viewValue({
+      azimuth: THREE.MathUtils.radToDeg(where.theta),
+      polar: THREE.MathUtils.radToDeg(where.phi),
+      zoom: this.#camera.zoom,
+    });
+  }
+
   #stage() {
     return stageOf(
       this.outfit,
@@ -181,16 +199,80 @@ export class ThingyCharacter extends HTMLElement {
       this.#scheduleBlink();
     } else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
+    else if (name === "view") this.#setView();
     else if (name === "pose" || name === "tool") this.#setPose();
   }
 
+  /** A spin still dying away from a drag would carry him off a set angle. */
+  #stopSpin(): void {
+    if (!this.#controls) return;
+    this.#controls.enableDamping = false;
+    this.#controls.update();
+    this.#controls.enableDamping = true;
+  }
+
   resetView(): void {
-    this.#camera.position.set(3.5, 3.0, 12);
+    this.#stopSpin();
+    this.#camera.position.set(...HOME_CAMERA.position);
     this.#camera.zoom = 1;
     this.#camera.updateProjectionMatrix();
-    this.#controls?.target.set(0, 1.38, 0);
+    this.#controls?.target.set(...HOME_CAMERA.target);
     this.#controls?.update();
     this.#dirty = true;
+  }
+
+  #setView(): void {
+    const view = parseView(this.getAttribute("view"));
+    if (!view || !this.#controls) return;
+    this.#stopSpin();
+    const distance = this.#camera.position
+      .clone()
+      .sub(this.#controls.target)
+      .length();
+    this.#camera.position
+      .setFromSphericalCoords(
+        distance,
+        THREE.MathUtils.degToRad(view.polar),
+        THREE.MathUtils.degToRad(view.azimuth),
+      )
+      .add(this.#controls.target);
+    this.#camera.zoom = view.zoom;
+    this.#camera.updateProjectionMatrix();
+    this.#controls.update();
+    this.#dirty = true;
+  }
+
+  /**
+   * A picture of him just as he stands now, square and transparent. It rejects
+   * if there is no model to draw. The frame is drawn and restored in one task,
+   * so nothing shows on the page.
+   */
+  picture(size = 1000): Promise<Blob> {
+    const renderer = this.#renderer;
+    if (!renderer || !this.#model || !this.hasAttribute("data-ready"))
+      return Promise.reject(new Error("Thingy is not ready"));
+    const canvas = renderer.domElement;
+    const ratio = renderer.getPixelRatio();
+    const { left, right } = this.#camera;
+    const pending = new Promise<Blob>((resolve, reject) => {
+      renderer.setPixelRatio(1);
+      renderer.setSize(size, size, false);
+      this.#camera.left = this.#camera.bottom;
+      this.#camera.right = this.#camera.top;
+      this.#camera.updateProjectionMatrix();
+      renderer.render(this.#scene, this.#camera);
+      canvas.toBlob(
+        (blob) =>
+          blob ? resolve(blob) : reject(new Error("No picture was made")),
+        "image/png",
+      );
+    });
+    renderer.setPixelRatio(ratio);
+    this.#camera.left = left;
+    this.#camera.right = right;
+    this.#resize();
+    renderer.render(this.#scene, this.#camera);
+    return pending;
   }
 
   /**
@@ -271,13 +353,20 @@ export class ThingyCharacter extends HTMLElement {
       this.#controls.enableDamping = true;
       this.#controls.dampingFactor = 0.09;
       this.#controls.enablePan = false;
-      this.#controls.minZoom = 0.65;
-      this.#controls.maxZoom = 2.4;
-      this.#controls.minPolarAngle = Math.PI * 0.18;
-      this.#controls.maxPolarAngle = Math.PI * 0.63;
+      this.#controls.minZoom = VIEW_LIMITS.zoom[0];
+      this.#controls.maxZoom = VIEW_LIMITS.zoom[1];
+      this.#controls.minPolarAngle = THREE.MathUtils.degToRad(
+        VIEW_LIMITS.polar[0],
+      );
+      this.#controls.maxPolarAngle = THREE.MathUtils.degToRad(
+        VIEW_LIMITS.polar[1],
+      );
       this.#setZoom();
       this.#controls.addEventListener("change", () => {
         this.#dirty = true;
+        this.dispatchEvent(
+          new CustomEvent("thingy-view", { bubbles: true, composed: true }),
+        );
       });
       // A press that barely moves is a tap, for the host page to answer; a
       // vertical swipe scrolls the page and arrives here as a pointercancel.
@@ -394,6 +483,7 @@ export class ThingyCharacter extends HTMLElement {
       ground.position.y = 0.005;
       this.#scene.add(ground);
       this.resetView();
+      this.#setView();
       this.#observer = new ResizeObserver(() => this.#resize());
       this.#observer.observe(this);
       this.#intersection = new IntersectionObserver(([entry]) => {
@@ -626,9 +716,15 @@ export class ThingyCharacter extends HTMLElement {
       );
       this.#camera.position.copy(this.#controls.target).add(offset);
     } else if (this.zoomable && (event.key === "+" || event.key === "="))
-      this.#camera.zoom = Math.min(2.4, this.#camera.zoom * 1.1);
+      this.#camera.zoom = Math.min(
+        VIEW_LIMITS.zoom[1],
+        this.#camera.zoom * 1.1,
+      );
     else if (this.zoomable && event.key === "-")
-      this.#camera.zoom = Math.max(0.65, this.#camera.zoom / 1.1);
+      this.#camera.zoom = Math.max(
+        VIEW_LIMITS.zoom[0],
+        this.#camera.zoom / 1.1,
+      );
     else if (event.key === "Home") this.resetView();
     else if (event.key === "Enter" || event.key === " ") this.#tap();
     else return;

@@ -54,9 +54,12 @@ pages light.
 
 ### A character you can turn around: an iframe
 
+The studio's **Bring him along** gives you this code for whatever stands on the
+stage, or write it yourself:
+
 ```html
 <iframe
-  src="https://thingy.thingelstad.xyz/embed/?outfit=workshop&pose=present&light=off&motion=off"
+  src="https://thingy.thingelstad.xyz/embed/?version=latest&outfit=workshop&tool=hammer&pose=show&face=proud&light=off&motion=off"
   title="Thingy, Workshop Builder"
   width="360"
   height="400"
@@ -65,10 +68,23 @@ pages light.
 ></iframe>
 ```
 
+`version=latest` follows the newest model, so an embed changes when this site's
+does. Name a version to keep one model for good; with no `version` the frame stays
+on v0.10 and has no faces or tools, as every address from before this did. `tool`
+and `face` take the values listed under the component below. `view=<round>,<up>,<zoom>`
+starts him at an angle: degrees around him, degrees down from straight above, and
+zoom, as `view=60,80,1.2`. He can still be turned from there.
+
 The frame has a transparent background and no surrounding controls. Drag to
 rotate; use the scroll wheel to zoom. The canvas also supports left/right arrows,
 plus/minus, and Home. Motion defaults off and obeys reduced motion even when the
 URL asks for it. The full character home has the wardrobe and pose controls.
+
+### A picture of him as you have him
+
+**Download picture** in the same place saves a square 1000 px transparent PNG drawn
+from the stage: this outfit, tool, pose, face and light, at the angle you turned him.
+No still is published for it, so every combination works.
 
 ### A component inside an application
 
@@ -107,6 +123,8 @@ More optional attributes, for a page that wants him as its centrepiece:
   no `tool`, `pose="present"` is the laptop, as it is on v0.10. Tool poses are single
   frames, so `motion` has nothing to play; the element's `moves` property says so.
 - `zoom="off"` leaves the mouse wheel to the page and drops the zoom keys.
+- `view` starts him at an angle, written as the iframe's `view` is. The element's
+  `view` property reads where he is now, and `thingy-view` fires as it changes.
 - `poster` replaces the pose image shown until the model is ready, and
   `view-label` replaces the canvas's accessible name.
 
@@ -115,6 +133,8 @@ A press that barely moves, or Enter or Space on the focused canvas, emits
 `hop({ height, direction, turns })` is one such answer: he jumps `height` CSS
 pixels and spins (`direction` 1 or -1, one turn by default), landing where he
 began. It does nothing under reduced motion.
+`picture(size)` resolves to a square transparent PNG of him as he stands now, and
+rejects until he is ready.
 
 The iframe is the simplest integration when the consuming site has a strict
 content security policy. A native component needs its host in `script-src` and

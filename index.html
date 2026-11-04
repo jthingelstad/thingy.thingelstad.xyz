@@ -74,6 +74,15 @@
             A builder. Always Thingy.
           </p>
         </div>
+        <button
+          class="bring-toggle"
+          id="bring-toggle"
+          data-sheet-tab="bring"
+          aria-controls="bring-along"
+          aria-expanded="false"
+        >
+          Bring him
+        </button>
         <div class="turntable">
           <div class="ground-ring" aria-hidden="true"></div>
           <thingy-character
@@ -184,60 +193,66 @@
                 Your reduced-motion setting is on. Poses stay still.
               </p>
             </div>
+            <section
+              class="bring"
+              id="bring-along"
+              data-panel="bring"
+              data-way="live"
+              aria-labelledby="bring-title"
+            >
+              <h2 id="bring-title">Bring him along</h2>
+              <p class="bring-summary" id="bring-summary"></p>
+              <div class="bring-ways" id="bring-ways">
+                <button data-way="live" aria-pressed="true">Live</button
+                ><button data-way="picture" aria-pressed="false">Picture</button
+                ><button data-way="link" aria-pressed="false">Link</button>
+              </div>
+              <div class="way" data-way="live">
+                <p>
+                  The real 3D Thingy. People can drag him round on your page.
+                  Loads a <span class="bring-weight"></span> model.
+                </p>
+                <button class="take" id="copy">
+                  <span data-icon="code"></span
+                  ><span
+                    ><b id="copy-label">Copy embed</b
+                    ><small
+                      >Live 3D on your site,
+                      <span class="bring-weight"></span> model</small
+                    ></span
+                  >
+                </button>
+                <pre tabindex="0"><code id="embed-code"></code></pre>
+              </div>
+              <div class="way" data-way="picture">
+                <p>
+                  A still image, turned just the way you have him now.
+                  Transparent background.
+                </p>
+                <button class="take" id="download">
+                  <span data-icon="image"></span
+                  ><span
+                    ><b id="download-label">Download picture</b
+                    ><small>A still, as you have him turned now</small></span
+                  >
+                </button>
+              </div>
+              <div class="way" data-way="link">
+                <p>
+                  This page, set up like this. For sharing him with someone.
+                </p>
+                <button class="take" id="copy-link">
+                  <span data-icon="link"></span
+                  ><span
+                    ><b id="copy-link-label">Copy link</b
+                    ><small>This page, set up like this</small></span
+                  >
+                </button>
+                <pre tabindex="0"><code id="link-code"></code></pre>
+              </div>
+            </section>
           </div>
         </aside>
-      </section>
-      <section
-        class="bring-along"
-        id="bring-along"
-        aria-labelledby="bring-title"
-      >
-        <div class="bring-intro">
-          <h2 id="bring-title">Bring Thingy along.</h2>
-          <p>
-            Choose a character. Pick a pose.<br />Give him a place on your site.
-          </p>
-          <img
-            id="reuse-preview"
-            src="/character/v0.10/poses/workshop-present.webp"
-            alt="Thingy as the Workshop Builder, presenting a laptop"
-            width="360"
-            height="360"
-            loading="lazy"
-          />
-        </div>
-        <div class="reuse-options">
-          <label for="reuse-outfit">Character</label
-          ><select id="reuse-outfit"></select>
-          <p class="field-label">Pose preview</p>
-          <div id="reuse-poses" class="pose-previews"></div>
-          <p id="reuse-description" class="reuse-description"></p>
-          <a
-            id="example-link"
-            class="text-link"
-            href="/embed/?outfit=workshop&amp;pose=present"
-            >Open this character <span data-icon="external"></span
-          ></a>
-        </div>
-        <div class="embed-code">
-          <h3>Embed in your website</h3>
-          <pre tabindex="0"><code id="embed-code"></code></pre>
-          <button class="button primary copy-button" id="copy">
-            <span data-icon="copy"></span
-            ><span id="copy-label">Copy embed</span></button
-          ><a
-            class="download"
-            id="download"
-            href="/character/v0.10/poses/workshop-present.png"
-            download
-            ><span data-icon="image"></span>Download a pose image
-            <span class="format">(PNG, transparent)</span></a
-          >
-          <p class="embed-note">
-            One address for each outfit and pose. The image works in any page;
-            the embed adds rotation and motion.
-          </p>
-        </div>
       </section>
       <section class="builder-example" aria-labelledby="builder-title">
         <div>
