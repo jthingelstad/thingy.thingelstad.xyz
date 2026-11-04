@@ -15,7 +15,7 @@ To bring Thingy into a project, read one document: the Thingy Kit, https://thing
 - Models: `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`)
 - Stills: `https://thingy.thingelstad.xyz/character/latest/poses/<outfit>-<pose>.webp` (transparent; the manifest lists which exist)
 - Iframe: `https://thingy.thingelstad.xyz/embed/?version=latest&outfit=<outfit>&pose=<pose>&face=<face>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
-- Illustration: `https://thingy.thingelstad.xyz/thingy-original.png`, the original drawing, a 1022 px PNG for `og:image` and icons
+- Illustration: `https://thingy.thingelstad.xyz/thingy-original.png`, the original drawing in the librarian's jacket, a 1022 px PNG of 220 KB for `og:image` and icons
 - Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character version="latest" outfit="workshop" tool="hammer" pose="work" face="proud">`. The kit lists every attribute, event and method.
 
 ## Keep one Thingy for good

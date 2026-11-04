@@ -45,7 +45,8 @@ site check fails if it or `llms.txt` names a file that was not built.
 must publish every still named there, or the contract tests fail. A change to the
 persona opens an issue listing the words each surface keeps of its own to reread
 (`tools/persona-rollout.mjs`). That workflow has not run yet, since the persona has
-not changed since it was added.
+not changed since it was added. This repository is private, so the issue and its
+links are for Jamie and his agents.
 
 Things I've Built uses smaller vendored copies of the stills: hello on its index,
 present on About, thinking on Search, and rest on its 404 page.
