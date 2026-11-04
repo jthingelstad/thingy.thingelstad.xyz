@@ -1,7 +1,9 @@
 # Thingy's character home
 
-An independent static character viewer for `thingy.thingelstad.xyz`, paired with
-the librarian at `https://thingy.thingelstad.com/`. Read the parent project guide.
+The source of Thingy's character, published as the static site
+`thingy.thingelstad.xyz`: his persona, his model and the code to show him. Other
+projects take him from here, starting with the librarian at
+`https://thingy.thingelstad.com/`. Read the parent project guide.
 
 - Use Node 24, TypeScript, Vite, and Three.js. This is a reusable web component,
   so consumers do not need a particular application framework.
@@ -12,6 +14,11 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - `persona/THINGY.md` is Thingy's persona and the authority for him on every
   surface (approved by Jamie, November 3, 2026). Edit it only on Jamie's word;
   `/persona/` and `/persona.md` are built from it.
+- `kit/KIT.md` is the Thingy Kit, the one link to send anyone bringing him into a
+  project, published as `/kit/` and `/kit.md`. Anything a consumer can use (an
+  attribute, event, method, outfit, pose, face, tool or address) goes in it, and
+  `llms.txt` stays an index that leads to it. It repeats persona lines but never
+  defines him: `persona/THINGY.md` wins.
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.

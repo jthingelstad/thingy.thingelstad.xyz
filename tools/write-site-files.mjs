@@ -1,5 +1,5 @@
-// After the Vite builds: write dist/sitemap.xml, dist/revision.json and
-// dist/persona.md, the persona as agents read it.
+// After the Vite builds: write dist/sitemap.xml, dist/revision.json, and
+// dist/persona.md and dist/kit.md, the persona and the kit as agents read them.
 //
 // Each sitemap URL's lastmod is the last commit that touched the files the
 // page is made from, never the build time (search-consoles rule, 2026-10-28).
@@ -34,6 +34,15 @@ export const PAGES = [
     ],
   },
   {
+    path: "/kit/",
+    sources: [
+      "kit/index.html",
+      "kit/KIT.md",
+      "src/markdown.ts",
+      "src/style.css",
+    ],
+  },
+  {
     path: "/print/",
     sources: ["print/index.html", "src/style.css", "public/print"],
   },
@@ -53,6 +62,7 @@ await fs.writeFile(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
 );
 await fs.copyFile("persona/THINGY.md", "dist/persona.md");
+await fs.copyFile("kit/KIT.md", "dist/kit.md");
 // character/latest/ is the newest version's directory, so a page can name the
 // newest model or still at one address that never changes.
 await fs.cp(

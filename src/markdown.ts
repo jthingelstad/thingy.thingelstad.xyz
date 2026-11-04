@@ -1,7 +1,7 @@
-// A small Markdown renderer for persona/THINGY.md, run at build time so the
-// persona page and /persona.md come from the same file. It knows only what
-// that file uses: headings, paragraphs, nested lists, one table, block quotes,
-// links, code, bold and emphasis. Anything else stays as escaped text.
+// A small Markdown renderer for persona/THINGY.md and kit/KIT.md, run at build
+// time so each page and its .md address come from the same file. It knows only
+// what those files use: headings, paragraphs, nested lists, tables, block quotes,
+// fenced code, links, code, bold and emphasis. Anything else stays as escaped text.
 
 const escape = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -125,6 +125,15 @@ export function renderMarkdown(
       );
       continue;
     }
+    if (line.startsWith("```")) {
+      index++;
+      const code = take((l) => !l.startsWith("```"));
+      index++;
+      out.push(
+        `<pre tabindex="0"><code>${escape(code.join("\n"))}</code></pre>`,
+      );
+      continue;
+    }
     if (line.startsWith(">")) {
       const block = take((l) => l.startsWith(">")).map((l) =>
         l.replace(/^> ?/, ""),
@@ -142,7 +151,9 @@ export function renderMarkdown(
       );
       continue;
     }
-    const paragraph = take((l) => !!l.trim() && !/^(#{1,4} |>|\||- )/.test(l));
+    const paragraph = take(
+      (l) => !!l.trim() && !/^(#{1,4} |>|\||- |```)/.test(l),
+    );
     out.push(`<p>${inline(paragraph.map((l) => l.trim()).join(" "))}</p>`);
   }
   return out.join("\n");

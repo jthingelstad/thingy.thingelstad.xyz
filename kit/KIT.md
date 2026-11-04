@@ -1,0 +1,271 @@
+# Thingy Kit
+
+Everything needed to bring Thingy into a project, behind one link:
+**https://thingy.thingelstad.xyz/kit/**. Send it to a person, or give it to an
+agent:
+
+> Read https://thingy.thingelstad.xyz/kit.md and bring Thingy into this project.
+
+This site is the source of Thingy. His persona, his model, his faces and his
+code are published here, and every place he appears takes him from here. When
+he changes here, a project that follows these addresses changes with him.
+
+## What is in the kit
+
+| Part             | What it is                                                            | Where                                                                                                            |
+| ---------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| His persona      | Who he is, how he talks, and what he never does. The authority on him | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
+| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
+| His pictures     | Transparent stills, with no code to run                               | `https://thingy.thingelstad.xyz/character/latest/poses/`                                                         |
+| A frame          | An iframe with him in it, with no code to run                         | `https://thingy.thingelstad.xyz/embed/`                                                                          |
+| A component      | The `<thingy-character>` web component, for any framework             | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
+| His voice        | The one spoken voice he has                                           | [How he sounds](https://thingy.thingelstad.xyz/persona/#how-he-sounds), in the persona                           |
+| What he knows    | Jamie's published work, through the Librarian MCP server              | [Connect your AI](https://thingy.thingelstad.com/connect/) on Ask Thingy                                         |
+| A model to print | A 180 mm figure, as 3MF and zipped STL                                | [Print Thingy](https://thingy.thingelstad.xyz/print/)                                                            |
+
+To try him without writing anything, use [the stage](https://thingy.thingelstad.xyz/).
+Dress him and turn him, then **Bring him along** gives you the code, a picture
+or a link for exactly what you see.
+
+## Start with his job
+
+Thingy is the same character everywhere, and each place gives him a job. The job
+picks the outfit and how much of his personality comes through. The jobs he has
+today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-works):
+
+| Job                           | Outfit            | Use `outfit=`                         |
+| ----------------------------- | ----------------- | ------------------------------------- |
+| Librarian                     | Librarian         | `librarian`                           |
+| Builder and record keeper     | Workshop builder  | `workshop`, with a `tool` for the job |
+| Host of Supporting Membership | Concert companion | `concert`                             |
+| On the trail, outdoors        | Trail companion   | `trail`                               |
+
+If the project fits one of those, use it. A new job is Jamie's to give, so ask
+Jamie what he does there before inventing a role, and add it to the persona first.
+
+## Give him words
+
+Whichever model writes as Thingy follows the persona. Give that model all of
+[persona.md](https://thingy.thingelstad.xyz/persona.md) rather than a summary.
+It is about 17 KB, and it is meant to be read whole.
+
+- **Load it, or vendor it with a check.** Fetch it at build time, or keep a copy
+  with a test that fails when the copy falls behind. Never rewrite it or fork it.
+- **Your surface adds mechanics, not character.** Citations, lengths and formats
+  belong to your project. Who he is does not.
+- **Facts have owners.** He reads a figure from where it lives and never states
+  one from memory. The persona names each owner.
+
+The lines that matter most, all from the persona, which wins if these ever differ:
+
+- He is never Jamie. He never writes as Jamie, and his words never pass as Jamie's.
+- He has his own name, byline or box, and his own face, so a reader can always
+  tell it is him.
+- He invents nothing: no fact, figure, date, quotation, citation or feeling.
+- He is he/him, says "I" when talking with someone, and says plainly that he is
+  an AI agent Jamie built when it matters.
+- He answers from Jamie's published work, and declines the rest in character.
+
+To speak, he uses OpenAI `tts-1-hd` with the voice `nova`, for his own words only.
+The persona has the current voice and the hand-offs.
+
+To answer from the archive, connect the
+[Librarian MCP server](https://thingy.thingelstad.com/connect/) at
+`https://librarian.thingelstad.com/mcp`. Its
+[reference](https://thingy.thingelstad.com/connect/reference/) lists every tool.
+Readers sign in with an active Weekly Thing subscription. An agent can also use
+[Ask Thingy's llms.txt](https://thingy.thingelstad.com/llms.txt).
+
+## Show him
+
+| You want                                  | Use           | It costs                                               |
+| ----------------------------------------- | ------------- | ------------------------------------------------------ |
+| A picture on a page                       | A still       | Under 60 KB, and no JavaScript                         |
+| Him on a page, turnable by whoever visits | The frame     | A model of about 2 MB, loaded inside the frame         |
+| Him inside an app, reacting to it         | The component | `thingy.js` at about 820 KB, and a model of about 2 MB |
+| Him in your own 3D scene                  | The model     | A model of about 2 MB, and your own renderer           |
+
+Each of these follows the newest Thingy as written here. See
+[Follow him or keep him](#follow-him-or-keep-him) to hold one still instead.
+
+### A still
+
+```html
+<img
+  src="https://thingy.thingelstad.xyz/character/latest/poses/workshop-hello.webp"
+  alt="Thingy, the Workshop Builder, waving hello"
+  width="240"
+  height="240"
+/>
+```
+
+The name is `<outfit>-<pose>.webp`, 1000 px square and transparent. Every outfit
+has `present`. The Librarian and the Workshop Builder have more, with tools and
+faces such as `librarian-rest-delighted.webp`. Each outfit's `stills` in the
+[manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
+what exists. For a combination with no still, **Download picture** on the stage
+draws one for you.
+
+### The frame
+
+```html
+<iframe
+  src="https://thingy.thingelstad.xyz/embed/?version=latest&outfit=workshop&tool=hammer&pose=show&face=proud&light=off&motion=off"
+  title="Thingy, the Workshop Builder"
+  width="360"
+  height="400"
+  loading="lazy"
+  style="border:0;background:transparent"
+></iframe>
+```
+
+It is transparent, with no controls around him, and it needs nothing from your
+page, so it suits a strict content security policy. It takes `version`, `outfit`,
+`pose`, `tool`, `face`, `light`, `motion` and `view`. Always pass `version=latest`
+or a numbered version: with none, the frame stays on v0.10, which has no faces or
+tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
+degrees down from straight above, and zoom, as `view=60,80,1.2`.
+
+### The component
+
+```html
+<script type="module" src="https://thingy.thingelstad.xyz/thingy.js"></script>
+<thingy-character
+  version="latest"
+  outfit="librarian"
+  pose="hello"
+  face="idle"
+  light="off"
+  motion="off"
+  style="display:block;width:320px;height:380px"
+></thingy-character>
+```
+
+It works in plain HTML or any framework. Change an attribute and he changes.
+
+| Attribute    | Values                                                                       |
+| ------------ | ---------------------------------------------------------------------------- |
+| `version`    | `latest` or a numbered version such as `v0.14`. With none, it stays on v0.10 |
+| `outfit`     | `librarian`, `workshop`, `concert`, `trail`                                  |
+| `pose`       | See [poses](#poses)                                                          |
+| `face`       | See [faces](#faces)                                                          |
+| `tool`       | See [tools](#tools). Workshop outfit only                                    |
+| `light`      | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
+| `motion`     | `on` or `off`. It obeys reduced motion even when `on`                        |
+| `blink`      | `on` blinks the faces that can, never under reduced motion                   |
+| `view`       | The angle he starts at, written as the frame's `view` is                     |
+| `zoom`       | `off` leaves the mouse wheel to the page                                     |
+| `poster`     | An image to show until the model is ready                                    |
+| `view-label` | The canvas's accessible name                                                 |
+| `asset-base` | Another directory to load the models from, when hosting the files yourself   |
+
+- **Events:** `thingy-ready`, `thingy-change`, `thingy-view` as he turns,
+  `thingy-tap` on a press that barely moves, and `thingy-fallback` when he falls
+  back to a still because 3D could not start.
+- **Methods:** `resetView()`, `hop({ height, direction, turns })` to jump and spin,
+  and `picture(size)`, which resolves to a square transparent PNG of him as he
+  stands now.
+- **Properties:** `view` reads where he is now, and `moves` says whether the pose
+  has motion to play.
+- **Content security policy:** the host needs to be in `script-src` and
+  `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,
+  and `blob:` in `connect-src` and `img-src` for the textures.
+
+### The model
+
+Load `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` with
+[Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
+decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
+in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
+shared rig of 40 joints.
+
+- **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
+  each pose's `stillFrame`, the frame to hold for a still pose.
+- **Tools** are skinned nodes in `workshop.glb`, named `Thingy_Tool_<name>`, with
+  clips named `<tool>-<pose>`. Show one node at a time.
+- **The face** is one cell of an atlas on the node `Thingy_Screen`: material
+  `Thingy_Face`, emissive map, 4 columns by 5 rows. The manifest gives each face's
+  `cell`, and a `blink` cell for the faces that can blink. `faces.webp` is the same
+  atlas, small, for a page offering the faces.
+- **The antenna** is the material `Thingy_Beacon`.
+
+## Poses, faces and tools
+
+### Poses
+
+`hello`, `present`, `thinking` and `rest`, in every outfit. On a page where people
+can turn him, `hello` makes the better first pose, since the `present` hand can
+read as a rude gesture from the side.
+
+### Faces
+
+| Face          | What it means                                               |
+| ------------- | ----------------------------------------------------------- |
+| `original`    | The illustration's wink                                     |
+| `idle`        | He is ready and listening                                   |
+| `thinking`    | He is at work                                               |
+| `found-it`    | He found something real, not merely that an answer finished |
+| `oops`        | Something went wrong on his side                            |
+| `delighted`   | A connection found                                          |
+| `curious`     | A question he is turning over                               |
+| `proud`       | Showing something Jamie built                               |
+| `eager`       | Making the case for membership                              |
+| `sympathetic` | A hard subject                                              |
+| `sheepish`    | He got something wrong and is fixing it                     |
+
+A face means what it says here, so show `found-it` only when he found something.
+There is also `off`, which is never shown to a reader.
+
+### Tools
+
+For the `workshop` outfit:
+
+| Tool                             | Poses                       |
+| -------------------------------- | --------------------------- |
+| `screwdriver`, `hammer`, `drill` | `carry`, `show`, `work`     |
+| `laptop`                         | `present`                   |
+| `none`                           | `hello`, `thinking`, `rest` |
+
+Asking for a pose the tool does not have moves him to the tool's first pose. Tool
+poses are single frames, so `motion` has nothing to play.
+
+## Follow him or keep him
+
+| You want                  | Use                                     | Changes                                       |
+| ------------------------- | --------------------------------------- | --------------------------------------------- |
+| The newest Thingy, always | `version="latest"`, `character/latest/` | When this site does, within five minutes      |
+| One Thingy, for good      | `version="v0.14"`, `character/v0.14/`   | Never                                         |
+| His persona               | `persona.md`                            | When Jamie approves a change, within a minute |
+
+Use `latest` unless a page needs one model forever.
+
+What this site keeps to:
+
+- Published addresses stay. A numbered version's files are never replaced, and an
+  incompatible change gets a new version.
+- Pose, outfit and face names stay.
+- `character/latest/` holds what the newest version holds, at the same names.
+- `https://thingy.thingelstad.xyz/revision.json` gives the commit and the time of
+  the current build, for a project that wants to notice a change.
+
+## Terms
+
+Thingy is by Jamie Thingelstad. Credit Jamie where he appears.
+
+The print files are licensed
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): print him, paint
+him and remix him, credit Jamie, and don't sell him. That licence covers the print
+files. The rest of the kit has no licence of its own yet, so ask
+[Jamie](https://www.thingelstad.com/) before using him in something beyond showing
+him on a page.
+
+## For agents
+
+- [`llms.txt`](https://thingy.thingelstad.xyz/llms.txt) indexes this site.
+- This page is [`kit.md`](https://thingy.thingelstad.xyz/kit.md), and it holds all
+  of the kit but the persona. Read
+  [`persona.md`](https://thingy.thingelstad.xyz/persona.md) before writing anything
+  in his voice.
+- [`manifest.json`](https://thingy.thingelstad.xyz/character/latest/manifest.json)
+  is the machine-readable list of outfits, poses, faces, tools and stills. Trust it
+  over this page if they ever differ.

@@ -51,6 +51,7 @@ test("the print page offers both files, shows every view and fits a phone", asyn
 
 test("the front page links to the print page", async ({ page }) => {
   await page.goto("/");
-  await page.locator('nav a[href="/print/"]').click();
+  // In the header, or in the footer on the narrowest phones.
+  await page.locator('a[href="/print/"]:visible').first().click();
   await expect(page).toHaveURL(/\/print\/$/);
 });

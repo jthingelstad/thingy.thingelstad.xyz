@@ -1,8 +1,10 @@
 # Thingy’s character home
 
-The interactive character companion to [Ask Thingy](https://thingy.thingelstad.com/).
-It lives at **https://thingy.thingelstad.xyz/**. This repository builds the static
-site and publishes it to AWS from `main` (see [Hosting](#hosting)).
+The source of Thingy, Jamie's agent sidekick: his persona, his 3D model, his faces
+and tools, and the code to show him. Every place he appears, starting with
+[Ask Thingy](https://thingy.thingelstad.com/), takes him from here. It lives at
+**https://thingy.thingelstad.xyz/**. This repository builds the static site and
+publishes it to AWS from `main` (see [Hosting](#hosting)).
 
 The viewer loads real, skinned GLB meshes derived from the approved v0.10 Blender
 master. It supports four outfits, four poses, orbit and keyboard camera controls,
@@ -31,120 +33,16 @@ Install the matching Chromium once with `npx playwright install chromium`.
 
 ## Bring Thingy into another project
 
-### A quiet companion: an image
+[**Thingy Kit**](https://thingy.thingelstad.xyz/kit/) is the one link to send, to a
+person or an agent: his persona, the stills, the iframe, the web component with
+every attribute, event and method, the model's structure, and how to follow the
+newest Thingy or keep one for good. [`kit/KIT.md`](kit/KIT.md) is its one source,
+published as `/kit/` and `/kit.md`, and `llms.txt` opens with it. The contract tests
+fail if it stops naming an outfit, pose, face, tool, attribute or event, and the
+site check fails if it or `llms.txt` names a file that was not built.
 
-Use a transparent WebP at the size needed on the page. PNG versions are available
-for downloads. Images need no renderer, JavaScript, or animation loop.
-
-```html
-<img
-  src="https://thingy.thingelstad.xyz/character/v0.10/poses/workshop-thinking.webp"
-  alt="Thingy, the Workshop Builder, thinking through a build"
-  width="240"
-  height="240"
-/>
-```
-
-Workshop Builder has `hello`, `present`, `thinking`, and `rest` images. The
-presenting pose has the laptop; the other three do not. The interactive pose
-clips and images share the names in [the manifest](public/character/v0.10/manifest.json).
-The integration examples at `/examples/workshop.html` show all four together.
-
-Things I’ve Built uses smaller vendored copies of these images: hello on its
-index, present on About, thinking on Search, and rest on its 404 page. That lets
-the site use Thingy before this new hostname is published, and keeps ordinary
-pages light.
-
-### A character you can turn around: an iframe
-
-The studio's **Bring him along** gives you this code for whatever stands on the
-stage, or write it yourself:
-
-```html
-<iframe
-  src="https://thingy.thingelstad.xyz/embed/?version=latest&outfit=workshop&tool=hammer&pose=show&face=proud&light=off&motion=off"
-  title="Thingy, Workshop Builder"
-  width="360"
-  height="400"
-  loading="lazy"
-  style="border:0;background:transparent"
-></iframe>
-```
-
-`version=latest` follows the newest model, so an embed changes when this site's
-does. Name a version to keep one model for good; with no `version` the frame stays
-on v0.10 and has no faces or tools, as every address from before this did. `tool`
-and `face` take the values listed under the component below. `view=<round>,<up>,<zoom>`
-starts him at an angle: degrees around him, degrees down from straight above, and
-zoom, as `view=60,80,1.2`. He can still be turned from there.
-
-The frame has a transparent background and no surrounding controls. Drag to
-rotate; use the scroll wheel to zoom. The canvas also supports left/right arrows,
-plus/minus, and Home. Motion defaults off and obeys reduced motion even when the
-URL asks for it. The full character home has the wardrobe and pose controls.
-
-### A picture of him as you have him
-
-**Download picture** in the same place saves a square 1000 px transparent PNG drawn
-from the stage: this outfit, tool, pose, face and light, at the angle you turned him.
-No still is published for it, so every combination works.
-
-### A component inside an application
-
-```html
-<script type="module" src="https://thingy.thingelstad.xyz/thingy.js"></script>
-<thingy-character
-  outfit="workshop"
-  pose="thinking"
-  light="off"
-  motion="off"
-  style="width:320px;height:380px"
-></thingy-character>
-```
-
-This custom element works with plain HTML, Eleventy, React, or another framework.
-Change the attributes to change the character. It emits `thingy-ready`,
-`thingy-change`, and `thingy-fallback` events and exposes `resetView()`. An optional
-`asset-base` attribute changes the delivery directory when self-hosting the files.
-The default is the `character/` directory beside `thingy.js`.
-
-More optional attributes, for a page that wants him as its centrepiece:
-
-- `version="latest"` always takes the newest model of that outfit, and is what to
-  use unless a page needs one model forever. `version="v0.14"` pins the newer model,
-  in all four outfits, with the v0.13 cloth pass. This site's own viewer uses it; with
-  no `version` it stays v0.10, so a page already using the component does not change.
-- `face` shows a screen face on a model that has them (v0.14 on): `original`,
-  `idle`, `thinking`, `found-it`, `oops`, `delighted`, `curious`, `proud`, `eager`,
-  `sympathetic`, `sheepish`. `blink="on"` blinks the faces that can, never under
-  reduced motion.
-  `off` also exists, but it is never shown to a reader, so the viewer leaves it out.
-- `tool` puts something in the v0.14 Workshop Builder's hand: `none`, `screwdriver`,
-  `hammer`, `drill` or `laptop`. Each tool has its own poses, and asking for another
-  moves to the tool's first: `carry`, `show` and `work` for the three hand tools,
-  `present` for the laptop, and `hello`, `thinking` and `rest` for empty hands. With
-  no `tool`, `pose="present"` is the laptop, as it is on v0.10. Tool poses are single
-  frames, so `motion` has nothing to play; the element's `moves` property says so.
-- `zoom="off"` leaves the mouse wheel to the page and drops the zoom keys.
-- `view` starts him at an angle, written as the iframe's `view` is. The element's
-  `view` property reads where he is now, and `thingy-view` fires as it changes.
-- `poster` replaces the pose image shown until the model is ready, and
-  `view-label` replaces the canvas's accessible name.
-
-A press that barely moves, or Enter or Space on the focused canvas, emits
-`thingy-tap`, so a page can answer a tap without mistaking a turn for one.
-`hop({ height, direction, turns })` is one such answer: he jumps `height` CSS
-pixels and spins (`direction` 1 or -1, one turn by default), landing where he
-began. It does nothing under reduced motion.
-`picture(size)` resolves to a square transparent PNG of him as he stands now, and
-rejects until he is ready.
-
-The iframe is the simplest integration when the consuming site has a strict
-content security policy. A native component needs its host in `script-src` and
-`connect-src`, `'wasm-unsafe-eval'` in `script-src` for Meshopt’s WebAssembly
-decoder, and `blob:` in `connect-src` and `img-src` for the model's textures.
-Model files are standard glTF 2.0 and can also be loaded directly with
-[Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader).
+Things I've Built uses smaller vendored copies of the stills: hello on its index,
+present on About, thinking on Search, and rest on its 404 page.
 
 ## Stable asset addresses
 

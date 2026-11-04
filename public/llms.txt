@@ -1,29 +1,35 @@
-# Thingy's character home
+# Thingy
 
-> Thingy is Jamie Thingelstad's agent sidekick. He is the librarian on Ask Thingy (https://thingy.thingelstad.com/), the builder and record keeper on Things I've built and the host of the Weekly Thing's Supporting Membership. This site is his home: who he is, a 3D viewer with four outfits, a choice of poses and faces, and the Workshop Builder's tools, the images, iframe and web component other pages use to show him, and a model to print.
+> Thingy is Jamie Thingelstad's agent sidekick. He is the librarian on Ask Thingy (https://thingy.thingelstad.com/), the builder and record keeper on Things I've built and the host of the Weekly Thing's Supporting Membership. This site is the source of his character: his persona, his 3D model, his faces and tools, and the code to show him. Every place he appears takes him from here.
 
-The character is a rigged glTF 2.0 model derived from a Blender master. Every outfit and pose has a stable address under a versioned directory; a future incompatible revision gets a new directory instead of replacing these files.
+To bring Thingy into a project, read one document: the Thingy Kit, https://thingy.thingelstad.xyz/kit.md. It has his job, his words, every way to show him and the addresses to follow. Then read his persona before writing anything in his voice.
+
+## Start here
+
+- [Thingy Kit](https://thingy.thingelstad.xyz/kit/): everything it takes to bring him into a project, behind one link. As Markdown: https://thingy.thingelstad.xyz/kit.md
+- [Who Thingy is](https://thingy.thingelstad.xyz/persona/): his persona, the authority for how he talks, where he works, how he looks and sounds, and what he never does. As Markdown: https://thingy.thingelstad.xyz/persona.md
+
+## Follow the newest Thingy
+
+- [Manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json): outfits (librarian, trail, workshop, concert), poses, faces, tools, model and still paths, at an address that always holds the newest version
+- Models: `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`)
+- Stills: `https://thingy.thingelstad.xyz/character/latest/poses/<outfit>-<pose>.webp` (transparent; the manifest lists which exist)
+- Iframe: `https://thingy.thingelstad.xyz/embed/?version=latest&outfit=<outfit>&pose=<pose>&face=<face>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
+- Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character version="latest" outfit="workshop" tool="hammer" pose="work" face="proud">`. The kit lists every attribute, event and method.
+
+## Keep one Thingy for good
+
+- [Character manifest, v0.14](https://thingy.thingelstad.xyz/character/v0.14/manifest.json): the numbered directory of the current model. Its files are never replaced; a future incompatible revision gets a new directory.
+- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): the first model, with no faces or tools. It has PNG stills beside each WebP. An iframe or component with no `version` stays on it.
 
 ## Pages
 
-- [Who Thingy is](https://thingy.thingelstad.xyz/persona/): his persona, the authority for how he talks, where he works, how he looks and sounds, and what he never does. The same text as Markdown: https://thingy.thingelstad.xyz/persona.md
-- [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit, pose, face and tool, switch the antenna light, and copy embed code
+- [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit, pose, face and tool, switch the antenna light, and copy the embed, a picture or a link for what stands on the stage
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
-- [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0
-
-## Use the character
-
-- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): outfits (librarian, trail, workshop, concert), poses (hello, present, thinking, rest), model and image paths
-- Newest model: `https://thingy.thingelstad.xyz/character/latest/` is always the newest version's directory ([manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json)). In the web component, `version="latest"`.
-- Still images: `https://thingy.thingelstad.xyz/character/v0.10/poses/<outfit>-<pose>.webp` (transparent WebP; PNG beside each). Every outfit has a `present` image; the Workshop Builder has all four poses.
-- Iframe: `https://thingy.thingelstad.xyz/embed/?outfit=<outfit>&pose=<pose>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
-- Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character outfit="workshop" pose="thinking" light="off" motion="off">`. Events: `thingy-ready`, `thingy-change`, `thingy-fallback`.
-- Newer model: [character manifest, v0.14](https://thingy.thingelstad.xyz/character/v0.14/manifest.json) adds screen faces and the Workshop Builder's tools. On the web component, `version="v0.14"` with `face="curious"` and, for the workshop outfit, `tool="hammer" pose="work"`.
-- Print model: [print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) lists the 3MF and zipped STL with sizes and SHA-256 sums, the print settings and the licence (CC BY-NC 4.0, credit Jamie Thingelstad). Not test-printed yet.
-- Models: `https://thingy.thingelstad.xyz/character/v0.10/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`).
+- [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0. [Print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) has the sizes and SHA-256 sums. Not test-printed yet.
 
 ## Related
 
-- [Ask Thingy](https://thingy.thingelstad.com/): Thingy as the librarian, answering from everything Jamie has published
+- [Ask Thingy](https://thingy.thingelstad.com/): Thingy as the librarian, answering from everything Jamie has published. [Its llms.txt](https://thingy.thingelstad.com/llms.txt) covers the Librarian MCP server.
 - [How Thingy was built](https://thingelstad.xyz/things/thingy-model/): the project page on Things I've built
 - [Jamie Thingelstad](https://www.thingelstad.com/): the blog

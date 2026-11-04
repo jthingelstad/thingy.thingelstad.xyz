@@ -86,6 +86,7 @@ assert.deepEqual(locs, [
   "https://thingy.thingelstad.xyz/",
   "https://thingy.thingelstad.xyz/examples/workshop.html",
   "https://thingy.thingelstad.xyz/persona/",
+  "https://thingy.thingelstad.xyz/kit/",
   "https://thingy.thingelstad.xyz/print/",
 ]);
 for (const loc of locs) {
@@ -128,4 +129,26 @@ assert.match(
   /https:\/\/thingy\.thingelstad\.xyz\/persona\.md/,
   "llms.txt names persona.md",
 );
+// The kit is the one link to send: a page and its Markdown, the same file,
+// and the first thing llms.txt offers.
+const kit = await fs.readFile("kit/KIT.md", "utf8");
+assert.equal(await read("kit.md"), kit, "kit.md is kit/KIT.md");
+const kitPage = await read("kit/index.html");
+assert.ok(!kitPage.includes("<!-- kit"), "kit page is rendered");
+assert.ok(
+  !/\*\*|\]\(|^```/m.test(kitPage.replace(/<[^>]+>/g, "")),
+  "no Markdown left in the kit page text",
+);
+assert.ok(
+  llms.indexOf("/kit/") < llms.indexOf("/persona/"),
+  "llms.txt offers the kit first",
+);
+// Every address the kit and llms.txt give out was really built. A wildcard
+// address (one with <outfit> in it) stops at the directory before it.
+const built = [kit, llms].flatMap((text) => [
+  ...text.matchAll(/https:\/\/thingy\.thingelstad\.xyz\/([^\s)`<&?#"*]*)/g),
+]);
+for (const [, address] of built)
+  await fs.access(`dist/${address.replace(/\.$/, "")}`);
+assert.ok(built.length > 10, "the kit and llms.txt give addresses");
 console.log(`Site OK: ${files.length} files, ${locs.length} sitemap URLs`);
