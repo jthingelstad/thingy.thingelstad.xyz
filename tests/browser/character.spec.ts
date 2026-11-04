@@ -131,6 +131,32 @@ test("version latest loads the newest model, and hop jumps, spins and lands wher
   expect((await character.screenshot()).equals(before)).toBe(true);
 });
 
+test("a hop that carries him out of view still lands", async ({ page }) => {
+  await page.route("**/__hop-away", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<!doctype html><html lang="en"><head><title>hop away</title></head><body style="margin:0">
+        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:160px;height:160px"></thingy-character>
+        <script type="module" src="/thingy.js"></script></body></html>`,
+    }),
+  );
+  await page.goto("/__hop-away");
+  const character = page.locator("#librarian");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await character.evaluate((el) =>
+    (el as HTMLElement & { hop(o: object): void }).hop({ height: 240 }),
+  );
+  await expect
+    .poll(() => character.evaluate((el) => (el as HTMLElement).style.translate))
+    .not.toBe("");
+  await expect
+    .poll(
+      () => character.evaluate((el) => (el as HTMLElement).style.translate),
+      { timeout: 5000 },
+    )
+    .toBe("");
+});
+
 test("hop stays still under reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.route("**/__still", (route) =>

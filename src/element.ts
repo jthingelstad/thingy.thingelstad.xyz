@@ -609,9 +609,10 @@ export class ThingyCharacter extends HTMLElement {
   #loop = (): void => {
     this.#frame = requestAnimationFrame(this.#loop);
     this.#clock.update();
+    // Before the guard: a hop can carry him out of view, and he must still land.
+    this.#stepHop();
     if (!this.#visible || document.hidden || !this.#renderer) return;
     this.#controls?.update();
-    this.#stepHop();
     if (this.playing) {
       this.#mixer?.update(Math.min(this.#clock.getDelta(), 0.05));
       this.#dirty = true;
