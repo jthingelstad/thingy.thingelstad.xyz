@@ -84,6 +84,77 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
   expect(errors).toEqual([]);
 });
 
+test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a tap but not a turn", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (
+      (message.type() === "error" || message.type() === "warning") &&
+      !/GL Driver Message.*GPU stall due to ReadPixels/.test(message.text())
+    )
+      errors.push(message.text());
+  });
+  await page.route("**/__v014", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<!doctype html><html lang="en"><head><title>v0.14</title></head><body style="height:3000px;margin:0">
+        <thingy-character id="librarian" outfit="librarian" version="v0.14" pose="present" face="original" zoom="off" view-label="Thingy, to turn" style="display:block;width:420px;height:420px"></thingy-character>
+        <script type="module" src="/thingy.js"></script></body></html>`,
+    }),
+  );
+  await page.goto("/__v014");
+  const character = page.locator("#librarian");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const canvas = character.locator("canvas");
+  await expect(canvas).toHaveAttribute("aria-label", "Thingy, to turn");
+  await page.evaluate(() => {
+    (window as unknown as { taps: number }).taps = 0;
+    document.addEventListener("thingy-tap", () => {
+      (window as unknown as { taps: number }).taps += 1;
+    });
+  });
+  const taps = () =>
+    page.evaluate(() => (window as unknown as { taps: number }).taps);
+  const shot = () => character.screenshot();
+  const original = await shot();
+
+  await character.evaluate((el) => el.setAttribute("face", "oops"));
+  await page.waitForTimeout(200);
+  const oops = await shot();
+  expect(oops.equals(original)).toBe(false);
+  await character.evaluate((el) => el.setAttribute("face", "original"));
+
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("The canvas has no bounds");
+  const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.click(middle.x, middle.y);
+  expect(await taps()).toBe(1);
+  await canvas.press("Enter");
+  expect(await taps()).toBe(2);
+
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.down();
+  await page.mouse.move(middle.x + 80, middle.y, { steps: 4 });
+  await page.mouse.up();
+  expect(await taps()).toBe(2);
+
+  // Out and back again is still a turn.
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.down();
+  await page.mouse.move(middle.x + 80, middle.y);
+  await page.mouse.move(middle.x, middle.y);
+  await page.mouse.up();
+  expect(await taps()).toBe(2);
+
+  await page.mouse.wheel(0, 300);
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
 test("pose images, copied embed, download, and transparent iframe share the same choice", async ({
   page,
   context,

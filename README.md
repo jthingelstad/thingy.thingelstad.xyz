@@ -89,10 +89,26 @@ Change the attributes to change the character. It emits `thingy-ready`,
 `asset-base` attribute changes the delivery directory when self-hosting the files.
 The default is the `character/` directory beside `thingy.js`.
 
+More optional attributes, for a page that wants him as its centrepiece:
+
+- `version="v0.14"` picks a newer model; an outfit that version lacks stays on
+  v0.10. So far v0.14 has only the Librarian, with the v0.13 cloth pass.
+- `face` shows a screen face on a model that has them (v0.14 on): `original`,
+  `idle`, `thinking`, `found-it`, `oops`, `delighted`, `curious`, `proud`, `eager`,
+  `sympathetic`, `sheepish`. `blink="on"` blinks the faces that can, never under
+  reduced motion.
+- `zoom="off"` leaves the mouse wheel to the page and drops the zoom keys.
+- `poster` replaces the pose image shown until the model is ready, and
+  `view-label` replaces the canvas's accessible name.
+
+A press that barely moves, or Enter or Space on the focused canvas, emits
+`thingy-tap`, so a page can answer a tap without mistaking a turn for one.
+
 The iframe is the simplest integration when the consuming site has a strict
-content security policy. A native component needs its host allowed for module
-and asset fetches, and Meshopt’s WebAssembly decoder needs the appropriate CSP
-permission. Model files are standard glTF 2.0 and can also be loaded directly with
+content security policy. A native component needs its host in `script-src` and
+`connect-src`, `'wasm-unsafe-eval'` in `script-src` for Meshopt’s WebAssembly
+decoder, and `blob:` in `connect-src` and `img-src` for the model's textures.
+Model files are standard glTF 2.0 and can also be loaded directly with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader).
 
 ## Stable asset addresses
@@ -106,6 +122,31 @@ compresses geometry and animation; WebP compresses the PBR texture atlas. The
 laptop remains a separate skinned node so the runtime can hide it in other poses.
 The beacon keeps a separately named material. A future incompatible revision
 gets a new directory instead of replacing these addresses.
+
+`public/character/v0.14/manifest.json` is the same contract for the newer model,
+with its faces added. The screen is a separate skinned node, `Thingy_Screen`, lit
+by one cell of an atlas: material `Thingy_Face`, emissive map, 4 columns by 5 rows.
+
+## Rebuild the v0.14 Librarian
+
+Blender 5.2 LTS, from the character-art repository's master:
+
+```sh
+blender --background \
+  ../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.14.blend \
+  --python-exit-code 1 --python tools/export_character_v014.py
+node tools/optimize-v014.mjs
+```
+
+It never saves the master. It bakes the full master on to a lighter body, so the
+cloth reaches the browser as colour and normal maps, and takes the faces from the
+master's atlas. Add `-- --reuse-bakes` after the script to change the grade, materials
+or actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
+repeats, so the saved maps still fit. The stills, `poses/librarian-present.webp` and
+`librarian-hello.webp`, are captures of this model in the component from its default
+camera, so each matches its first frame; `node tools/capture-poster-v014.mjs` makes
+them from a running preview. Ask Thingy's front page waves, and keeps its own copy of
+the hello still.
 
 ## Rebuild the derivatives
 

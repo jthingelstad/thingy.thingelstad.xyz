@@ -6,9 +6,15 @@ import {
   pose,
   embedURL,
   iframeCode,
+  face,
+  faceOffset,
+  FACE_ATLAS,
+  FACES,
+  modelVersion,
   OUTFITS,
   POSES,
   posterPath,
+  VERSIONS,
 } from "../src/config";
 
 test("untrusted embed parameters are limited to supported characters and poses", () => {
@@ -39,6 +45,49 @@ test("the site and external consumers agree on the versioned asset contract", ()
       `/character/v0.10/${manifest.outfits.workshop.stills[name].webp}`,
     );
   }
+});
+test("each model version publishes what the component asks of it", () => {
+  for (const [version, outfits] of Object.entries(VERSIONS)) {
+    const manifest = JSON.parse(
+      readFileSync(
+        new URL(
+          `../public/character/${version}/manifest.json`,
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+    assert.deepEqual([...outfits], Object.keys(manifest.outfits));
+    for (const key of outfits)
+      assert.equal(
+        posterPath(key, "present", "/character/", version as "v0.10"),
+        `/character/${version}/${manifest.outfits[key].poster}`,
+      );
+  }
+});
+test("a version an outfit lacks falls back, and nothing untrusted reaches a path", () => {
+  assert.equal(modelVersion("v0.14", "librarian"), "v0.14");
+  assert.equal(modelVersion("v0.14", "trail"), "v0.10");
+  assert.equal(modelVersion(null, "librarian"), "v0.10");
+  for (const input of ["../v0.14", "__proto__", "v9"])
+    assert.equal(modelVersion(input, "librarian"), "v0.10");
+});
+test("the faces match the published atlas, and a face picks its own cell", () => {
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL("../public/character/v0.14/manifest.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  assert.deepEqual(FACES, manifest.faces);
+  assert.equal(FACE_ATLAS.columns, manifest.faceAtlas.columns);
+  assert.equal(FACE_ATLAS.rows, manifest.faceAtlas.rows);
+  assert.deepEqual(faceOffset(0), [0, 0]);
+  assert.deepEqual(faceOffset(5), [0.25, 0.2]);
+  assert.deepEqual(faceOffset(16), [0, 0.8]);
+  assert.equal(face("sheepish"), "sheepish");
+  for (const input of [null, "", "__proto__", "blink"])
+    assert.equal(face(input), "original");
 });
 test("an embedded character keeps outfit, pose, beacon and motion independent", () => {
   const state = {

@@ -1,4 +1,10 @@
 export const VERSION = "v0.10";
+/** Every published model, oldest first. An outfit a version lacks stays on VERSION. */
+export const VERSIONS = {
+  "v0.10": ["librarian", "trail", "workshop", "concert"],
+  "v0.14": ["librarian"],
+} as const;
+export type Version = keyof typeof VERSIONS;
 export const OUTFITS = {
   librarian: {
     label: "Librarian",
@@ -24,6 +30,25 @@ export const POSES = {
   thinking: { label: "Thinking", frame: 37 },
   rest: { label: "At rest", frame: 1 },
 } as const;
+/**
+ * The screen faces of models that have one (v0.14 on), by atlas cell. `blink`
+ * is the same face with its eyes shut; a face without one never blinks.
+ */
+export const FACE_ATLAS = { columns: 4, rows: 5 } as const;
+export const FACES: Record<string, { cell: number; blink?: number }> = {
+  original: { cell: 0, blink: 5 },
+  idle: { cell: 1, blink: 6 },
+  thinking: { cell: 2 },
+  "found-it": { cell: 3 },
+  oops: { cell: 4 },
+  off: { cell: 7 },
+  delighted: { cell: 8 },
+  curious: { cell: 9, blink: 14 },
+  proud: { cell: 10 },
+  eager: { cell: 11, blink: 15 },
+  sympathetic: { cell: 12, blink: 16 },
+  sheepish: { cell: 13 },
+};
 export type Outfit = keyof typeof OUTFITS;
 export type Pose = keyof typeof POSES;
 export type CharacterState = {
@@ -39,6 +64,24 @@ export function outfit(value: string | null | undefined): Outfit {
 }
 export function pose(value: string | null | undefined): Pose {
   return value && Object.hasOwn(POSES, value) ? (value as Pose) : "present";
+}
+export function face(value: string | null | undefined): string {
+  return value && Object.hasOwn(FACES, value) ? value : "original";
+}
+/** glTF texture space starts at the atlas's top left. */
+export function faceOffset(cell: number): [number, number] {
+  const { columns, rows } = FACE_ATLAS;
+  return [(cell % columns) / columns, Math.floor(cell / columns) / rows];
+}
+export function modelVersion(
+  value: string | null | undefined,
+  key: Outfit,
+): Version {
+  return value &&
+    Object.hasOwn(VERSIONS, value) &&
+    (VERSIONS[value as Version] as readonly string[]).includes(key)
+    ? (value as Version)
+    : VERSION;
 }
 export function embedURL(
   state: CharacterState,
@@ -60,6 +103,7 @@ export function posterPath(
   key: Outfit,
   selected: Pose = "present",
   base = "/character/",
+  version: Version = VERSION,
 ): string {
-  return `${base}${VERSION}/poses/${key}-${key === "workshop" ? selected : "present"}.webp`;
+  return `${base}${version}/poses/${key}-${key === "workshop" ? selected : "present"}.webp`;
 }

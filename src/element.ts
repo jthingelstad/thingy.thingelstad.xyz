@@ -4,21 +4,25 @@ import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import {
+  FACES,
   OUTFITS,
   POSES,
-  VERSION,
+  face,
+  faceOffset,
+  modelVersion,
   outfit,
   pose,
   posterPath,
   type Outfit,
   type Pose,
+  type Version,
 } from "./config";
 
 const defaultAssets = new URL("character/", import.meta.url).href;
 const styles = `
 :host{display:block;position:relative;contain:layout style;min-height:160px}
-canvas{display:block;width:100%;height:100%;outline:none;touch-action:pan-y}
-canvas:focus-visible{outline:2px solid #23533b;outline-offset:-4px;border-radius:8px}
+canvas{display:block;width:100%;height:100%;outline:none;touch-action:pan-y;cursor:grab}canvas:active{cursor:grabbing}
+canvas:focus-visible{outline:2px solid var(--thingy-character-focus,#23533b);outline-offset:-4px;border-radius:8px}
 .frame{position:absolute;inset:0}img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 :host([data-ready]) img{display:none}.status{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;font:14px/1.5 system-ui;color:#51544f}
 :host([data-ready]) .status{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
@@ -56,6 +60,12 @@ export class ThingyCharacter extends HTMLElement {
     "light",
     "motion",
     "asset-base",
+    "version",
+    "face",
+    "blink",
+    "zoom",
+    "poster",
+    "view-label",
   ];
   #root = this.attachShadow({ mode: "open" });
   #renderer?: THREE.WebGLRenderer;
@@ -76,6 +86,10 @@ export class ThingyCharacter extends HTMLElement {
   #dirty = true;
   #generation = 0;
   #currentOutfit?: Outfit;
+  #currentVersion?: Version;
+  #faceMap?: THREE.Texture;
+  #blinkTimer = 0;
+  #press?: { x: number; y: number; at: number };
   #head?: THREE.Object3D;
   #beacon = new THREE.PointLight(0xff933f, 0, 1.2, 2);
   #reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -88,6 +102,12 @@ export class ThingyCharacter extends HTMLElement {
   }
   get playing(): boolean {
     return this.getAttribute("motion") === "on" && !this.#reduced.matches;
+  }
+  get version(): Version {
+    return modelVersion(this.getAttribute("version"), this.outfit);
+  }
+  get zoomable(): boolean {
+    return this.getAttribute("zoom") !== "off";
   }
   get assetBase(): string {
     return new URL(
@@ -112,10 +132,16 @@ export class ThingyCharacter extends HTMLElement {
     if (before === after) return;
     if (!this.isConnected || !this.#renderer) return;
     this.#updatePoster();
-    if (name === "outfit" || name === "asset-base") void this.#load();
+    if (name === "outfit" || name === "asset-base" || name === "version")
+      void this.#load();
     else if (name === "light") this.#setLight();
     else if (name === "motion") this.#setMotion();
-    else this.#setPose();
+    else if (name === "face") {
+      this.#setFace();
+      this.#scheduleBlink();
+    } else if (name === "blink") this.#scheduleBlink();
+    else if (name === "zoom" || name === "view-label") this.#setZoom();
+    else if (name === "pose") this.#setPose();
   }
 
   resetView(): void {
@@ -133,7 +159,10 @@ export class ThingyCharacter extends HTMLElement {
       `Thingy, ${OUTFITS[this.outfit].label}, ${POSES[this.pose].label}`,
     );
     const poster = this.#root.querySelector("img");
-    if (poster) poster.src = posterPath(this.outfit, this.pose, this.assetBase);
+    if (poster)
+      poster.src =
+        this.getAttribute("poster") ||
+        posterPath(this.outfit, this.pose, this.assetBase, this.version);
   }
 
   #initialize(): void {
@@ -153,7 +182,6 @@ export class ThingyCharacter extends HTMLElement {
       renderer.shadowMap.type = THREE.PCFShadowMap;
       const canvas = renderer.domElement;
       canvas.tabIndex = 0;
-      canvas.setAttribute("aria-label", "Rotate and zoom Thingy");
       this.#root.querySelector(".frame")!.append(canvas);
       this.#controls = new OrbitControls(this.#camera, canvas);
       canvas.style.touchAction = "pan-y";
@@ -164,9 +192,52 @@ export class ThingyCharacter extends HTMLElement {
       this.#controls.maxZoom = 2.4;
       this.#controls.minPolarAngle = Math.PI * 0.18;
       this.#controls.maxPolarAngle = Math.PI * 0.63;
+      this.#setZoom();
       this.#controls.addEventListener("change", () => {
         this.#dirty = true;
       });
+      // A press that barely moves is a tap, for the host page to answer; a
+      // vertical swipe scrolls the page and arrives here as a pointercancel.
+      canvas.addEventListener(
+        "pointerdown",
+        (event) => {
+          this.#press = {
+            x: event.clientX,
+            y: event.clientY,
+            at: performance.now(),
+          };
+        },
+        { signal: this.#abort.signal },
+      );
+      // Once a press has moved it is a turn, even if it comes back to where it began.
+      canvas.addEventListener(
+        "pointermove",
+        (event) => {
+          const press = this.#press;
+          if (
+            press &&
+            Math.hypot(event.clientX - press.x, event.clientY - press.y) >= 6
+          )
+            this.#press = undefined;
+        },
+        { signal: this.#abort.signal },
+      );
+      canvas.addEventListener(
+        "pointerup",
+        () => {
+          const press = this.#press;
+          this.#press = undefined;
+          if (press && performance.now() - press.at < 500) this.#tap();
+        },
+        { signal: this.#abort.signal },
+      );
+      canvas.addEventListener(
+        "pointercancel",
+        () => {
+          this.#press = undefined;
+        },
+        { signal: this.#abort.signal },
+      );
       canvas.addEventListener("keydown", this.#keyboard, {
         signal: this.#abort.signal,
       });
@@ -189,9 +260,14 @@ export class ThingyCharacter extends HTMLElement {
         },
         { signal: this.#abort.signal },
       );
-      this.#reduced.addEventListener("change", () => this.#setPose(), {
-        signal: this.#abort.signal,
-      });
+      this.#reduced.addEventListener(
+        "change",
+        () => {
+          this.#setPose();
+          this.#scheduleBlink();
+        },
+        { signal: this.#abort.signal },
+      );
       const pmrem = new THREE.PMREMGenerator(renderer);
       const room = new RoomEnvironment();
       this.#environment = pmrem.fromScene(room, 0.04);
@@ -270,14 +346,20 @@ export class ThingyCharacter extends HTMLElement {
   async #load(): Promise<void> {
     const generation = ++this.#generation;
     const selected = this.outfit;
-    if (selected === this.#currentOutfit && this.#model) return;
+    const version = this.version;
+    if (
+      selected === this.#currentOutfit &&
+      version === this.#currentVersion &&
+      this.#model
+    )
+      return;
     this.removeAttribute("data-ready");
     if (this.#renderer) this.#renderer.domElement.style.visibility = "hidden";
     this.#status("Getting Thingy ready…");
     try {
       const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
       const gltf: GLTF = await loader.loadAsync(
-        `${this.assetBase}${VERSION}/${selected}.glb`,
+        `${this.assetBase}${version}/${selected}.glb`,
       );
       if (generation !== this.#generation || !this.isConnected) {
         dispose(gltf.scene);
@@ -290,10 +372,24 @@ export class ThingyCharacter extends HTMLElement {
         dispose(this.#model);
       }
       this.#model = gltf.scene;
+      this.#faceMap = undefined;
+      const anisotropy = Math.min(
+        8,
+        this.#renderer?.capabilities.getMaxAnisotropy() ?? 1,
+      );
       this.#model.traverse((object) => {
         if (object instanceof THREE.Mesh) {
           object.castShadow = true;
           object.receiveShadow = true;
+          const material = object.material as THREE.MeshStandardMaterial;
+          for (const map of [
+            material.map,
+            material.normalMap,
+            material.emissiveMap,
+          ])
+            if (map) map.anisotropy = anisotropy;
+          if (material.name === "Thingy_Face")
+            this.#faceMap = material.emissiveMap ?? undefined;
         }
       });
       this.#head = this.#model.getObjectByName("head");
@@ -301,8 +397,11 @@ export class ThingyCharacter extends HTMLElement {
       this.#clips = gltf.animations;
       this.#mixer = new THREE.AnimationMixer(this.#model);
       this.#currentOutfit = selected;
+      this.#currentVersion = version;
       this.#setPose();
       this.#setLight();
+      this.#setFace();
+      this.#scheduleBlink();
       if (this.#renderer)
         this.#renderer.domElement.style.visibility = "visible";
       this.setAttribute("data-ready", "");
@@ -366,6 +465,50 @@ export class ThingyCharacter extends HTMLElement {
     this.#dirty = true;
   }
 
+  #setFace(closed = false): void {
+    if (!this.#faceMap) return;
+    const item = FACES[face(this.getAttribute("face"))];
+    const [x, y] = faceOffset(closed ? (item.blink ?? item.cell) : item.cell);
+    this.#faceMap.offset.set(x, y);
+    this.#dirty = true;
+  }
+
+  /** A blink every few seconds, only on request and never under reduced motion. */
+  #scheduleBlink(): void {
+    clearTimeout(this.#blinkTimer);
+    this.#setFace();
+    if (
+      this.getAttribute("blink") !== "on" ||
+      this.#reduced.matches ||
+      !this.#faceMap ||
+      FACES[face(this.getAttribute("face"))].blink === undefined
+    )
+      return;
+    this.#blinkTimer = window.setTimeout(
+      () => {
+        if (!this.#visible || document.hidden) return this.#scheduleBlink();
+        this.#setFace(true);
+        this.#blinkTimer = window.setTimeout(() => this.#scheduleBlink(), 130);
+      },
+      2600 + Math.random() * 4200,
+    );
+  }
+
+  #setZoom(): void {
+    if (this.#controls) this.#controls.enableZoom = this.zoomable;
+    this.#renderer?.domElement.setAttribute(
+      "aria-label",
+      this.getAttribute("view-label") ||
+        (this.zoomable ? "Rotate and zoom Thingy" : "Rotate Thingy"),
+    );
+  }
+
+  #tap(): void {
+    this.dispatchEvent(
+      new CustomEvent("thingy-tap", { bubbles: true, composed: true }),
+    );
+  }
+
   #setMotion(): void {
     if (!this.#action) return;
     this.#action.paused = !this.playing;
@@ -389,11 +532,12 @@ export class ThingyCharacter extends HTMLElement {
         event.key === "ArrowLeft" ? 0.15 : -0.15,
       );
       this.#camera.position.copy(this.#controls.target).add(offset);
-    } else if (event.key === "+" || event.key === "=")
+    } else if (this.zoomable && (event.key === "+" || event.key === "="))
       this.#camera.zoom = Math.min(2.4, this.#camera.zoom * 1.1);
-    else if (event.key === "-")
+    else if (this.zoomable && event.key === "-")
       this.#camera.zoom = Math.max(0.65, this.#camera.zoom / 1.1);
     else if (event.key === "Home") this.resetView();
+    else if (event.key === "Enter" || event.key === " ") this.#tap();
     else return;
     event.preventDefault();
     this.#camera.updateProjectionMatrix();
@@ -427,6 +571,7 @@ export class ThingyCharacter extends HTMLElement {
   disconnectedCallback(): void {
     ++this.#generation;
     cancelAnimationFrame(this.#frame);
+    clearTimeout(this.#blinkTimer);
     this.#abort.abort();
     this.#observer?.disconnect();
     this.#intersection?.disconnect();
@@ -441,6 +586,8 @@ export class ThingyCharacter extends HTMLElement {
     this.#renderer = undefined;
     this.#model = undefined;
     this.#currentOutfit = undefined;
+    this.#currentVersion = undefined;
+    this.#faceMap = undefined;
     this.removeAttribute("data-ready");
   }
 }

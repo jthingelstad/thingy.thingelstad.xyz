@@ -1,0 +1,35 @@
+{
+  "version": "0.14",
+  "format": "glTF 2.0",
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "animationFps": 24,
+  "defaultPose": "present",
+  "poses": {
+    "hello": { "label": "Hello", "stillFrame": 49 },
+    "present": { "label": "Present", "stillFrame": 1 },
+    "thinking": { "label": "Thinking", "stillFrame": 37 },
+    "rest": { "label": "At rest", "stillFrame": 1 }
+  },
+  "outfits": {
+    "librarian": { "label": "Librarian", "model": "librarian.glb", "poster": "poses/librarian-present.webp" }
+  },
+  "faceAtlas": { "material": "Thingy_Face", "map": "emissive", "columns": 4, "rows": 5 },
+  "faces": {
+    "original": { "cell": 0, "blink": 5 },
+    "idle": { "cell": 1, "blink": 6 },
+    "thinking": { "cell": 2 },
+    "found-it": { "cell": 3 },
+    "oops": { "cell": 4 },
+    "off": { "cell": 7 },
+    "delighted": { "cell": 8 },
+    "curious": { "cell": 9, "blink": 14 },
+    "proud": { "cell": 10 },
+    "eager": { "cell": 11, "blink": 15 },
+    "sympathetic": { "cell": 12, "blink": 16 },
+    "sheepish": { "cell": 13 }
+  },
+  "runtimeMaterials": { "beacon": "Thingy_Beacon", "face": "Thingy_Face" },
+  "notes": "A web derivative of the v0.14 character: the cloth pass is baked on to a lighter body, and the screen shows one cell of the face atlas. Only the Librarian so far. This is not a printable model."
+}
