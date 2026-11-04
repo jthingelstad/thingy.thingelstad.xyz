@@ -4,6 +4,8 @@
 
 To bring Thingy into a project, read one document: the Thingy Kit, https://thingy.thingelstad.xyz/kit.md. It has his job, his words, every way to show him and the addresses to follow. Then read his persona before writing anything in his voice.
 
+Everything here is licensed CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/). Credit Jamie Thingelstad, and do not use it commercially. The source is public: https://github.com/jthingelstad/thingy.thingelstad.xyz
+
 ## Start here
 
 - [Thingy Kit](https://thingy.thingelstad.xyz/kit/): everything it takes to bring him into a project, behind one link. As Markdown: https://thingy.thingelstad.xyz/kit.md

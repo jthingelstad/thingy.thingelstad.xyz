@@ -251,8 +251,10 @@ export function embedURL(
   url.search = search.toString();
   return url.href;
 }
+// The licence asks for credit, so the code a page takes carries it.
+const CREDIT = `<p><small><a href="https://thingy.thingelstad.xyz/">Thingy</a> by <a href="https://www.thingelstad.com/">Jamie Thingelstad</a>, <a rel="license" href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></small></p>`;
 export function iframeCode(state: EmbedState): string {
-  return `<iframe src="${embedURL(state)}" title="Thingy, ${OUTFITS[state.outfit].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>`;
+  return `<iframe src="${embedURL(state)}" title="Thingy, ${OUTFITS[state.outfit].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>\n${CREDIT}`;
 }
 export function posterPath(
   key: Outfit,

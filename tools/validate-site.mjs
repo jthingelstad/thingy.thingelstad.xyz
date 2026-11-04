@@ -151,4 +151,32 @@ const built = [kit, llms].flatMap((text) => [
 for (const [, address] of built)
   await fs.access(`dist/${address.replace(/\.$/, "")}`);
 assert.ok(built.length > 10, "the kit and llms.txt give addresses");
+// Everything is CC BY-NC 4.0, and every page says so to people and to machines.
+const DEED = "https://creativecommons.org/licenses/by-nc/4.0/";
+for (const file of files.filter((name) => name.endsWith(".html"))) {
+  const html = await fs.readFile(file, "utf8");
+  assert.match(
+    html.split("</head>")[0],
+    new RegExp(`rel="license"\\s+href="${DEED}"`),
+    `${file} declares its licence in the head`,
+  );
+  if (file === path.join("dist", "embed", "index.html")) continue;
+  assert.match(
+    html,
+    /property="cc:attributionName"/,
+    `${file} names who to credit`,
+  );
+  assert.match(
+    html,
+    /\/shared\/cc\/nc\.svg/,
+    `${file} shows the licence's marks`,
+  );
+}
+for (const mark of ["cc", "by", "nc", "by-nc"])
+  await fs.access(`dist/shared/cc/${mark}.svg`);
+assert.ok(
+  (await fs.readFile("dist/thingy.js", "utf8")).includes("CC BY-NC 4.0"),
+  "thingy.js carries its licence",
+);
+await fs.access("LICENSE");
 console.log(`Site OK: ${files.length} files, ${locs.length} sitemap URLs`);

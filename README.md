@@ -45,8 +45,7 @@ site check fails if it or `llms.txt` names a file that was not built.
 must publish every still named there, or the contract tests fail. A change to the
 persona opens an issue listing the words each surface keeps of its own to reread
 (`tools/persona-rollout.mjs`). That workflow has not run yet, since the persona has
-not changed since it was added. This repository is private, so the issue and its
-links are for Jamie and his agents.
+not changed since it was added.
 
 Things I've Built uses smaller vendored copies of the stills: hello on its index,
 present on About, thinking on Search, and rest on its 404 page.
@@ -149,7 +148,7 @@ knows only what the file uses), and `/persona.md`, the file as is, for agents.
 ## The print model
 
 [/print/](print/index.html) offers a 180 mm one-colour print of Thingy, made for
-a Bambu Lab P2S and licensed CC BY-NC 4.0 (Jamie, November 3, 2026). The
+a Bambu Lab P2S. The
 character-art repository builds it (`source/export_print_v013.py` there, from the
 v0.13 master); this site only publishes it. `public/print/v0.13/` holds the 3MF as
 built, the STL zipped beside a short read-me, web stills and a manifest with each
@@ -166,7 +165,7 @@ print gets a new directory. Print files are cached for a day.
 
 ## Hosting
 
-S3 and CloudFront in Jamie's AWS account (999153317627, us-east-1), defined in
+S3 and CloudFront in Jamie's AWS account (`<account>`, us-east-1), defined in
 `infra/` and created with the `cloud-engineer` identity:
 
 - **`thingy-xyz-site`** (`infra/site.json`): the private, versioned bucket; the
@@ -185,7 +184,7 @@ S3 and CloudFront in Jamie's AWS account (999153317627, us-east-1), defined in
 
 | Resource      | Identifier                                        |
 | ------------- | ------------------------------------------------- |
-| Bucket        | `thingy-xyz-site-web-999153317627`                |
+| Bucket        | `thingy-xyz-site-web-<account>`                   |
 | Distribution  | `EUJA70DJHWN4` (`d36jfrqu1wwoe0.cloudfront.net`)  |
 | Certificate   | `566cf451-ef24-4bfc-a180-b95b535b5b9a`            |
 | Deploy role   | `thingy-xyz-delivery-DeploymentRole-fNa3LY9EijLE` |
@@ -255,6 +254,13 @@ and no query parameters; options live in the site's Tinylytics settings. Local, 
 reference to tinylytics.app; `tools/validate-site.mjs` fails if one does. The
 `/embed/` frame and `thingy.js` never count: they sit inside other sites' pages.
 
-The character illustration and model belong to Jamie Thingelstad. Blender source
-files remain in the private character repository. Shared Inter fonts retain
-their OFL license files under `public/shared/fonts/`.
+## Licence
+
+[![CC BY-NC 4.0](public/shared/cc/by-nc.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+Thingy and everything in this repository are by Jamie Thingelstad and licensed
+[CC BY-NC 4.0](LICENSE): the persona, the kit, the model, the stills, the print
+files and the code. [NOTICE.md](NOTICE.md) lists the few parts with licences of
+their own. Every page says so in its footer with the Creative Commons markup, and
+`tools/validate-site.mjs` fails a page that doesn't. The Blender masters stay in a
+separate private repository.

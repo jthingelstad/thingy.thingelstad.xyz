@@ -647,8 +647,23 @@ footer {
 footer p {
   margin: 0;
 }
-footer span {
+footer p > span {
   padding: 0 8px;
+}
+/* The Creative Commons mark: the licence's name, then its three icons. */
+.cc-mark {
+  white-space: nowrap;
+}
+.cc-mark img {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 3px;
+  vertical-align: -3px;
+}
+.cc-badge {
+  display: inline-block;
+  line-height: 0;
 }
 @media (max-width: 1240px) {
   .studio {
