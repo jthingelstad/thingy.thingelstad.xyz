@@ -37,3 +37,10 @@ test("headings get ids, the title can be skipped, tables and quotes render", () 
   assert.ok(html.includes('<th scope="row">x</th><td data-label="B">y</td>'));
   assert.equal(slug("How he speaks, everywhere"), "how-he-speaks-everywhere");
 });
+
+test("fenced code keeps its lines and holds no Markdown", () => {
+  assert.equal(
+    renderMarkdown("Before\n```html\n<a>**raw**</a>\n  [x](y)\n```\nAfter"),
+    '<p>Before</p>\n<pre tabindex="0"><code>&lt;a&gt;**raw**&lt;/a&gt;\n  [x](y)</code></pre>\n<p>After</p>',
+  );
+});

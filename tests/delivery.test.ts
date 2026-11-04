@@ -74,6 +74,8 @@ test("caching keeps entry points short and hashed bundles long", () => {
     "print/index.html",
     "persona/index.html",
     "persona.md",
+    "kit/index.html",
+    "kit.md",
     "embed/index.html",
     "404.html",
     "sitemap.xml",

@@ -540,6 +540,11 @@ h1 {
   font-size: 12px;
   color: var(--muted);
 }
+.bring-kit {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
 .way pre {
   display: none;
   margin: 7px 0 0;
@@ -667,10 +672,9 @@ footer span {
     gap: 24px;
   }
 }
-/* The two links into the home page's own sections give way first. */
+/* The link into the home page's own section gives way first. */
 @media (max-width: 960px) {
-  .site-header nav a[href$="#character"],
-  .site-header nav a[href$="#bring-along"] {
+  .site-header nav a[href$="#character"] {
     display: none;
   }
 }
@@ -964,6 +968,18 @@ footer span {
     white-space: nowrap;
   }
 }
+/* The phone sheet has no room for it, and the header carries the same link. */
+@media (max-width: 1000px) {
+  .bring-kit {
+    display: none;
+  }
+}
+/* The narrowest phones: Print Thingy gives way too, and stays in the footer. */
+@media (max-width: 480px) {
+  .site-header nav a[href="/print/"] {
+    display: none;
+  }
+}
 @media (max-width: 760px) {
   .frame {
     padding-inline: 22px;
@@ -1030,5 +1046,121 @@ footer span {
   }
   * {
     transition: none !important;
+  }
+}
+
+/* The long pages made from Markdown: the persona and the kit. */
+.persona {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.3fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  border-top: 1px solid var(--line);
+  padding-block: 40px 56px;
+}
+.persona-contents {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  font-size: 15px;
+}
+.persona-contents ol {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+.persona-contents p {
+  color: var(--muted);
+}
+.persona-copy {
+  max-width: 68ch;
+  line-height: 1.6;
+}
+.persona-copy h2 {
+  font-size: clamp(30px, 2.6vw, 40px);
+  margin: 48px 0 16px;
+}
+.persona-copy h3 {
+  font-size: 22px;
+  margin: 32px 0 12px;
+}
+.persona-copy > :first-child {
+  margin-top: 0;
+}
+.persona-copy li + li {
+  margin-top: 6px;
+}
+.persona-copy ul ul {
+  margin-top: 6px;
+}
+.persona-copy blockquote {
+  margin: 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--line);
+  color: #43484b;
+}
+.persona-copy .table-wrap {
+  overflow-x: auto;
+  max-width: calc(100vw - 40px);
+}
+.persona-copy table {
+  border-collapse: collapse;
+  min-width: 640px;
+  font-size: 16px;
+}
+.persona-copy th,
+.persona-copy td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.persona-copy pre {
+  overflow-x: auto;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #f0f0e9;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.persona-copy code {
+  overflow-wrap: anywhere;
+}
+.persona-copy pre code {
+  overflow-wrap: normal;
+}
+@media (max-width: 760px) {
+  .persona {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .persona-contents {
+    position: static;
+  }
+  .persona-copy table,
+  .persona-copy tbody,
+  .persona-copy tr,
+  .persona-copy th,
+  .persona-copy td {
+    display: block;
+    min-width: 0;
+  }
+  .persona-copy thead {
+    display: none;
+  }
+  .persona-copy tr {
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .persona-copy th,
+  .persona-copy td {
+    padding: 4px 0;
+    border: 0;
+  }
+  .persona-copy th[scope="row"] {
+    font-size: 19px;
+  }
+  .persona-copy td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
   }
 }

@@ -49,7 +49,7 @@ test("the persona page renders the persona and serves it as Markdown", async ({
 test("every page's header fits: no link overlaps the brand or another link", async ({
   page,
 }) => {
-  for (const path of ["/", "/persona/", "/print/"]) {
+  for (const path of ["/", "/persona/", "/kit/", "/print/"]) {
     await page.goto(path);
     const problems = await page.evaluate(() => {
       const box = (el: Element) => el.getBoundingClientRect();
@@ -84,4 +84,57 @@ test("the front page links to the persona page", async ({ page }) => {
   await page.goto("/");
   await page.locator('nav a[href="/persona/"]').click();
   await expect(page).toHaveURL(/\/persona\/$/);
+});
+
+test("the kit is one link: a page, its Markdown, and words to copy", async ({
+  page,
+  context,
+}, info) => {
+  await context.grantPermissions(["clipboard-write", "clipboard-read"]);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await page.locator('.site-header nav a[href="/kit/"]').click();
+  await expect(page).toHaveURL(/\/kit\/$/);
+  await expect(page.locator("h1")).toHaveText("Thingy Kit.");
+
+  const source = readFileSync(
+    new URL("../../kit/KIT.md", import.meta.url),
+    "utf8",
+  );
+  const headings = [...source.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+  await expect(page.locator(".persona-copy h2")).toHaveText(headings);
+  await expect(page.locator(".persona-contents ol a")).toHaveCount(
+    headings.length,
+  );
+  await expect(page.locator(".persona-copy pre")).toHaveCount(
+    source.split("```").length / 2 - 0.5,
+  );
+  const markdown = await page.request.get("/kit.md");
+  expect(markdown.headers()["content-type"]).toContain("text/markdown");
+  expect(await markdown.text()).toBe(source);
+
+  await page.locator('[data-copy="kit-prompt"]').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "Read https://thingy.thingelstad.xyz/kit.md and bring Thingy into this project.",
+  );
+  await page.locator('[data-copy="kit-link"]').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "https://thingy.thingelstad.xyz/kit/",
+  );
+
+  // A long line of code scrolls in its own box, never the page or the article.
+  const overflow = await page.evaluate(() =>
+    Math.max(
+      document.documentElement.scrollWidth - window.innerWidth,
+      document.querySelector(".persona-copy")!.getBoundingClientRect().right -
+        window.innerWidth,
+    ),
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+  expect(errors).toEqual([]);
+  await page.screenshot({
+    path: `/tmp/thingy-kit-${info.project.name}.png`,
+    fullPage: true,
+  });
 });

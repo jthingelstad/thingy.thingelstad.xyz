@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thingy Kit — Thingy</title>
+    <meta
+      name="description"
+      content="Everything it takes to bring Thingy into a project, behind one link: his persona, his 3D model, his faces and tools, and the code to show him."
+    />
+    <meta name="theme-color" content="#faf8f2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link
+      rel="preload"
+      href="/shared/fonts/inter-tight-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="alternate" type="text/markdown" href="/kit.md" />
+    <link rel="canonical" href="https://thingy.thingelstad.xyz/kit/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Thingy" />
+    <meta property="og:title" content="Thingy Kit" />
+    <meta
+      property="og:description"
+      content="Everything it takes to bring Thingy into a project, behind one link: his persona, his 3D model, his faces and tools, and the code to show him."
+    />
+    <meta property="og:url" content="https://thingy.thingelstad.xyz/kit/" />
+    <meta
+      property="og:image"
+      content="https://thingy.thingelstad.xyz/character/v0.10/poses/workshop-present.png"
+    />
+    <meta property="og:image:width" content="1000" />
+    <meta property="og:image:height" content="1000" />
+    <meta
+      property="og:image:alt"
+      content="Thingy in his workshop builder outfit"
+    />
+    <meta name="twitter:card" content="summary" />
+    <link rel="me" href="https://micro.blog/jthingelstad" />
+    <link rel="me" href="https://github.com/jthingelstad" />
+    <style>
+      .site-header nav a[aria-current="page"] {
+        color: var(--green);
+      }
+      .kit-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(200px, 320px);
+        gap: 32px;
+        align-items: center;
+        padding-block: 16px 32px;
+      }
+      .kit-hero img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .lede {
+        font-size: clamp(21px, 1.95vw, 30px);
+        line-height: 1.4;
+        color: #43484b;
+        max-width: 34ch;
+      }
+      .source {
+        max-width: 56ch;
+        line-height: 1.5;
+      }
+      .send {
+        display: grid;
+        gap: 12px;
+        margin: 28px 0 0;
+        padding: 0;
+        max-width: 620px;
+        list-style: none;
+      }
+      .send li {
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+      .send h2 {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0;
+        color: var(--muted);
+      }
+      .send p {
+        margin: 0 0 8px;
+        overflow-wrap: anywhere;
+        font-size: 16px;
+      }
+      .send button {
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: transparent;
+        color: var(--ink);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .send button:hover {
+        background: #f0f0e9;
+      }
+      @media (max-width: 760px) {
+        .kit-hero {
+          grid-template-columns: 1fr;
+        }
+        .kit-hero img {
+          max-width: 200px;
+          order: -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#kit">Skip to the kit</a>
+    <header class="site-header frame">
+      <a class="brand" href="/" aria-label="Thingy home"
+        ><svg viewBox="0 0 28 48" aria-hidden="true">
+          <path d="M5 44Q14 29 23 44Z" fill="#252a26" />
+          <path d="m14 37 1-21" stroke="#252a26" stroke-width="4" />
+          <circle cx="15" cy="12" r="9" fill="#f28a28" />
+          <circle cx="12" cy="9" r="3" fill="#ffac50" opacity=".8" /></svg
+        ><span>Thingy</span></a
+      >
+      <nav aria-label="Main">
+        <a href="/#character">The character</a><a href="/persona/">Who he is</a
+        ><a href="/kit/" aria-current="page">Thingy Kit</a
+        ><a href="/print/">Print Thingy</a
+        ><a class="ask" href="https://thingy.thingelstad.com/"
+          >Ask Thingy
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M8 4h12v12M20 4 4 20" /></svg
+        ></a>
+      </nav>
+    </header>
+    <main class="frame">
+      <section class="kit-hero" aria-labelledby="title">
+        <div>
+          <h1 id="title">Thingy Kit.</h1>
+          <p class="lede">
+            Everything it takes to bring him into a project: his persona, his
+            model and his code, behind one link.
+          </p>
+          <p class="source">
+            This site is the source of Thingy. Every place he appears takes him
+            from here, and a project that follows these addresses changes when
+            he does.
+          </p>
+          <ul class="send">
+            <li>
+              <h2>Send a person this link</h2>
+              <p id="kit-link">https://thingy.thingelstad.xyz/kit/</p>
+              <button data-copy="kit-link">Copy link</button>
+            </li>
+            <li>
+              <h2>Or tell an agent this</h2>
+              <p id="kit-prompt">
+                Read https://thingy.thingelstad.xyz/kit.md and bring Thingy into
+                this project.
+              </p>
+              <button data-copy="kit-prompt">Copy words</button>
+            </li>
+          </ul>
+        </div>
+        <img
+          src="/character/v0.14/poses/workshop-hammer-show.webp"
+          alt="Thingy, the Workshop Builder, showing a hammer"
+          width="1000"
+          height="1000"
+        />
+      </section>
+      <section class="persona" id="kit" aria-label="The kit">
+        <nav class="persona-contents" aria-label="On this page">
+          <ol>
+            <!-- kit-contents -->
+          </ol>
+          <p>For agents, the same text is <a href="/kit.md">kit.md</a>.</p>
+        </nav>
+        <article class="persona-copy">
+          <!-- kit -->
+        </article>
+      </section>
+    </main>
+    <footer class="frame">
+      <p>
+        A character by
+        <a class="h-card" href="https://www.thingelstad.com/" rel="author"
+          ><span class="p-name">Jamie Thingelstad</span></a
+        >.
+        <a href="https://thingelstad.xyz/things/thingy-model/"
+          >How Thingy was built</a
+        >. <a href="/print/">Print Thingy</a>.
+      </p>
+      <p>
+        <a href="https://thingy.thingelstad.com/"
+          >The librarian lives at .com</a
+        >
+        <span>·</span> The character lives at .xyz
+      </p>
+    </footer>
+    <script>
+      for (const button of document.querySelectorAll("[data-copy]")) {
+        const label = button.textContent;
+        button.addEventListener("click", async () => {
+          const text = document
+            .getElementById(button.dataset.copy)
+            .textContent.trim()
+            .replace(/\s+/g, " ");
+          try {
+            await navigator.clipboard.writeText(text);
+            button.textContent = "Copied";
+          } catch {
+            button.textContent = "Select the text above to copy";
+          }
+          setTimeout(() => (button.textContent = label), 2500);
+        });
+      }
+    </script>
+  </body>
+</html>

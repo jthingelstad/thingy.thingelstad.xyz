@@ -227,3 +227,34 @@ test("the weight a page offers is the weight of the newest model", () => {
     assert.equal(weight, `${(size / 1e6).toFixed(1)} MB`, key);
   }
 });
+
+test("the kit names everything a consumer can use", () => {
+  const kit = readFileSync(new URL("../kit/KIT.md", import.meta.url), "utf8");
+  const element = readFileSync(
+    new URL("../src/element.ts", import.meta.url),
+    "utf8",
+  );
+  const newest = newestCharacterVersion(
+    readdirSync(new URL("../public/character/", import.meta.url)),
+  );
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL(`../public/character/${newest}/manifest.json`, import.meta.url),
+      "utf8",
+    ),
+  );
+  const names = [
+    ...Object.keys(manifest.outfits),
+    ...Object.keys(manifest.poses),
+    ...Object.keys(manifest.toolPoses),
+    ...Object.keys(manifest.faces),
+    ...Object.keys(manifest.tools),
+    ...[...element.matchAll(/CustomEvent\(\s*"(thingy-[a-z]+)"/g)].map(
+      (m) => m[1],
+    ),
+  ];
+  const attributes = /observedAttributes[^[]*\[([^\]]+)\]/.exec(element)!;
+  names.push(...attributes[1].match(/[a-z-]+/g)!);
+  for (const name of new Set(names))
+    assert.ok(kit.includes(`\`${name}\``), `the kit names ${name}`);
+});

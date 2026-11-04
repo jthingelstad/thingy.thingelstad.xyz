@@ -28,25 +28,31 @@ function tinylytics(enabled: boolean): Plugin {
   };
 }
 
-// The persona page renders persona/THINGY.md at build time, so the page and
-// /persona.md (written by tools/write-site-files.mjs) are the same text.
-function persona(): Plugin {
+// The persona and kit pages render their Markdown at build time, so each page
+// and its .md address (written by tools/write-site-files.mjs) are the same text.
+function markdownPages(): Plugin {
+  const pages = { persona: "persona/THINGY.md", kit: "kit/KIT.md" };
   return {
-    name: "thingy-persona",
+    name: "thingy-markdown-pages",
     transformIndexHtml: {
       order: "pre",
       handler(html) {
-        if (!html.includes("<!-- persona -->")) return html;
-        const source = readFileSync("persona/THINGY.md", "utf8");
-        const contents = [...source.matchAll(/^## (.+)$/gm)]
-          .map((m) => `<li><a href="#${slug(m[1])}">${inline(m[1])}</a></li>`)
-          .join("");
-        return html
-          .replace("<!-- persona-contents -->", contents)
-          .replace(
-            "<!-- persona -->",
-            renderMarkdown(source, { skipTitle: true }),
-          );
+        for (const [name, file] of Object.entries(pages)) {
+          if (!html.includes(`<!-- ${name} -->`)) continue;
+          let source = readFileSync(file, "utf8");
+          // The kit page's hero says what the file's opening says.
+          if (name === "kit") source = source.slice(source.indexOf("\n## "));
+          const contents = [...source.matchAll(/^## (.+)$/gm)]
+            .map((m) => `<li><a href="#${slug(m[1])}">${inline(m[1])}</a></li>`)
+            .join("");
+          return html
+            .replace(`<!-- ${name}-contents -->`, contents)
+            .replace(
+              `<!-- ${name} -->`,
+              renderMarkdown(source, { skipTitle: true }),
+            );
+        }
+        return html;
       },
     },
   };
@@ -54,7 +60,7 @@ function persona(): Plugin {
 
 export default defineConfig(({ command }) => ({
   plugins: [
-    persona(),
+    markdownPages(),
     tinylytics(command === "build" && process.env.THINGY_TINYLYTICS === "true"),
   ],
   build: {
@@ -66,6 +72,7 @@ export default defineConfig(({ command }) => ({
         "examples/workshop.html",
         "print/index.html",
         "persona/index.html",
+        "kit/index.html",
       ],
     },
   },
