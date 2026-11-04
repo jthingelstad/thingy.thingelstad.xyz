@@ -12,17 +12,17 @@ he changes here, a project that follows these addresses changes with him.
 
 ## What is in the kit
 
-| Part             | What it is                                                                               | Where                                                                                                            |
-| ---------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| His persona      | Who he is, how he talks, and what he never does. The authority on him                    | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
-| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                                   | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
-| His pictures     | Transparent stills, with no code to run                                                  | `https://thingy.thingelstad.xyz/character/latest/poses/`                                                         |
-| A frame          | An iframe with him in it, with no code to run                                            | `https://thingy.thingelstad.xyz/embed/`                                                                          |
-| A component      | The `<thingy-character>` web component, for any framework                                | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
-| His voice        | The one spoken voice he has                                                              | [How he sounds](https://thingy.thingelstad.xyz/persona/#how-he-sounds), in the persona                           |
-| What he knows    | Jamie's published work, through the Librarian MCP server                                 | [Connect your AI](https://thingy.thingelstad.com/connect/) on Ask Thingy                                         |
-| A model to print | A 180 mm figure, as 3MF and zipped STL                                                   | [Print Thingy](https://thingy.thingelstad.xyz/print/)                                                            |
-| His illustration | The original drawing, the authority on how he looks. A PNG, for `og:image` and app icons | `https://thingy.thingelstad.xyz/thingy-original.png`                                                             |
+| Part             | What it is                                                                                                                 | Where                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| His persona      | Who he is, how he talks, and what he never does. The authority on him                                                      | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
+| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                                                                     | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
+| His pictures     | Transparent stills, with no code to run                                                                                    | `https://thingy.thingelstad.xyz/character/latest/poses/<name>.webp`                                              |
+| A frame          | An iframe with him in it, with no code to run                                                                              | `https://thingy.thingelstad.xyz/embed/`                                                                          |
+| A component      | The `<thingy-character>` web component, for any framework                                                                  | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
+| His voice        | The one spoken voice he has                                                                                                | [How he sounds](https://thingy.thingelstad.xyz/persona/#how-he-sounds), in the persona                           |
+| What he knows    | Jamie's published work, through the Librarian MCP server                                                                   | [Connect your AI](https://thingy.thingelstad.com/connect/) on Ask Thingy                                         |
+| A model to print | A 180 mm figure, as 3MF and zipped STL                                                                                     | [Print Thingy](https://thingy.thingelstad.xyz/print/)                                                            |
+| His illustration | The original drawing, in the librarian's jacket. The authority on how he looks. A 220 KB PNG, for `og:image` and app icons | `https://thingy.thingelstad.xyz/thingy-original.png`                                                             |
 
 To try him without writing anything, use [the stage](https://thingy.thingelstad.xyz/).
 Dress him and turn him, then **Bring him along** gives you the code, a picture
@@ -34,15 +34,25 @@ Thingy is the same character everywhere, and each place gives him a job. The job
 picks the outfit and how much of his personality comes through. The jobs he has
 today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-works):
 
-| Job                           | Outfit            | Use `outfit=`                         |
-| ----------------------------- | ----------------- | ------------------------------------- |
-| Librarian                     | Librarian         | `librarian`                           |
-| Builder and record keeper     | Workshop builder  | `workshop`, with a `tool` for the job |
-| Host of Supporting Membership | Concert companion | `concert`                             |
-| On the trail, outdoors        | Trail companion   | `trail`                               |
+| Job                           | Outfit                       | Use `outfit=`                         |
+| ----------------------------- | ---------------------------- | ------------------------------------- |
+| Librarian                     | Librarian                    | `librarian`                           |
+| Builder and record keeper     | Workshop Builder             | `workshop`, with a `tool` for the job |
+| Host of Supporting Membership | Concert companion            | `concert`                             |
+| Narrator of the audio edition | None, since he is only heard |                                       |
 
-If the project fits one of those, use it. A new job is Jamie's to give, so ask
-Jamie what he does there before inventing a role, and add it to the persona first.
+The Trail companion, `trail`, is an outfit with no job yet.
+
+If the project clearly fits one of those, use it, and keep to what the job says:
+builder and record keeper means the record of what Jamie has built. If you aren't
+sure it fits, ask Jamie. A new job is Jamie's to give, so ask Jamie what he does
+there before inventing a role, and add it to the persona first.
+
+Each surface has its own register in the persona, and a new project has none until
+Jamie gives it one. Until then, borrow the nearest and write down that you did, as
+[docs/THINGY.md](https://github.com/jthingelstad/thingelstad.xyz/blob/main/docs/THINGY.md)
+does for Things I've Built. Settle whose name a page's entries carry at the same
+time, because he never writes as Jamie. That file settles it for its site.
 
 ## Give him words
 
@@ -102,14 +112,25 @@ Each of these follows the newest Thingy as written here. See
 />
 ```
 
-The name is `<outfit>-<pose>.webp`, 1000 px square and transparent. Every outfit
-has `present`. The Librarian and the Workshop Builder have more, with tools and
-faces such as `librarian-rest-delighted.webp`. Each outfit's `stills` in the
-[manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
-what exists. For a combination with no still, **Download picture** on the stage
-draws one for you. A strict content security policy needs the host in `img-src`.
-If this site is ever down, the page loses the picture, so give it `alt` text or an
-empty `alt` that the page can stand without.
+The name is `<outfit>-<pose>.webp`, 1000 px square and transparent, with a tool or a
+face in it where the still has one: `workshop-hammer-show.webp`,
+`librarian-rest-delighted.webp`.
+
+- **Every outfit has `present`.** The Trail companion and Concert companion have
+  only that, named by `poster` in the manifest. In `workshop-present` he holds the
+  laptop.
+- **The Librarian's stills also have faces, and the Workshop Builder's have tools.**
+  `stills` for each outfit in the
+  [manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
+  them. A still shows the `original` face unless its name gives another.
+- **For anything with no still,** use the frame or the component, which draw any
+  outfit, pose, tool and face. **Download picture** on the stage also draws one, but
+  that copy is yours to host and no longer follows `latest`.
+- **Your policy and your background.** A strict content security policy needs the
+  host in `img-src`. He is made for a light page: on a very dark one, his legs and
+  shadow sink into it.
+- **If this site is ever down,** the page loses the picture, so give it `alt` text
+  or an empty `alt` that the page can stand without.
 
 ### The frame
 
@@ -127,8 +148,8 @@ empty `alt` that the page can stand without.
 It is transparent, with no controls around him, and runs nothing on your page, so
 a strict content security policy needs only the host in `frame-src`. It takes
 `version`, `outfit`, `pose`, `tool`, `face`, `light`, `motion` and `view`. Always
-pass `version=latest` or a numbered version: with none, the frame stays on v0.10,
-which has no faces or tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
+pass `version=latest` or a numbered version with its `v`: with none, or with `0.14`,
+the frame shows v0.10 without warning, which has no faces or tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
 degrees down from straight above, and zoom, as `view=60,80,1.2`.
 
 ### The component
@@ -150,9 +171,9 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 
 | Attribute    | Values                                                                       |
 | ------------ | ---------------------------------------------------------------------------- |
-| `version`    | `latest` or a numbered version such as `v0.14`. With none, it stays on v0.10 |
+| `version`    | `latest` or `v0.14`, with the `v`. Anything else shows v0.10 without warning |
 | `outfit`     | `librarian`, `workshop`, `concert`, `trail`                                  |
-| `pose`       | See [poses](#poses)                                                          |
+| `pose`       | See [poses](#poses). Without one he stands in `present`, so set it           |
 | `face`       | See [faces](#faces)                                                          |
 | `tool`       | See [tools](#tools). Workshop outfit only                                    |
 | `light`      | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
@@ -276,8 +297,10 @@ For the `workshop` outfit:
 | `laptop`                         | `present`                   |
 | `none`                           | `hello`, `thinking`, `rest` |
 
-Asking for a pose the tool does not have moves him to the tool's first pose. Tool
-poses are single frames, so `motion` has nothing to play.
+`carry` holds the tool at his side, `show` holds it up, and `work` raises it to use
+it. Leave `tool` off and `present` holds the laptop. Asking for a pose the tool does
+not have moves him to the tool's first pose. Tool poses are single frames, so
+`motion` has nothing to play.
 
 ## Follow him or keep him
 
@@ -294,13 +317,13 @@ Change him here, and this is how it reaches a project:
 - **On its own:** the model, the stills, the component and the frame, for anything
   following `latest`. Nothing to do.
 - **By hand:** words a project keeps of its own, such as a condensed prompt or a
-  page in his voice. Each change to the persona opens
-  [an issue](https://github.com/jthingelstad/thingy.thingelstad.xyz/issues) listing
+  page in his voice. Each change to the persona opens an issue for Jamie, listing
   what to reread, drawn from
   [surfaces.json](https://thingy.thingelstad.xyz/kit/surfaces.json).
 
-Add a new project to `surfaces.json`, with every still it names. A new model cannot
-ship without those stills, because the site's own checks fail first.
+Tell Jamie about a new project, so it can join `surfaces.json` with every still it
+names. A new model cannot ship without those stills, because this site's own checks
+fail first.
 
 What this site keeps to:
 
