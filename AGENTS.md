@@ -6,16 +6,22 @@ the librarian at `https://thingy.thingelstad.com/`. Read the parent project guid
 - Use Node 24, TypeScript, Vite, and Three.js. This is a reusable web component,
   so consumers do not need a particular application framework.
 - The approved Blender master lives in the sibling character-art repository:
-  `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`.
-  Never overwrite it. Export scripts operate in memory and write derivatives here.
+  `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`, and
+  `-v0.14.blend` for the newer Librarian. Never overwrite them. Export scripts
+  operate in memory and write derivatives here.
 - `persona/THINGY.md` is Thingy's persona and the authority for him on every
   surface (approved by Jamie, November 3, 2026). Edit it only on Jamie's word;
   `/persona/` and `/persona.md` are built from it.
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.
-- `public/character/v0.10/` is the versioned delivery contract. Preserve published
-  addresses and pose names. Add a new version for future incompatible changes.
+- `public/character/v0.10/` and `v0.14/` are the versioned delivery contract.
+  Preserve published addresses and pose names. Add a new version for future
+  incompatible changes. `thingy.thingelstad.com`'s front page loads the component
+  and the v0.14 Librarian from here (2026-11-04), so `thingy.js` and those files are
+  live for another site; its copy of the hello still should follow a model change.
+  It uses `hello` because the `present` hand, turned to his side, reads as a rude
+  gesture. Check any page that lets people rotate him from every angle.
 - Keep Blender masters, raw bakes, logs, caches, secrets, and machine paths out of
   public assets. Never read `.env*`. Inspect export metadata before publication.
 - Respect reduced motion, provide still-image fallback, and dispose WebGL resources.
