@@ -15,6 +15,7 @@ To bring Thingy into a project, read one document: the Thingy Kit, https://thing
 - Models: `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`)
 - Stills: `https://thingy.thingelstad.xyz/character/latest/poses/<outfit>-<pose>.webp` (transparent; the manifest lists which exist)
 - Iframe: `https://thingy.thingelstad.xyz/embed/?version=latest&outfit=<outfit>&pose=<pose>&face=<face>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
+- Illustration: `https://thingy.thingelstad.xyz/thingy-original.png`, the original drawing, a 1022 px PNG for `og:image` and icons
 - Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character version="latest" outfit="workshop" tool="hammer" pose="work" face="proud">`. The kit lists every attribute, event and method.
 
 ## Keep one Thingy for good
@@ -27,6 +28,10 @@ To bring Thingy into a project, read one document: the Thingy Kit, https://thing
 - [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit, pose, face and tool, switch the antenna light, and copy the embed, a picture or a link for what stands on the stage
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
 - [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0. [Print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) has the sizes and SHA-256 sums. Not test-printed yet.
+
+## Where he works
+
+- [surfaces.json](https://thingy.thingelstad.xyz/kit/surfaces.json): every place he appears, the stills each one names and the words each one keeps of its own
 
 ## Related
 

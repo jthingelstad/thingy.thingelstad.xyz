@@ -258,3 +258,49 @@ test("the kit names everything a consumer can use", () => {
   for (const name of new Set(names))
     assert.ok(kit.includes(`\`${name}\``), `the kit names ${name}`);
 });
+
+test("the newest model publishes every still a surface names", () => {
+  const { surfaces } = JSON.parse(
+    readFileSync(new URL("../kit/surfaces.json", import.meta.url), "utf8"),
+  );
+  const newest = newestCharacterVersion(
+    readdirSync(new URL("../public/character/", import.meta.url)),
+  );
+  const root = new URL(`../public/character/${newest}/`, import.meta.url);
+  const manifest = JSON.parse(
+    readFileSync(new URL("manifest.json", root), "utf8"),
+  );
+  const published = new Set(
+    Object.values<{ stills?: Record<string, { webp: string }> }>(
+      manifest.outfits,
+    ).flatMap((outfit) =>
+      Object.values(outfit.stills ?? {}).map((still) => still.webp),
+    ),
+  );
+  for (const surface of surfaces)
+    for (const still of surface.stills) {
+      const file = `poses/${still}.webp`;
+      assert.ok(
+        published.has(file),
+        `${surface.name}: ${still} in the manifest`,
+      );
+      assert.ok(
+        statSync(new URL(file, root)).size > 0,
+        `${still} is published`,
+      );
+    }
+});
+
+test("a persona change opens a checklist of what each surface keeps", async () => {
+  const { rolloutIssue } = await import("../tools/persona-rollout.mjs");
+  const body = rolloutIssue(
+    [
+      { name: "Kept", repo: "o/kept", keeps: ["prompts/a.md: words"] },
+      { name: "Follows", repo: "o/follows", keeps: [] },
+    ],
+    "abc123",
+  );
+  assert.match(body, /commit\/abc123/);
+  assert.match(body, /## Kept \(o\/kept\)\n\n- \[ \] prompts\/a\.md: words/);
+  assert.doesNotMatch(body, /Follows/);
+});

@@ -41,6 +41,12 @@ published as `/kit/` and `/kit.md`, and `llms.txt` opens with it. The contract t
 fail if it stops naming an outfit, pose, face, tool, attribute or event, and the
 site check fails if it or `llms.txt` names a file that was not built.
 
+[`kit/surfaces.json`](kit/surfaces.json) lists every place he appears. A new model
+must publish every still named there, or the contract tests fail. A change to the
+persona opens an issue listing the words each surface keeps of its own to reread
+(`tools/persona-rollout.mjs`). That workflow has not run yet, since the persona has
+not changed since it was added.
+
 Things I've Built uses smaller vendored copies of the stills: hello on its index,
 present on About, thinking on Search, and rest on its 404 page.
 
