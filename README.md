@@ -1,13 +1,13 @@
 # Thingy’s character home
 
 The source of Thingy, Jamie's agent sidekick: his persona, his 3D model, his faces
-and tools, and the code to show him. Every place he appears, starting with
+and accessories, and the code to show him. Every place he appears, starting with
 [Ask Thingy](https://thingy.thingelstad.com/), takes him from here. It lives at
 **https://thingy.thingelstad.xyz/**. This repository builds the static site and
 publishes it to AWS from `main` (see [Hosting](#hosting)).
 
-The viewer loads real, skinned GLB meshes derived from the approved v0.10 Blender
-master. It supports four outfits, four poses, orbit and keyboard camera controls,
+The viewer loads real, skinned GLB meshes derived from the approved Blender
+master. It supports four scenes with their accessories, four poses, orbit and keyboard camera controls,
 an antenna-light switch, and opt-in animation. Reduced-motion preferences keep
 the poses still. A transparent render remains available if WebGL or model loading
 fails. The only third-party request is Tinylytics page counting, in the published
@@ -38,7 +38,7 @@ person or an agent: his persona, the stills, the iframe, the web component with
 every attribute, event and method, the model's structure, and how to follow the
 newest Thingy or keep one for good. [`kit/KIT.md`](kit/KIT.md) is its one source,
 published as `/kit/` and `/kit.md`, and `llms.txt` opens with it. The contract tests
-fail if it stops naming an outfit, pose, face, tool, attribute or event, and the
+fail if it stops naming a scene, pose, face, accessory, attribute or event, and the
 site check fails if it or `llms.txt` names a file that was not built.
 
 [`kit/surfaces.json`](kit/surfaces.json) lists every place he appears. A new model
@@ -52,55 +52,61 @@ present on About, thinking on Search, and rest on its 404 page.
 
 ## Stable asset addresses
 
-`public/character/v0.10/manifest.json` is the delivery contract. Outfit IDs are
-`librarian`, `trail`, `workshop`, and `concert`. Pose IDs are `hello`, `present`,
+`public/character/v0.15/manifest.json` is the delivery contract. Scene IDs are
+`library`, `outdoors`, `workshop`, and `concert`. Pose IDs are `hello`, `present`,
 `thinking`, and `rest`. `light` and `motion` accept `on` or `off`.
 
-Each outfit loads separately, about 2–3 MB. The shared rig has 40 joints. Meshopt
-compresses geometry and animation; WebP compresses the PBR texture atlas. The
-laptop remains a separate skinned node so the runtime can hide it in other poses.
-The beacon keeps a separately named material. A future incompatible revision
+Each scene loads separately, about 2–3 MB. The shared rig has 40 joints. Meshopt
+compresses geometry and animation; WebP compresses the PBR texture atlas. Each
+accessory is a separate skinned node, `Thingy_Accessory_<id>`, so the runtime can
+show or hide it. The beacon keeps a separately named material. A future incompatible revision
 gets a new directory instead of replacing these addresses.
 
 **The newest model has one address that never changes:**
 `https://thingy.thingelstad.xyz/character/latest/` is a copy of the newest version's
-directory, made at build time: `latest/<outfit>.glb`, `latest/manifest.json` and
-`latest/poses/<outfit>-<pose>.webp`. It is cached for five minutes, not a day, and
+directory, made at build time: `latest/<scene>.glb`, `latest/manifest.json` and
+`latest/poses/<scene>-<pose>.webp`. It is cached for five minutes, not a day, and
 holds what the newest version holds. Use it to follow the model; use a numbered
 directory to keep one picture for good.
 
-`public/character/v0.14/manifest.json` is the same contract for the newer model,
-with its faces and tools added. The screen is a separate skinned node,
+The screen is a separate skinned node,
 `Thingy_Screen`, lit by one cell of an atlas: material `Thingy_Face`, emissive map,
 4 columns by 5 rows. `faces.webp` is that atlas, small, for a page offering the
-faces. In `workshop.glb` each tool is its own skinned node, `Thingy_Tool_<name>`,
-with clips named `<tool>-<pose>`; show one node at a time. The Librarian's `stills`
+faces. The Workshop's tools have clips named `<tool>-<pose>`. The Library's `stills`
 add the pose-face pairs Ask Thingy's pages show, such as
-`librarian-rest-delighted.webp`.
+`library-rest-delighted.webp`.
 
-## Rebuild the v0.14 models
+**To add a scene:** add it to `SCENES` in `src/config.ts`, with its slots of
+accessories, and to the manifest, and publish its model and `present` still. The
+stage, the frame and the component offer whatever `SCENES` says; nothing else
+changes. The contract tests hold the two together.
+
+`v0.10` and `v0.14` keep their files, under the outfit names they were made with, but
+the component only draws the versions in `VERSIONS`.
+
+## Rebuild the v0.15 models
 
 Blender 5.2 LTS, from the character-art repository's master:
 
 ```sh
 blender --background \
-  ../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.14.blend \
-  --python-exit-code 1 --python tools/export_character_v014.py -- --outfit workshop
-node tools/optimize-v014.mjs workshop
+  ../thingy-character/source/Thingy-wardrobe-v0.15.blend \
+  --python-exit-code 1 --python tools/export_character_v015.py -- --scene workshop
+node tools/optimize-v015.mjs workshop
 ```
 
 It never saves the master. It bakes the full master on to a lighter body, so the
 cloth reaches the browser as colour and normal maps, and takes the faces from the
-master's atlas. Add `--reuse-bakes` after `--outfit` to change the grade, materials or
+master's atlas. Add `--reuse-bakes` after `--scene` to change the grade, materials or
 actions in about 30 seconds instead of baking again for 15 minutes; the UV layout
 repeats, so the saved maps still fit. `--reference-only` renders the master from the
 component's camera, to compare a grade against. The stills in `poses/` are captures
 of each model in the component from its default camera, so each matches its first
-frame; `node tools/capture-poster-v014.mjs [outfit ...]` makes them from a running
-preview. Ask Thingy's pages load the Librarian's from `character/latest/`, so they
-follow the model on their own. With no `--outfit` the export makes the Librarian,
-which Ask Thingy loads live: the same bakes rebuild the published file byte for
-byte, so check that it still does.
+frame; `node tools/capture-poster-v015.mjs [scene ...]` makes them from a running
+preview. Ask Thingy's pages load the Library's from `character/latest/`, so they
+follow the model on their own. The Library has not changed since v0.14:
+`node tools/optimize-v015.mjs library` takes the v0.14 file, with its name and
+licence corrected and every other byte the same, and its stills are the same files.
 
 ## Rebuild the derivatives
 
@@ -129,7 +135,7 @@ pixels. [glTF Transform](https://gltf-transform.dev/cli) compresses the GLBs.
 The validator checks the delivered file structure and metadata, and checks the
 uncompressed geometry too when local bakes are present. Khronos’s validator
 reports Meshopt as an unsupported extension; browser tests separately exercise
-its real decoder, every outfit, and animated poses.
+its real decoder, every scene, and animated poses.
 
 ## Who Thingy is
 

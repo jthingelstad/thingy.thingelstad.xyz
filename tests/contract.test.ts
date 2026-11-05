@@ -3,8 +3,13 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { newestCharacterVersion } from "../tools/delivery-plan.mjs";
 import {
-  outfit,
+  scene,
   pose,
+  accessories,
+  accessoriesValue,
+  posesFor,
+  shownNodes,
+  SCENES,
   embedURL,
   iframeCode,
   face,
@@ -17,7 +22,6 @@ import {
   parseView,
   stageOf,
   modelVersion,
-  OUTFITS,
   POSES,
   posterPath,
   VERSIONS,
@@ -33,68 +37,122 @@ test("untrusted embed parameters are limited to supported characters and poses",
     "<script>alert(1)</script>",
     "WORKSHOP",
   ]) {
-    assert.equal(outfit(input), "librarian");
+    assert.equal(scene(input), "library");
     assert.equal(pose(input), "present");
   }
 });
-test("the site and external consumers agree on the versioned asset contract", () => {
-  const manifest = JSON.parse(
+const newestManifest = () =>
+  JSON.parse(
     readFileSync(
-      new URL("../public/character/v0.10/manifest.json", import.meta.url),
+      new URL(
+        `../public/character/${VERSIONS.at(-1)}/manifest.json`,
+        import.meta.url,
+      ),
       "utf8",
     ),
   );
-  assert.deepEqual(Object.keys(OUTFITS), Object.keys(manifest.outfits));
+test("the site and external consumers agree on the versioned asset contract", () => {
+  const manifest = newestManifest();
   assert.deepEqual(Object.keys(POSES), Object.keys(manifest.poses));
   for (const [name, value] of Object.entries(POSES)) {
     assert.equal(value.frame, manifest.poses[name].stillFrame);
     assert.equal(
       posterPath("workshop", name as keyof typeof POSES),
-      `/character/v0.10/${manifest.outfits.workshop.stills[name].webp}`,
+      `/character/${VERSIONS.at(-1)}/${manifest.scenes.workshop.stills[name].webp}`,
     );
   }
 });
-test("each model version publishes what the component asks of it", () => {
-  for (const [version, outfits] of Object.entries(VERSIONS)) {
-    const manifest = JSON.parse(
-      readFileSync(
-        new URL(
-          `../public/character/${version}/manifest.json`,
-          import.meta.url,
-        ),
-        "utf8",
-      ),
+test("the page's scenes are the manifest's scenes, in the same order", () => {
+  const manifest = newestManifest();
+  assert.deepEqual(Object.keys(SCENES), Object.keys(manifest.scenes));
+  for (const [key, item] of Object.entries(SCENES)) {
+    const published = manifest.scenes[key];
+    assert.equal(item.label, published.label);
+    assert.equal(
+      posterPath(key as keyof typeof SCENES, "present"),
+      `/character/${VERSIONS.at(-1)}/${published.poster}`,
     );
-    assert.deepEqual([...outfits], Object.keys(manifest.outfits));
-    for (const key of outfits)
-      assert.equal(
-        posterPath(key, "present", "/character/", version as "v0.10"),
-        `/character/${version}/${manifest.outfits[key].poster}`,
-      );
+    const slot = (s: {
+      id: string;
+      standard?: string;
+      empty?: unknown;
+      options: {
+        id: string;
+        label: string;
+        poses?: readonly string[];
+        absent?: string;
+      }[];
+    }) => ({
+      id: s.id,
+      standard: s.standard,
+      empty: s.empty,
+      options: s.options.map(({ id, label, poses, absent }) => ({
+        id,
+        label,
+        poses,
+        absent,
+      })),
+    });
+    assert.deepEqual(
+      JSON.parse(JSON.stringify(item.slots.map(slot))),
+      JSON.parse(JSON.stringify(published.slots.map(slot))),
+      key,
+    );
   }
+});
+test("every still a page can ask for is in the manifest", () => {
+  const manifest = newestManifest();
+  for (const key of Object.keys(SCENES) as (keyof typeof SCENES)[])
+    for (const held of [
+      null,
+      "none",
+      ...SCENES[key].slots.flatMap((s) => s.options.map((o) => o.id)),
+    ])
+      for (const asked of [...Object.keys(POSES), "carry", "show", "work"]) {
+        const path = posterPath(
+          key,
+          asked as "hello",
+          "",
+          VERSIONS.at(-1),
+          held,
+        );
+        const file = path.replace(`${VERSIONS.at(-1)}/`, "");
+        assert(
+          statSync(`public/character/${VERSIONS.at(-1)}/${file}`).size > 100,
+          `${key} ${held} ${asked}: ${file}`,
+        );
+        assert(manifest.scenes[key].poster, key);
+      }
 });
 test("the component's newest model is the newest published directory", () => {
   assert.equal(
-    Object.keys(VERSIONS).at(-1),
+    VERSIONS.at(-1),
     newestCharacterVersion(
       readdirSync(new URL("../public/character/", import.meta.url)),
     ),
   );
 });
-test("a version an outfit lacks falls back, and nothing untrusted reaches a path", () => {
-  assert.equal(modelVersion("v0.14", "librarian"), "v0.14");
-  assert.equal(modelVersion("v0.14", "trail"), "v0.14");
-  assert.equal(modelVersion("v0.14", "unknown" as "trail"), "v0.10");
-  assert.equal(modelVersion(null, "librarian"), "v0.10");
-  assert.equal(modelVersion("latest", "librarian"), "v0.14");
-  assert.equal(modelVersion("latest", "trail"), "v0.14");
-  for (const input of ["../v0.14", "__proto__", "v9"])
-    assert.equal(modelVersion(input, "librarian"), "v0.10");
+test("anything but a model the component draws means the newest, and nothing untrusted reaches a path", () => {
+  const newest = VERSIONS.at(-1);
+  assert.equal(modelVersion("v0.15"), newest);
+  for (const input of [
+    null,
+    "",
+    "latest",
+    "../v0.14",
+    "__proto__",
+    "v9",
+    "v0.10",
+  ])
+    assert.equal(modelVersion(input), newest);
 });
 test("the faces match the published atlas, and a face picks its own cell", () => {
   const manifest = JSON.parse(
     readFileSync(
-      new URL("../public/character/v0.14/manifest.json", import.meta.url),
+      new URL(
+        `../public/character/${VERSIONS.at(-1)}/manifest.json`,
+        import.meta.url,
+      ),
       "utf8",
     ),
   );
@@ -112,41 +170,68 @@ test("a person is never offered the screen turned off, and every offered face ex
   assert(!Object.hasOwn(FACE_CHOICES, "off"));
   for (const id of Object.keys(FACE_CHOICES)) assert(Object.hasOwn(FACES, id));
 });
-test("each tool keeps to the poses it was made for", () => {
+test("each accessory keeps to the poses it was made for", () => {
   const at = (held: string | null, asked: string | null) =>
-    stageOf("workshop", "v0.14", held, asked);
+    stageOf("workshop", held, asked);
   assert.equal(at("hammer", "work").clip, "hammer-work");
   // A pose the tool has no grip for moves to the tool's first.
   assert.equal(at("hammer", "hello").clip, "hammer-carry");
   assert.equal(at("laptop", "work").clip, "present");
   assert.equal(at("none", "carry").clip, "hello");
-  // An old address keeps its laptop, and asking for empty hands really is empty.
-  assert.deepEqual(at(null, "present").tool, "laptop");
-  assert.deepEqual(at("none", "present").tool, "none");
+  // Present in the Workshop brings the laptop, and asking for none really is none.
+  assert.deepEqual(at(null, "present").accessories, ["laptop"]);
+  assert.deepEqual(at("none", "present").accessories, []);
+  assert.equal(at("none", "present").pose, "hello");
   for (const input of ["__proto__", "<script>", "WRENCH"])
-    assert.equal(at(input, "hello").tool, "none");
+    assert.deepEqual(at(input, "hello").accessories, []);
+  assert.deepEqual(posesFor("workshop", ["drill"]), ["carry", "show", "work"]);
+  assert.deepEqual(posesFor("workshop", []), ["hello", "thinking", "rest"]);
+  assert.deepEqual(posesFor("concert", ["headphones"]), Object.keys(POSES));
 });
-test("tools stay where the model has them, and old hosts see what they always did", () => {
-  for (const key of ["librarian", "trail", "concert"] as const) {
-    const now = stageOf(key, "v0.14", "hammer", "work");
-    assert.equal(now.tool, "none");
-    assert.equal(now.clip, "present");
-  }
-  const old = stageOf("workshop", "v0.10", "hammer", "work");
-  assert.equal(old.tool, "none");
-  assert.equal(old.clip, "present");
+test("accessories stay in their own scene, and a scene gives what it gives", () => {
+  assert.deepEqual(accessories("library", null), []);
+  assert.deepEqual(accessories("library", "hammer,headphones"), []);
+  assert.deepEqual(accessories("outdoors", null), ["backpack"]);
+  assert.deepEqual(accessories("outdoors", "none"), []);
+  assert.deepEqual(accessories("concert", null), ["headphones"]);
+  assert.deepEqual(accessories("concert", "backpack"), []);
+  // A slot holds one, the first it can.
+  assert.deepEqual(accessories("workshop", "hammer,drill"), ["hammer"]);
+  assert.equal(accessoriesValue([]), "none");
+  assert.equal(accessoriesValue(["hammer"]), "hammer");
+  const now = stageOf("library", "hammer", "work");
+  assert.deepEqual(now.accessories, []);
+  assert.equal(now.clip, "hello");
   assert.equal(
-    posterPath("workshop", "work", "/character/", "v0.14", "drill"),
-    "/character/v0.14/poses/workshop-drill-work.webp",
+    posterPath("workshop", "work", "/character/", undefined, "drill"),
+    `/character/${VERSIONS.at(-1)}/poses/workshop-drill-work.webp`,
   );
   assert.equal(
-    posterPath("librarian", "hello", "/character/", "v0.14"),
-    "/character/v0.14/poses/librarian-present.webp",
+    posterPath("outdoors", "hello"),
+    `/character/${VERSIONS.at(-1)}/poses/outdoors-present.webp`,
+  );
+  assert.equal(
+    posterPath("library", "hello"),
+    `/character/${VERSIONS.at(-1)}/poses/library-hello.webp`,
   );
 });
-test("an embedded character keeps outfit, pose, beacon and motion independent", () => {
+test("the mesh a page shows is the one the choice names", () => {
+  assert.deepEqual(shownNodes("concert", ["headphones"]), [
+    "Thingy_Accessory_headphones",
+  ]);
+  assert.deepEqual(shownNodes("concert", []), ["Thingy_Accessory_ears"]);
+  assert.deepEqual(shownNodes("outdoors", ["backpack"]), [
+    "Thingy_Accessory_backpack",
+  ]);
+  assert.deepEqual(shownNodes("outdoors", []), []);
+  assert.deepEqual(shownNodes("workshop", ["drill"]), [
+    "Thingy_Accessory_drill",
+  ]);
+  assert.deepEqual(shownNodes("library", []), []);
+});
+test("an embedded character keeps scene, pose, beacon and motion independent", () => {
   const state = {
-    outfit: "workshop",
+    scene: "workshop",
     pose: "thinking",
     light: true,
     motion: false,
@@ -154,19 +239,19 @@ test("an embedded character keeps outfit, pose, beacon and motion independent", 
   const url = new URL(embedURL(state));
   assert.equal(url.origin, "https://thingy.thingelstad.xyz");
   assert.deepEqual(Object.fromEntries(url.searchParams), {
-    outfit: "workshop",
+    scene: "workshop",
     pose: "thinking",
     light: "on",
     motion: "off",
   });
-  assert(iframeCode(state).includes('title="Thingy, Workshop Builder"'));
+  assert(iframeCode(state).includes('title="Thingy, Workshop"'));
 });
 test("an embed says only what differs, and follows what it is told to", () => {
   const url = new URL(
     embedURL({
-      outfit: "workshop",
+      scene: "workshop",
       pose: "work",
-      tool: "hammer",
+      accessories: ["hammer"],
       face: "proud",
       version: "latest",
       light: false,
@@ -176,8 +261,8 @@ test("an embed says only what differs, and follows what it is told to", () => {
   );
   assert.deepEqual(Object.fromEntries(url.searchParams), {
     version: "latest",
-    outfit: "workshop",
-    tool: "hammer",
+    scene: "workshop",
+    accessories: "hammer",
     pose: "work",
     face: "proud",
     light: "off",
@@ -186,9 +271,9 @@ test("an embed says only what differs, and follows what it is told to", () => {
   });
   const plain = new URL(
     embedURL({
-      outfit: "trail",
+      scene: "outdoors",
       pose: "hello",
-      tool: "none",
+      accessories: ["backpack"],
       face: "original",
       version: "latest",
       light: false,
@@ -198,8 +283,35 @@ test("an embed says only what differs, and follows what it is told to", () => {
   );
   assert.deepEqual(
     [...plain.searchParams.keys()],
-    ["version", "outfit", "pose", "light", "motion"],
+    ["version", "scene", "pose", "light", "motion"],
   );
+  const without = new URL(
+    embedURL({
+      scene: "concert",
+      pose: "hello",
+      accessories: [],
+      light: false,
+      motion: false,
+    }),
+  );
+  assert.equal(without.searchParams.get("accessories"), "none");
+  // What the address says, read back, is what stood on the stage.
+  for (const held of [["hammer"], ["screwdriver"], ["drill"]]) {
+    const back = new URL(
+      embedURL({
+        scene: "workshop",
+        pose: "show",
+        accessories: held,
+        light: false,
+        motion: false,
+      }),
+    );
+    assert.deepEqual(
+      stageOf("workshop", back.searchParams.get("accessories"), "show")
+        .accessories,
+      held,
+    );
+  }
 });
 test("a view from an address is checked, limited and written back the same", () => {
   assert.deepEqual(parseView("60,80,1.2"), {
@@ -221,7 +333,7 @@ test("a view from an address is checked, limited and written back the same", () 
   assert.equal(HOME_VIEW, "16,83,1");
 });
 test("the weight a page offers is the weight of the newest model", () => {
-  const newest = Object.keys(VERSIONS).at(-1)!;
+  const newest = VERSIONS.at(-1)!;
   for (const [key, weight] of Object.entries(MODEL_WEIGHT)) {
     const { size } = statSync(`public/character/${newest}/${key}.glb`);
     assert.equal(weight, `${(size / 1e6).toFixed(1)} MB`, key);
@@ -244,11 +356,15 @@ test("the kit names everything a consumer can use", () => {
     ),
   );
   const names = [
-    ...Object.keys(manifest.outfits),
+    ...Object.keys(manifest.scenes),
     ...Object.keys(manifest.poses),
     ...Object.keys(manifest.toolPoses),
     ...Object.keys(manifest.faces),
-    ...Object.keys(manifest.tools),
+    ...Object.values<{ slots: { options: { id: string }[] }[] }>(
+      manifest.scenes,
+    ).flatMap((item) =>
+      item.slots.flatMap((slot) => slot.options.map((option) => option.id)),
+    ),
     ...[...element.matchAll(/CustomEvent\(\s*"(thingy-[a-z]+)"/g)].map(
       (m) => m[1],
     ),
@@ -272,9 +388,9 @@ test("the newest model publishes every still a surface names", () => {
   );
   const published = new Set(
     Object.values<{ stills?: Record<string, { webp: string }> }>(
-      manifest.outfits,
-    ).flatMap((outfit) =>
-      Object.values(outfit.stills ?? {}).map((still) => still.webp),
+      manifest.scenes,
+    ).flatMap((item) =>
+      Object.values(item.stills ?? {}).map((still) => still.webp),
     ),
   );
   for (const surface of surfaces)

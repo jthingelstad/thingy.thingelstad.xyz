@@ -1,0 +1,289 @@
+{
+  "version": "0.15",
+  "format": "glTF 2.0",
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "animationFps": 24,
+  "defaultPose": "present",
+  "poses": {
+    "hello": {
+      "label": "Hello",
+      "stillFrame": 49
+    },
+    "present": {
+      "label": "Present",
+      "stillFrame": 1
+    },
+    "thinking": {
+      "label": "Thinking",
+      "stillFrame": 37
+    },
+    "rest": {
+      "label": "At rest",
+      "stillFrame": 1
+    }
+  },
+  "scenes": {
+    "library": {
+      "label": "Library",
+      "model": "library.glb",
+      "poster": "poses/library-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/library-hello.webp"
+        },
+        "present": {
+          "webp": "poses/library-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/library-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/library-rest.webp"
+        },
+        "hello-idle": {
+          "webp": "poses/library-hello-idle.webp"
+        },
+        "present-idle": {
+          "webp": "poses/library-present-idle.webp"
+        },
+        "present-proud": {
+          "webp": "poses/library-present-proud.webp"
+        },
+        "rest-delighted": {
+          "webp": "poses/library-rest-delighted.webp"
+        },
+        "rest-idle": {
+          "webp": "poses/library-rest-idle.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/library-thinking-curious.webp"
+        }
+      },
+      "slots": []
+    },
+    "outdoors": {
+      "label": "Outdoors",
+      "model": "outdoors.glb",
+      "poster": "poses/outdoors-present.webp",
+      "slots": [
+        {
+          "id": "pack",
+          "standard": "backpack",
+          "options": [
+            {
+              "id": "backpack",
+              "label": "Backpack",
+              "node": "Thingy_Accessory_backpack"
+            }
+          ]
+        }
+      ]
+    },
+    "workshop": {
+      "label": "Workshop",
+      "model": "workshop.glb",
+      "poster": "poses/workshop-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/workshop-hello.webp"
+        },
+        "present": {
+          "webp": "poses/workshop-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/workshop-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/workshop-rest.webp"
+        },
+        "screwdriver-carry": {
+          "webp": "poses/workshop-screwdriver-carry.webp"
+        },
+        "screwdriver-show": {
+          "webp": "poses/workshop-screwdriver-show.webp"
+        },
+        "screwdriver-work": {
+          "webp": "poses/workshop-screwdriver-work.webp"
+        },
+        "hammer-carry": {
+          "webp": "poses/workshop-hammer-carry.webp"
+        },
+        "hammer-show": {
+          "webp": "poses/workshop-hammer-show.webp"
+        },
+        "hammer-work": {
+          "webp": "poses/workshop-hammer-work.webp"
+        },
+        "drill-carry": {
+          "webp": "poses/workshop-drill-carry.webp"
+        },
+        "drill-show": {
+          "webp": "poses/workshop-drill-show.webp"
+        },
+        "drill-work": {
+          "webp": "poses/workshop-drill-work.webp"
+        }
+      },
+      "toolClips": [
+        "screwdriver-carry",
+        "screwdriver-show",
+        "screwdriver-work",
+        "hammer-carry",
+        "hammer-show",
+        "hammer-work",
+        "drill-carry",
+        "drill-show",
+        "drill-work"
+      ],
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands",
+            "poses": [
+              "hello",
+              "thinking",
+              "rest"
+            ]
+          },
+          "options": [
+            {
+              "id": "screwdriver",
+              "label": "Screwdriver",
+              "node": "Thingy_Accessory_screwdriver",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "hammer",
+              "label": "Hammer",
+              "node": "Thingy_Accessory_hammer",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "drill",
+              "label": "Drill",
+              "node": "Thingy_Accessory_drill",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "laptop",
+              "label": "Laptop",
+              "node": "Thingy_Accessory_laptop",
+              "poses": [
+                "present"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "concert": {
+      "label": "Concert",
+      "model": "concert.glb",
+      "poster": "poses/concert-present.webp",
+      "slots": [
+        {
+          "id": "ears",
+          "standard": "headphones",
+          "options": [
+            {
+              "id": "headphones",
+              "label": "Headphones",
+              "node": "Thingy_Accessory_headphones",
+              "absent": "ears",
+              "absentNode": "Thingy_Accessory_ears"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "faceAtlas": {
+    "material": "Thingy_Face",
+    "map": "emissive",
+    "columns": 4,
+    "rows": 5
+  },
+  "faces": {
+    "original": {
+      "cell": 0,
+      "blink": 5
+    },
+    "idle": {
+      "cell": 1,
+      "blink": 6
+    },
+    "thinking": {
+      "cell": 2
+    },
+    "found-it": {
+      "cell": 3
+    },
+    "oops": {
+      "cell": 4
+    },
+    "off": {
+      "cell": 7
+    },
+    "delighted": {
+      "cell": 8
+    },
+    "curious": {
+      "cell": 9,
+      "blink": 14
+    },
+    "proud": {
+      "cell": 10
+    },
+    "eager": {
+      "cell": 11,
+      "blink": 15
+    },
+    "sympathetic": {
+      "cell": 12,
+      "blink": 16
+    },
+    "sheepish": {
+      "cell": 13
+    }
+  },
+  "runtimeMaterials": {
+    "beacon": "Thingy_Beacon",
+    "face": "Thingy_Face"
+  },
+  "notes": "A web derivative of the v0.15 character: the cloth is baked on to a lighter body, the screen shows one cell of the face atlas, and each accessory is its own mesh, named Thingy_Accessory_<id>, so a page can show or hide it. A slot gives what a scene can have with it, and an accessory's `absent` mesh takes its place when it comes off. faces.webp is the same atlas, small, for a page that offers the faces. This is not a printable model.",
+  "toolPoses": {
+    "carry": {
+      "label": "Carry",
+      "stillFrame": 1
+    },
+    "show": {
+      "label": "Show",
+      "stillFrame": 1
+    },
+    "work": {
+      "label": "Work",
+      "stillFrame": 1
+    }
+  },
+  "faceSheet": "faces.webp",
+  "license": {
+    "name": "CC BY-NC 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "attribution": "Thingy by Jamie Thingelstad"
+  }
+}

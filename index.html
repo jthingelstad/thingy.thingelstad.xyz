@@ -6,7 +6,7 @@
     <title>Thingy — The character</title>
     <meta
       name="description"
-      content="Meet Thingy in three dimensions. Choose an outfit, a pose, a face and a tool, turn him around, and bring Jamie’s sidekick into your own pages. This site is the source of his character."
+      content="Meet Thingy in three dimensions. Choose a scene, a pose, a face and what he has with him, turn him around, and bring Jamie’s sidekick into your own pages. This site is the source of his character."
     />
     <meta name="theme-color" content="#faf8f2" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -31,7 +31,7 @@
     <meta property="og:title" content="Thingy — The character" />
     <meta
       property="og:description"
-      content="Meet Thingy in three dimensions. Choose an outfit, a pose, a face and a tool, turn him around, and bring Jamie’s sidekick into your own pages. This site is the source of his character."
+      content="Meet Thingy in three dimensions. Choose a scene, a pose, a face and what he has with him, turn him around, and bring Jamie’s sidekick into your own pages. This site is the source of his character."
     />
     <meta property="og:url" content="https://thingy.thingelstad.xyz/" />
     <meta
@@ -40,7 +40,7 @@
     />
     <meta property="og:image:width" content="1000" />
     <meta property="og:image:height" content="1000" />
-    <meta property="og:image:alt" content="Thingy in his librarian outfit" />
+    <meta property="og:image:alt" content="Thingy in the Library" />
     <meta name="twitter:card" content="summary" />
     <link rel="me" href="https://micro.blog/jthingelstad" />
     <link rel="me" href="https://github.com/jthingelstad" />
@@ -91,15 +91,15 @@
           <thingy-character
             id="main-thingy"
             asset-base="/character/"
-            version="v0.14"
-            outfit="librarian"
+            version="v0.15"
+            scene="library"
             pose="present"
             light="off"
             motion="off"
             ><img
               class="character-fallback"
-              src="/character/v0.10/poses/librarian-present.webp"
-              alt="Thingy in his librarian outfit"
+              src="/character/v0.15/poses/library-present.webp"
+              alt="Thingy in the Library"
               width="1000"
               height="1000"
           /></thingy-character>
@@ -115,20 +115,20 @@
           <div class="sheet-tabs" id="sheet-tabs">
             <button
               class="sheet-tab"
-              data-sheet-tab="outfit"
-              aria-controls="outfits"
+              data-sheet-tab="scene"
+              aria-controls="scenes"
               aria-expanded="false"
             >
-              <small>Outfit</small><b id="tab-outfit"></b>
+              <small>Scene</small><b id="tab-scene"></b>
             </button>
             <button
               class="sheet-tab"
-              data-sheet-tab="tool"
-              aria-controls="tools"
+              data-sheet-tab="accessories"
+              aria-controls="accessories"
               aria-expanded="false"
               hidden
             >
-              <small>Hand</small><b id="tab-tool"></b>
+              <small>Accessories</small><b id="tab-accessories"></b>
             </button>
             <button
               class="sheet-tab"
@@ -156,13 +156,18 @@
             </button>
           </div>
           <div class="controls-left">
-            <fieldset class="outfits" id="outfits" data-panel="outfit">
-              <legend>Outfit</legend>
-              <div id="outfit-options"></div>
+            <fieldset class="scenes" id="scenes" data-panel="scene">
+              <legend>Scene</legend>
+              <div id="scene-options"></div>
             </fieldset>
-            <fieldset class="tools" id="tools" data-panel="tool" hidden>
-              <legend>In his hand</legend>
-              <div id="tool-options"></div>
+            <fieldset
+              class="accessories"
+              id="accessories"
+              data-panel="accessories"
+              hidden
+            >
+              <legend>Accessories</legend>
+              <div id="accessory-options"></div>
             </fieldset>
           </div>
           <fieldset class="expressions" id="poses" data-panel="pose">

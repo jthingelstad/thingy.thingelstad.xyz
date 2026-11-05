@@ -13,21 +13,22 @@ Everything here is licensed CC BY-NC 4.0 (https://creativecommons.org/licenses/b
 
 ## Follow the newest Thingy
 
-- [Manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json): outfits (librarian, trail, workshop, concert), poses, faces, tools, model and still paths, at an address that always holds the newest version
-- Models: `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`)
-- Stills: `https://thingy.thingelstad.xyz/character/latest/poses/<outfit>-<pose>.webp` (transparent; the manifest lists which exist)
-- Iframe: `https://thingy.thingelstad.xyz/embed/?version=latest&outfit=<outfit>&pose=<pose>&face=<face>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
+- [Manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json): scenes (library, outdoors, workshop, concert), their accessories, poses, faces, model and still paths, at an address that always holds the newest version
+- Models: `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` (glTF 2.0 with Meshopt compression and WebP textures; served with `Access-Control-Allow-Origin: *`)
+- Stills: `https://thingy.thingelstad.xyz/character/latest/poses/<scene>-<pose>.webp` (transparent; the manifest lists which exist)
+- Iframe: `https://thingy.thingelstad.xyz/embed/?version=latest&scene=<scene>&accessories=<accessories>&pose=<pose>&face=<face>&light=on|off&motion=on|off`. Transparent, no controls; motion defaults off and obeys reduced motion.
 - Illustration: `https://thingy.thingelstad.xyz/thingy-original.png`, the original drawing in the librarian's jacket, a 1022 px PNG of 220 KB for `og:image` and icons
-- Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character version="latest" outfit="workshop" tool="hammer" pose="work" face="proud">`. The kit lists every attribute, event and method.
+- Web component: load `https://thingy.thingelstad.xyz/thingy.js` as a module, then use `<thingy-character version="latest" scene="workshop" accessories="hammer" pose="work" face="proud">`. The kit lists every attribute, event and method.
 
 ## Keep one Thingy for good
 
-- [Character manifest, v0.14](https://thingy.thingelstad.xyz/character/v0.14/manifest.json): the numbered directory of the current model. Its files are never replaced; a future incompatible revision gets a new directory.
-- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): the first model, with no faces or tools. It has PNG stills beside each WebP. An iframe or component with no `version` stays on it.
+- [Character manifest, v0.15](https://thingy.thingelstad.xyz/character/v0.15/manifest.json): the numbered directory of the current model. Its files are never replaced; a future incompatible revision gets a new directory.
+- [Character manifest, v0.14](https://thingy.thingelstad.xyz/character/v0.14/manifest.json): the model before Scenes, by its outfit names. The files stay published, but the component no longer draws it.
+- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): the first model, with no faces or tools. It has PNG stills beside each WebP. The files stay published, but the component no longer draws it.
 
 ## Pages
 
-- [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change outfit, pose, face and tool, switch the antenna light, and copy the embed, a picture or a link for what stands on the stage
+- [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change scene, accessories, pose and face, switch the antenna light, and copy the embed, a picture or a link for what stands on the stage
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
 - [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0. [Print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) has the sizes and SHA-256 sums. Not test-printed yet.
 

@@ -27,6 +27,8 @@ const newestFiles = await walk(newest);
 assert.deepEqual(
   (await walk("dist/character/latest"))
     .map((file) => path.relative("dist/character/latest", file))
+    // The Ask Thingy alias from write-site-files, gone when that change lands.
+    .filter((file) => !file.startsWith("poses/librarian-"))
     .sort(),
   newestFiles.map((file) => path.relative(newest, file)).sort(),
   "character/latest is not the newest version's files",
@@ -144,7 +146,7 @@ assert.ok(
   "llms.txt offers the kit first",
 );
 // Every address the kit and llms.txt give out was really built. A wildcard
-// address (one with <outfit> in it) stops at the directory before it.
+// address (one with <scene> in it) stops at the directory before it.
 const built = [kit, llms].flatMap((text) => [
   ...text.matchAll(/https:\/\/thingy\.thingelstad\.xyz\/([^\s)`<&?#"*]*)/g),
 ]);

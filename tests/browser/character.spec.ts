@@ -9,10 +9,10 @@ async function open(page: Page, tab: string): Promise<void> {
     await button.click();
 }
 
-test("outfits, poses, playback, light and keyboard camera work on a real WebGL character", async ({
+test("scenes, poses, playback, light and keyboard camera work on a real WebGL character", async ({
   page,
 }, info) => {
-  // Four outfits on the larger stage take longer than the default under CI's
+  // Four scenes on the larger stage take longer than the default under CI's
   // software rendering.
   test.setTimeout(180000);
   const errors: string[] = [];
@@ -37,27 +37,20 @@ test("outfits, poses, playback, light and keyboard camera work on a real WebGL c
     path: `/tmp/thingy-home-${info.project.name}.png`,
     fullPage: true,
   });
-  await open(page, "outfit");
-  for (const name of [
-    "Trail companion",
-    "Workshop Builder",
-    "Concert companion",
-    "Librarian",
-  ]) {
+  await open(page, "scene");
+  for (const name of ["Outdoors", "Workshop", "Concert", "Library"]) {
     await page.getByRole("radio", { name, exact: true }).check();
     await expect(character).toHaveAttribute("data-ready", "", {
       timeout: 30000,
     });
   }
-  await page
-    .getByRole("radio", { name: "Workshop Builder", exact: true })
-    .check();
+  await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   // Present is the laptop's, and it comes with that one pose.
-  await expect(character).toHaveAttribute("tool", "laptop");
+  await expect(character).toHaveAttribute("accessories", "laptop");
   await expect(page.locator('[data-pose="thinking"]')).toHaveCount(0);
-  await open(page, "tool");
-  await page.locator('[data-tool="none"]').click();
+  await open(page, "accessories");
+  await page.locator('[data-accessory=""]').click();
   await open(page, "pose");
   await page.locator('[data-pose="thinking"]').click();
   await expect(character).toHaveAttribute("pose", "thinking");
@@ -116,14 +109,14 @@ test("version latest loads the newest model, and hop jumps, spins and lands wher
     route.fulfill({
       contentType: "text/html",
       body: `<!doctype html><html lang="en"><head><title>hop</title></head><body style="margin:0;padding-top:200px">
-        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
+        <thingy-character id="library" scene="library" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );
   await page.goto("/__hop");
-  const character = page.locator("#librarian");
+  const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  expect(models).toEqual([expect.stringContaining("/character/v0.14/")]);
+  expect(models).toEqual([expect.stringContaining("/character/v0.15/")]);
   await page.waitForTimeout(300);
   const before = await character.screenshot();
 
@@ -156,12 +149,12 @@ test("a hop that carries him out of view still lands", async ({ page }) => {
     route.fulfill({
       contentType: "text/html",
       body: `<!doctype html><html lang="en"><head><title>hop away</title></head><body style="margin:0">
-        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:160px;height:160px"></thingy-character>
+        <thingy-character id="library" scene="library" version="latest" pose="hello" zoom="off" style="display:block;width:160px;height:160px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );
   await page.goto("/__hop-away");
-  const character = page.locator("#librarian");
+  const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await character.evaluate((el) =>
     (el as HTMLElement & { hop(o: object): void }).hop({ height: 240 }),
@@ -183,12 +176,12 @@ test("hop stays still under reduced motion", async ({ page }) => {
     route.fulfill({
       contentType: "text/html",
       body: `<!doctype html><html lang="en"><head><title>still</title></head><body style="margin:0">
-        <thingy-character id="librarian" outfit="librarian" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
+        <thingy-character id="library" scene="library" version="latest" pose="hello" zoom="off" style="display:block;width:420px;height:420px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );
   await page.goto("/__still");
-  const character = page.locator("#librarian");
+  const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   const moved = await character.evaluate(async (el) => {
     (el as HTMLElement & { hop(o: object): void }).hop({ height: 100 });
@@ -198,7 +191,7 @@ test("hop stays still under reduced motion", async ({ page }) => {
   expect(moved).toBe("");
 });
 
-test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a tap but not a turn", async ({
+test("the Library shows his faces, leaves the wheel alone, and reports a tap but not a turn", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -213,13 +206,13 @@ test("the v0.14 Librarian shows his faces, leaves the wheel alone, and reports a
   await page.route("**/__v014", (route) =>
     route.fulfill({
       contentType: "text/html",
-      body: `<!doctype html><html lang="en"><head><title>v0.14</title></head><body style="height:3000px;margin:0">
-        <thingy-character id="librarian" outfit="librarian" version="v0.14" pose="present" face="original" zoom="off" view-label="Thingy, to turn" style="display:block;width:420px;height:420px"></thingy-character>
+      body: `<!doctype html><html lang="en"><head><title>v0.15</title></head><body style="height:3000px;margin:0">
+        <thingy-character id="library" scene="library" version="v0.15" pose="present" face="original" zoom="off" view-label="Thingy, to turn" style="display:block;width:420px;height:420px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );
   await page.goto("/__v014");
-  const character = page.locator("#librarian");
+  const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   const canvas = character.locator("canvas");
   await expect(canvas).toHaveAttribute("aria-label", "Thingy, to turn");
@@ -275,7 +268,7 @@ test("what stands on the stage is what you copy, save and link", async ({
 }, info) => {
   test.setTimeout(180000);
   await context.grantPermissions(["clipboard-write", "clipboard-read"]);
-  await page.goto("/?outfit=workshop&tool=hammer&pose=work&face=proud");
+  await page.goto("/?scene=workshop&accessories=hammer&pose=work&face=proud");
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await open(page, "bring");
@@ -313,7 +306,7 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(page.locator("#copy-label")).toHaveText("Embed copied");
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain(
-    "/embed/?version=latest&outfit=workshop&tool=hammer&pose=work&face=proud&light=off&motion=off&view=60%2C80%2C1",
+    "/embed/?version=latest&scene=workshop&accessories=hammer&pose=work&face=proud&light=off&motion=off&view=60%2C80%2C1",
   );
 
   // Changing him changes what is taken, and the words forget the last copy.
@@ -386,31 +379,31 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(page.locator("#copy")).toBeVisible();
 });
 
-test("the embed follows latest with the face, tool and angle it was given, on a transparent page", async ({
+test("the embed follows latest with the face, accessory and angle it was given, on a transparent page", async ({
   page,
 }) => {
   await page.goto(
-    "/embed/?version=latest&outfit=workshop&tool=drill&pose=show&face=curious&light=on&motion=off&view=-40,70,1.2",
+    "/embed/?version=latest&scene=workshop&accessories=drill&pose=show&face=curious&light=on&motion=off&view=-40,70,1.2",
   );
   const character = page.locator("thingy-character");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   const facts = await character.evaluate((el) => {
     const thingy = el as never as {
       version: string;
-      tool: string;
+      accessories: string[];
       pose: string;
       view: string;
     };
     return {
       version: thingy.version,
-      tool: thingy.tool,
+      accessories: thingy.accessories,
       pose: thingy.pose,
       view: thingy.view,
     };
   });
   expect(facts).toEqual({
-    version: "v0.14",
-    tool: "drill",
+    version: "v0.15",
+    accessories: ["drill"],
     pose: "show",
     view: "-40,70,1.2",
   });
@@ -420,16 +413,16 @@ test("the embed follows latest with the face, tool and angle it was given, on a 
       .locator("body")
       .evaluate((el) => getComputedStyle(el).backgroundColor),
   ).toBe("rgba(0, 0, 0, 0)");
-  // A published address that names none of this still gets v0.10, as it was.
-  await page.goto("/embed/?outfit=workshop&pose=thinking");
+  // An address that names no version has the newest.
+  await page.goto("/embed/?scene=workshop&pose=thinking");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   expect(
     await character.evaluate(
       (el) => (el as never as { version: string }).version,
     ),
-  ).toBe("v0.10");
+  ).toBe("v0.15");
   // `off` is never shown to a reader, whatever the address says.
-  await page.goto("/embed/?version=latest&outfit=librarian&face=off");
+  await page.goto("/embed/?version=latest&scene=library&face=off");
   await expect(character).not.toHaveAttribute("face", "off");
 });
 
@@ -437,7 +430,7 @@ test("reduced motion stays still and a missing 3D asset leaves a useful pose ima
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/?outfit=workshop&pose=hello");
+  await page.goto("/?scene=workshop&pose=hello");
   await expect(page.locator("#play")).toBeDisabled();
   await expect(page.locator("#main-thingy")).toHaveAttribute("motion", "off");
   await page.route("**/*.glb", (route) => route.abort());
@@ -461,7 +454,7 @@ test("the standalone component finds its assets when used by another origin", as
   const server = createServer((_request, response) => {
     response.setHeader("Content-Type", "text/html");
     response.end(`<!doctype html><html lang="en"><head><title>A consuming project</title></head><body>
-      <thingy-character id="consumer" outfit="workshop" pose="thinking" style="width:320px;height:380px"></thingy-character>
+      <thingy-character id="consumer" scene="workshop" pose="thinking" style="width:320px;height:380px"></thingy-character>
       <script type="module" src="http://127.0.0.1:4322/thingy.js"></script></body></html>`);
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -485,7 +478,7 @@ test("the standalone component finds its assets when used by another origin", as
   }
 });
 
-test("the studio offers every face and, for the builder, every tool", async ({
+test("the studio offers every face and, for each scene, its accessories", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -493,7 +486,7 @@ test("the studio offers every face and, for the builder, every tool", async ({
   await page.goto("/");
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(character).toHaveAttribute("version", "v0.14");
+  await expect(character).toHaveAttribute("version", "v0.15");
   // The stage reaches up behind the header, and must not take its links.
   await page.locator(".site-header .ask").click({ trial: true });
   const shot = async () => {
@@ -512,24 +505,22 @@ test("the studio offers every face and, for the builder, every tool", async ({
   expect(original.equals(await shot())).toBe(false);
   expect(page.url()).toContain("face=curious");
 
-  // No tools outside the workshop; the face stays through a change of clothes.
-  await expect(page.locator("#tools")).toBeHidden();
-  await expect(page.locator('[data-sheet-tab="tool"]')).toBeHidden();
-  await open(page, "outfit");
-  await page
-    .getByRole("radio", { name: "Workshop Builder", exact: true })
-    .check();
+  // No accessories in the Library; the face stays through a change of scene.
+  await expect(page.locator("#accessories")).toBeHidden();
+  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
+  await open(page, "scene");
+  await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await open(page, "tool");
-  await expect(page.locator("#tools")).toBeVisible();
+  await open(page, "accessories");
+  await expect(page.locator("#accessories")).toBeVisible();
   await expect(character).toHaveAttribute("face", "curious");
 
   // Each tool is its own picture, with its own poses, and a tool pose holds still.
   const seen: Buffer[] = [await shot()];
   for (const tool of ["screwdriver", "hammer", "drill"]) {
-    await open(page, "tool");
-    await page.locator(`[data-tool="${tool}"]`).click();
-    await expect(character).toHaveAttribute("tool", tool);
+    await open(page, "accessories");
+    await page.locator(`[data-accessory="${tool}"]`).click();
+    await expect(character).toHaveAttribute("accessories", tool);
     // The first tool starts at Carry; after that the pose stays through a swap.
     await expect(character).toHaveAttribute(
       "pose",
@@ -545,18 +536,42 @@ test("the studio offers every face and, for the builder, every tool", async ({
       seen.push(picture);
     }
   }
-  expect(page.url()).toContain("tool=drill");
+  expect(page.url()).toContain("accessories=drill");
   expect(page.url()).toContain("pose=work");
 
-  // Leaving the workshop puts the tool down, and an address brings him back.
-  await open(page, "outfit");
-  await page.getByRole("radio", { name: "Librarian", exact: true }).check();
+  // A single accessory is a switch, and it really comes off.
+  for (const [name, id] of [
+    ["Concert", "headphones"],
+    ["Outdoors", "backpack"],
+  ] as const) {
+    await open(page, "scene");
+    await page.getByRole("radio", { name, exact: true }).check();
+    await expect(character).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    await open(page, "accessories");
+    const toggle = page.locator(`[data-accessory="${id}"]`);
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    const on = await shot();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect(character).toHaveAttribute("accessories", "none");
+    expect(on.equals(await shot())).toBe(false);
+    expect(page.url()).toContain("accessories=none");
+    await toggle.click();
+    await expect(character).toHaveAttribute("accessories", id);
+    expect(page.url()).not.toContain("accessories");
+  }
+
+  // Leaving a scene leaves its accessories, and an address brings them back.
+  await open(page, "scene");
+  await page.getByRole("radio", { name: "Library", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(character).toHaveAttribute("tool", "none");
-  await expect(character).toHaveAttribute("pose", "present");
-  await page.goto("/?outfit=workshop&tool=hammer&pose=show&face=proud");
+  await expect(character).toHaveAttribute("accessories", "none");
+  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
+  await page.goto("/?scene=workshop&accessories=hammer&pose=show&face=proud");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(page.locator('[data-tool="hammer"]')).toHaveAttribute(
+  await expect(page.locator('[data-accessory="hammer"]')).toHaveAttribute(
     "aria-pressed",
     "true",
   );
