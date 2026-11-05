@@ -1,5 +1,5 @@
 /** Every model the component can draw, oldest first. Older files stay published. */
-export const VERSIONS = ["v0.15", "v0.16"] as const;
+export const VERSIONS = ["v0.15", "v0.16", "v0.17"] as const;
 export type Version = (typeof VERSIONS)[number];
 /** `version="latest"`, or no version at all, asks for the newest model. */
 export const LATEST = "latest";
@@ -55,8 +55,19 @@ export const TOOL_POSES = {
   work: { label: "Work", frame: 1 },
   check: { label: "Check", frame: 1 },
   hold: { label: "Hold up", frame: 1 },
+  read: { label: "Read", frame: 1 },
+  sip: { label: "Sip", frame: 1 },
+  speak: { label: "Speak", frame: 1 },
+  throw: { label: "Throw", frame: 1 },
 } as const;
 const HAND_TOOL_POSES = ["carry", "show", "work"] as const;
+const EMPTY_HANDS = { label: "Empty hands" };
+const MUG = { id: "mug", label: "Mug", poses: ["carry", "sip"] } as const;
+const BATON = {
+  id: "baton",
+  label: "Kubb baton",
+  poses: ["carry", "throw"],
+} as const;
 export type Pose = keyof typeof POSES;
 export type ToolPose = keyof typeof TOOL_POSES;
 export type AnyPose = Pose | ToolPose;
@@ -101,7 +112,16 @@ export const SCENES = {
   library: {
     label: "Library",
     posedStills: true,
-    slots: [],
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "book", label: "Book", poses: ["read", "show"], steady: true },
+          MUG,
+        ],
+      },
+    ],
   },
   outdoors: {
     label: "Outdoors",
@@ -110,6 +130,18 @@ export const SCENES = {
         id: "pack",
         standard: "backpack",
         options: [{ id: "backpack", label: "Backpack" }],
+      },
+      {
+        id: "head",
+        options: [{ id: "helmet", label: "Bike helmet" }],
+      },
+      {
+        id: "neck",
+        options: [{ id: "camera", label: "Camera" }],
+      },
+      {
+        id: "hand",
+        options: [BATON],
       },
     ],
   },
@@ -134,6 +166,8 @@ export const SCENES = {
             poses: ["carry", "show"],
             steady: true,
           },
+          MUG,
+          { id: "candle", label: "Candle", poses: ["carry", "show"] },
         ],
       },
     ],
@@ -147,8 +181,16 @@ export const SCENES = {
         options: [{ id: "headphones", label: "Headphones", absent: "ears" }],
       },
       {
+        id: "neck",
+        options: [{ id: "scarf", label: "Scarf" }],
+      },
+      {
         id: "hand",
-        options: [{ id: "phone", label: "iPhone", poses: ["check", "hold"] }],
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "phone", label: "iPhone", poses: ["check", "hold"] },
+          { id: "mic", label: "Microphone", poses: ["speak", "hold"] },
+        ],
       },
     ],
   },

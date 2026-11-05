@@ -23,6 +23,29 @@ const paths: Record<string, string> = {
     '<path d="M2 18h20l-2 3H4Z"/><circle cx="12" cy="7" r="3.500"/><path d="M9 18l.5-4.500h5L15 18"/>',
   phone:
     '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  book: '<path d="M12 6c-2-1.500-5-2-9-2v15c4 0 7 .5 9 2 2-1.500 5-2 9-2V4c-4 0-7 .5-9 2ZM12 6v15"/>',
+  mug: '<path d="M4 7h12v11a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3ZM16 10h2a3 3 0 0 1 0 6h-2"/><path d="M8 3v1M12 3v1"/>',
+  mic: '<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/>',
+  baton: '<path d="m4 20 4-4M8 16 19 5a1.400 1.400 0 0 0-2-2L6 14Z"/>',
+  camera:
+    '<rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13" r="3.500"/><path d="M9 7l1.500-3h3L15 7"/>',
+  helmet:
+    '<path d="M3 15a9 9 0 0 1 18 0v1H3ZM7 10l2-4M12 9V5M17 10l-2-4M3 16l-1 3h9"/>',
+  scarf:
+    '<path d="M5 6c3 3 11 3 14 0v4c-3 3-11 3-14 0ZM14 12v9h4v-9M8 11v6h4"/>',
+  candle:
+    '<rect x="7" y="11" width="10" height="10" rx="1.500"/><path d="M12 11V8M12 8c-1.500-1.500-1-3 0-5 1 2 1.500 3.500 0 5Z"/>',
+  tongs:
+    '<path d="M18 21 9 5a2 2 0 0 0-3 1l-1 3M6 21 15 5a2 2 0 0 1 3 1l1 3"/>',
+  whisk:
+    '<path d="M12 22v-8M12 14c-5-4-5-12 0-12s5 8 0 12ZM12 14c-2-4-2-9 0-12 2 3 2 8 0 12Z"/>',
+  grill:
+    '<path d="M4 11h16a8 8 0 0 1-16 0ZM8 18l-2 4M16 18l2 4M9 7c-1-1 1-2 0-4M15 7c-1-1 1-2 0-4"/>',
+  read: '<path d="M12 6c-2-1.500-5-2-9-2v15c4 0 7 .5 9 2 2-1.500 5-2 9-2V4c-4 0-7 .5-9 2Z"/>',
+  sip: '<path d="M6 3h12l-1 8a5 5 0 0 1-10 0ZM12 16v5M8 21h8"/>',
+  speak:
+    '<path d="M4 9v6h3l5 4V5L7 9ZM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+  throw: '<path d="M4 20c4-10 9-14 16-15M14 4l6 1-2 6"/>',
   carry: '<path d="M12 3v14M6 11l6 6 6-6M5 21h14"/>',
   show: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   work: '<path d="m13 3-8 11h6l-1 7 9-12h-6Z"/>',

@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import validator from "gltf-validator";
 const root = fileURLToPath(new URL("../", import.meta.url));
-for (const version of ["v0.10", "v0.14", "v0.15", "v0.16"]) {
+for (const version of ["v0.10", "v0.14", "v0.15", "v0.16", "v0.17"]) {
   const publicRoot = `${root}public/character/${version}/`;
   const manifest = JSON.parse(readFileSync(`${publicRoot}manifest.json`));
   if (manifest.faceSheet)
@@ -47,7 +47,10 @@ for (const version of ["v0.10", "v0.14", "v0.15", "v0.16"]) {
     // From v0.16 the Workshop's laptop has a bone of its own, to turn in his hand, and
     // Concert is exported from the same rig.
     const joints =
-      version === "v0.16" && ["workshop", "concert"].includes(key) ? 41 : 40;
+      version === "v0.17" ||
+      (version === "v0.16" && ["workshop", "concert"].includes(key))
+        ? 41
+        : 40;
     assert.equal(
       json.skins[0].joints.length,
       joints,
