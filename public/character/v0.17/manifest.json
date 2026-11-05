@@ -84,7 +84,10 @@
                 "sip"
               ]
             }
-          ]
+          ],
+          "empty": {
+            "label": "Empty hands"
+          }
         }
       ],
       "toolClips": [
@@ -359,7 +362,10 @@
                 "hold"
               ]
             }
-          ]
+          ],
+          "empty": {
+            "label": "Empty hands"
+          }
         }
       ],
       "toolClips": [
@@ -367,6 +373,123 @@
         "phone-hold",
         "mic-speak",
         "mic-hold"
+      ]
+    },
+    "kitchen": {
+      "label": "Kitchen",
+      "model": "kitchen.glb",
+      "poster": "poses/kitchen-present.webp",
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands"
+          },
+          "options": [
+            {
+              "id": "tongs",
+              "label": "Tongs",
+              "node": "Thingy_Accessory_tongs",
+              "poses": [
+                "carry",
+                "work"
+              ]
+            },
+            {
+              "id": "whisk",
+              "label": "Whisk",
+              "node": "Thingy_Accessory_whisk",
+              "poses": [
+                "carry",
+                "work"
+              ]
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "grill",
+          "options": [
+            {
+              "id": "grill",
+              "label": "Grill",
+              "node": "Thingy_Accessory_grill"
+            }
+          ]
+        }
+      ],
+      "toolClips": [
+        "tongs-carry",
+        "tongs-work",
+        "whisk-carry",
+        "whisk-work",
+        "mug-carry",
+        "mug-sip"
+      ]
+    },
+    "winter": {
+      "label": "Winter",
+      "model": "winter.glb",
+      "poster": "poses/winter-present.webp",
+      "slots": [
+        {
+          "id": "neck",
+          "standard": "scarf",
+          "options": [
+            {
+              "id": "scarf",
+              "label": "Scarf",
+              "node": "Thingy_Accessory_scarf"
+            }
+          ]
+        }
+      ]
+    },
+    "cabin": {
+      "label": "Cabin",
+      "model": "cabin.glb",
+      "poster": "poses/cabin-present.webp",
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands"
+          },
+          "options": [
+            {
+              "id": "baton",
+              "label": "Kubb baton",
+              "node": "Thingy_Accessory_baton",
+              "poses": [
+                "carry",
+                "throw"
+              ]
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            }
+          ]
+        }
+      ],
+      "toolClips": [
+        "baton-carry",
+        "baton-throw",
+        "mug-carry",
+        "mug-sip"
       ]
     }
   },

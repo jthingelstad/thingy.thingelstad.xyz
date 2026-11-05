@@ -106,6 +106,8 @@ export type Scene = {
   label: string;
   /** Has a still for each pose. Any other scene's only still is `present`. */
   posedStills?: boolean;
+  /** The first model with this scene. An older model has only what it was made with. */
+  since?: Version;
   slots: readonly Slot[];
 };
 export const SCENES = {
@@ -194,6 +196,47 @@ export const SCENES = {
       },
     ],
   },
+  kitchen: {
+    label: "Kitchen",
+    since: "v0.17",
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "tongs", label: "Tongs", poses: ["carry", "work"] },
+          { id: "whisk", label: "Whisk", poses: ["carry", "work"] },
+          MUG,
+        ],
+      },
+      {
+        id: "grill",
+        options: [{ id: "grill", label: "Grill" }],
+      },
+    ],
+  },
+  winter: {
+    label: "Winter",
+    since: "v0.17",
+    slots: [
+      {
+        id: "neck",
+        standard: "scarf",
+        options: [{ id: "scarf", label: "Scarf" }],
+      },
+    ],
+  },
+  cabin: {
+    label: "Cabin",
+    since: "v0.17",
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [BATON, MUG],
+      },
+    ],
+  },
 } as const satisfies Record<string, Scene>;
 export type SceneKey = keyof typeof SCENES;
 export const SCENE_KEYS = Object.keys(SCENES) as SceneKey[];
@@ -203,10 +246,15 @@ export type CharacterState = {
   light: boolean;
   motion: boolean;
 };
-export function scene(value: string | null | undefined): SceneKey {
-  return value && Object.hasOwn(SCENES, value)
-    ? (value as SceneKey)
-    : "library";
+export function scene(
+  value: string | null | undefined,
+  version: Version = VERSIONS.at(-1)!,
+): SceneKey {
+  if (!value || !Object.hasOwn(SCENES, value)) return "library";
+  const since = (SCENES[value as SceneKey] as Scene).since;
+  return since && VERSIONS.indexOf(version) < VERSIONS.indexOf(since)
+    ? "library"
+    : (value as SceneKey);
 }
 export function pose(value: string | null | undefined): Pose {
   return value && Object.hasOwn(POSES, value) ? (value as Pose) : "present";
@@ -374,6 +422,9 @@ export const MODEL_WEIGHT: Record<SceneKey, string> = {
   outdoors: "2.3 MB",
   workshop: "2.6 MB",
   concert: "2.4 MB",
+  kitchen: "0 MB",
+  winter: "0 MB",
+  cabin: "0 MB",
 };
 export function embedURL(
   state: EmbedState,

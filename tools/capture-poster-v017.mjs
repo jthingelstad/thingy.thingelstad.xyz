@@ -1,6 +1,7 @@
-// The v0.16 stills: the model itself in the component, from its default camera, so
+// The v0.17 stills: the model itself in the component, from its default camera, so
 // a still and the first frame are the same picture. Name the scenes to capture, or
-// none for all but the Library, whose stills are v0.14's files, unchanged. Name
+// none for the three new scenes: the older scenes look as they did, so their
+// stills are v0.16's files, unchanged. Name
 // scene/clip to capture one still and touch no other, the way to add a still to a
 // published version, whose files are never replaced. Each still shows what its
 // scene gives him. Needs a running preview (npm run preview -- --port 4399).
@@ -11,10 +12,10 @@ import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const base = process.env.THINGY_PREVIEW || "http://127.0.0.1:4399";
-const directory = `${root}public/character/v0.16`;
+const directory = `${root}public/character/v0.17`;
 const manifest = JSON.parse(readFileSync(`${directory}/manifest.json`, "utf8"));
 const names = process.argv.slice(2);
-const wanted = names.length ? names : ["outdoors", "workshop", "concert"];
+const wanted = names.length ? names : ["kitchen", "winter", "cabin"];
 // A still's clip is a pose, <pose>-<face> or <tool>-<pose>.
 const shot = (scene, clip) => {
   const [first, second] = clip.split("-");
@@ -48,7 +49,7 @@ for (const { scene, clip, pose, tool, face = "original" } of shots) {
     route.fulfill({
       contentType: "text/html",
       body: `<!doctype html><html><body style="margin:0;background:transparent">
-        <thingy-character scene="${scene}" version="v0.16" pose="${pose}" ${tool ? `accessories="${tool}"` : ""} face="${face}" zoom="off" style="width:500px;height:500px"></thingy-character>
+        <thingy-character scene="${scene}" version="v0.17" pose="${pose}" ${tool ? `accessories="${tool}"` : ""} face="${face}" zoom="off" style="width:500px;height:500px"></thingy-character>
         <script type="module" src="/thingy.js"></script></body></html>`,
     }),
   );

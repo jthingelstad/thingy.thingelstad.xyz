@@ -52,8 +52,8 @@ present on About, thinking on Search, and rest on its 404 page.
 
 ## Stable asset addresses
 
-`public/character/v0.16/manifest.json` is the delivery contract. Scene IDs are
-`library`, `outdoors`, `workshop`, and `concert`. Pose IDs are `hello`, `present`,
+`public/character/v0.17/manifest.json` is the delivery contract. Scene IDs are
+`library`, `outdoors`, `workshop`, `concert`, `kitchen`, `winter`, and `cabin`. Pose IDs are `hello`, `present`,
 `thinking`, and `rest`. `light` and `motion` accept `on` or `off`.
 
 Each scene loads separately, about 2–3 MB. The shared rig has 40 joints. Meshopt
@@ -83,6 +83,23 @@ changes. The contract tests hold the two together.
 
 `v0.10` and `v0.14` keep their files, under the outfit names they were made with, but
 the component only draws the versions in `VERSIONS`.
+
+## Rebuild v0.17
+
+v0.17 adds things to have with him (book, mug, microphone, baton, camera, helmet, scarf,
+candle, tongs, whisk, grill) and three scenes (Kitchen, Winter, Cabin). The things are
+plain parts outside the atlas, so the four older scenes reuse their bakes: copy v0.16's
+`workshop` and `concert`, v0.15's `outdoors` and v0.14's `librarian` as `library` into
+`local-only/bakes/v0.17/`, and run the export with `--reuse-bakes`. The new scenes bake
+in full, one at a time; three at once runs Metal out of memory.
+
+```sh
+blender --background \
+  ../thingy-character/source/Thingy-wardrobe-v0.17.blend \
+  --python-exit-code 1 --python tools/export_character_v017.py -- --scene kitchen
+node tools/optimize-v017.mjs kitchen
+node tools/capture-poster-v017.mjs kitchen
+```
 
 ## Rebuild the v0.16 Workshop
 

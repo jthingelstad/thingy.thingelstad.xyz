@@ -344,7 +344,7 @@ h1 {
   display: block;
   aspect-ratio: 512 / 330;
   border-radius: 7px;
-  background-image: url("/character/v0.16/faces.webp");
+  background-image: url("/character/v0.17/faces.webp");
   background-size: 400% 500%;
   opacity: 0.76;
 }

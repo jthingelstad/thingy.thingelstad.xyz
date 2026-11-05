@@ -48,7 +48,7 @@ from mathutils import Matrix, Quaternion, Vector  # noqa: F401  (the FK helpers 
 
 ROOT = Path(__file__).resolve().parents[1]
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-SCENES = ['library', 'outdoors', 'workshop', 'concert']
+SCENES = ['library', 'outdoors', 'workshop', 'concert', 'kitchen', 'winter', 'cabin']
 KEY = ARGS[ARGS.index('--scene') + 1] if '--scene' in ARGS else 'library'
 INDEX = SCENES.index(KEY)
 RAW = ROOT / 'local-only/bakes/v0.17' / KEY
@@ -103,13 +103,36 @@ FAMILIES = {
         'ears': (),
         'tangerine': TANGERINE,
     },
+    'kitchen': {
+        'canvas': ('v15 · worn indigo canvas',),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'jersey': ('v15 · cream cotton jersey',),
+        'apron': ('v17 · butcher stripe apron', 'v17 · apron tie'),
+        'tangerine': TANGERINE,
+    },
+    'winter': {
+        'parka': ('v17 · mustard parka', 'v17 · parka thread'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (), 'tape': (),
+        'denim': ('v15 · washed charcoal denim',),
+        'knit': ('v17 · tangerine knit',),
+        'ripstop': ('v15 · ochre orange ripstop',),
+        'tangerine': TANGERINE,
+    },
+    'cabin': {
+        'flannel': ('v17 · buffalo check flannel', 'v15 · copper denim topstitch thread'),
+        'dark': DARK, 'ivory': IVORY, 'badge': (),
+        'jersey': ('v15 · cream cotton jersey',),
+        'jeans': ('v15 · worn indigo canvas',),
+        'tangerine': TANGERINE,
+    },
 }[KEY]
 GROUPS = list(FAMILIES)
 # A delivery grade in linear light, per family, toward reference/thingy-original.png.
 # The master's felt gets its dusty lift from a viewing-angle term a bake cannot keep.
 GRADE = {'navy': (1.8, 1.8, 1.85), 'ivory': (.95, 1.05, 1.25), 'badge': (1, .93, .62), **TRIAL_GRADE}
 PRESENT = ['Thingy v06 · Original', 'Thingy v07 · Trail lookout',
-           'Thingy v07 · Workshop present', 'Thingy v07 · Concert listen'][INDEX]
+           'Thingy v07 · Workshop present', 'Thingy v07 · Concert listen',
+           'Thingy v06 · Original', 'Thingy v07 · Trail lookout', 'Thingy v07 · Trail lookout'][INDEX]
 
 scene = bpy.context.scene
 rig = bpy.data.objects['Thingy_Body_Rig']
@@ -315,7 +338,7 @@ def atlas_share(name):
     """Relative texel density: the coat is most of the picture, and plenty is out of sight."""
     for needle, share in [
         ('continuous open-front coat', 1.7), ('continuous wool', 1.7), ('notched lapel', 1.7), ('rolled collar', 1.7),
-        ('open indigo canvas vest', 1.7), ('technical shell', 1.7), ('open charcoal denim jacket', 1.7),
+        ('butcher stripe apron', 1.7), ('open indigo canvas vest', 1.7), ('technical shell', 1.7), ('open charcoal denim jacket', 1.7),
         ('printed cotton tee', 1.7), ('sound tee', 1.7), ('name badge plate', 1.6), ('articulated sleeve', 1.5),
         ('fitted shell pocket', 1.5), ('canvas pocket', 1.5), ('breast pocket', 1.5), ('daypack', 1.3),
         ('folded route map', 1.6), ('folded show program', 1.6), ('keyboard image', 1.6), ('screen artwork', 1.6),
@@ -334,7 +357,8 @@ def web_vertices(name, count):
     """A delivery budget per part: most of it where the silhouette and folds are."""
     for needle, target in [
         ('continuous open-front coat', 14000), ('continuous wool', 8000), ('rolled notched lapel', 3000),
-        ('open indigo canvas vest', 12000), ('articulated sleeve', 3200), ('printed cotton tee', 3200),
+        ('butcher stripe apron', 2600), ('mitten thumb', 220), ('knit mitten', 800), ('fallen parka hood', 500),
+        ('apron', 250), ('open indigo canvas vest', 12000), ('articulated sleeve', 3200), ('printed cotton tee', 3200),
         ('sound tee', 3200), ('technical shell', 9000), ('open charcoal denim jacket', 9000),
         ('trouser waist', 1600), ('shorts waist', 1600), ('denim waist', 1600), ('rolled cotton cuff', 500),
         ('fitted cuff', 500), ('wristband', 400), ('canvas pocket', 700), ('fitted shell pocket', 700),

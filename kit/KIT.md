@@ -116,8 +116,8 @@ The name is `<scene>-<pose>.webp`, 1000 px square and transparent, with a tool o
 face in it where the still has one: `workshop-hammer-show.webp`,
 `library-rest-delighted.webp`.
 
-- **Every scene has `present`.** Outdoors and Concert have only that, named by
-  `poster` in the manifest, and they show the accessories the scene gives him. In
+- **Every scene has `present`.** Outdoors, Concert, Kitchen, Winter and Cabin have only
+  that, named by `poster` in the manifest, and they show the accessories the scene gives him. In
   `workshop-present` he holds the laptop.
 - **The Library's stills also have faces, and the Workshop's have tools and two
   faces for his job there:** `workshop-present-proud` and
@@ -172,8 +172,8 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 
 | Attribute     | Values                                                                       |
 | ------------- | ---------------------------------------------------------------------------- |
-| `version`     | `latest` or `v0.16`, with the `v`. Anything else is the newest               |
-| `scene`       | `library`, `outdoors`, `workshop`, `concert`                                 |
+| `version`     | `latest` or `v0.17`, with the `v`. Anything else is the newest               |
+| `scene`       | `library`, `outdoors`, `workshop`, `concert`, `kitchen`, `winter`, `cabin`   |
 | `pose`        | See [poses](#poses). Without one he stands in `present`, so set it           |
 | `face`        | See [faces](#faces)                                                          |
 | `accessories` | See [accessories](#accessories). A comma list, or `none`                     |
@@ -265,7 +265,7 @@ Load `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
 decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
 in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
-shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for the laptop.
+shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for the laptop, and from v0.17 every scene does.
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
@@ -314,13 +314,21 @@ he has, separated by commas, or say `none`.
 
 | Scene      | Accessories                      | With none | Unless told otherwise |
 | ---------- | -------------------------------- | --------- | --------------------- |
-| `library`  | None                             |           |                       |
+| `library`  | `book`, `mug`                    | Empty     | Empty hands           |
 | `outdoors` | `backpack`                       | Off       | `backpack`            |
+| `outdoors` | `helmet`                         | Off       | No helmet             |
+| `outdoors` | `camera`                         | Off       | No camera             |
+| `outdoors` | `baton`                          | Off       | No baton              |
 | `workshop` | `screwdriver`, `hammer`, `drill` | Empty     | Empty hands           |
 | `workshop` | `laptop`                         | Empty     | `laptop` in `present` |
-| `workshop` | `plate`                          | Empty     | Empty hands           |
+| `workshop` | `plate`, `mug`, `candle`         | Empty     | Empty hands           |
 | `concert`  | `headphones`                     | Off       | `headphones`          |
-| `concert`  | `phone`                          | Off       | No phone              |
+| `concert`  | `scarf`                          | Off       | No scarf              |
+| `concert`  | `phone`, `mic`                   | Empty     | Empty hands           |
+| `kitchen`  | `tongs`, `whisk`, `mug`          | Empty     | Empty hands           |
+| `kitchen`  | `grill`                          | Off       | No grill              |
+| `winter`   | `scarf`                          | Off       | `scarf`               |
+| `cabin`    | `baton`, `mug`                   | Empty     | Empty hands           |
 
 Some accessories keep to the poses they were made for:
 
@@ -330,10 +338,16 @@ Some accessories keep to the poses they were made for:
 | `laptop`                         | `present`, `work`           |
 | `plate`                          | `carry`, `show`             |
 | `phone`                          | `check`, `hold`             |
+| `book`                           | `read`, `show`              |
+| `mug`                            | `carry`, `sip`              |
+| `candle`                         | `carry`, `show`             |
+| `mic`                            | `speak`, `hold`             |
+| `baton`                          | `carry`, `throw`            |
+| `tongs`, `whisk`                 | `carry`, `work`             |
 | `none`, in the Workshop          | `hello`, `thinking`, `rest` |
 
 `carry` holds the tool at his side, `show` holds it in front of him, and `work` is
-using it. The laptop's `present` turns its screen to you, and its `work` to him. The `phone` shows the Thingy Model page on Things I've built, on a screen turned to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+using it. The laptop's `present` turns its screen to you, and its `work` to him. The `phone` shows the Thingy Model page on Things I've built, on a screen turned to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. `read` opens the `book` in both hands, `sip` drinks from the `mug`, `speak` talks into the `mic`, and `throw` swings the Kubb `baton`. The `grill` stands beside him, the `helmet` has room for his antenna, and the `scarf` is colors only. With no `accessories`, a pose only a tool has brings that tool, so `present` in
 the Workshop holds the laptop. Asking for a pose the accessory does not have moves
 him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
 An accessory a scene doesn't have is ignored. To read what he ended up with, use the
@@ -347,7 +361,7 @@ brings without changing. A slot holds one accessory at a time.
 | You want                  | Use                                     | Changes                                       |
 | ------------------------- | --------------------------------------- | --------------------------------------------- |
 | The newest Thingy, always | `version="latest"`, `character/latest/` | When this site does, within five minutes      |
-| One Thingy, for good      | `version="v0.16"`, `character/v0.16/`   | Never                                         |
+| One Thingy, for good      | `version="v0.17"`, `character/v0.17/`   | Never                                         |
 | His persona               | `persona.md`                            | When Jamie approves a change, within a minute |
 
 Use `latest` unless a page needs one model forever.

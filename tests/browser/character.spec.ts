@@ -38,7 +38,15 @@ test("scenes, poses, playback, light and keyboard camera work on a real WebGL ch
     fullPage: true,
   });
   await open(page, "scene");
-  for (const name of ["Outdoors", "Workshop", "Concert", "Library"]) {
+  for (const name of [
+    "Outdoors",
+    "Workshop",
+    "Concert",
+    "Kitchen",
+    "Winter",
+    "Cabin",
+    "Library",
+  ]) {
     await page.getByRole("radio", { name, exact: true }).check();
     await expect(character).toHaveAttribute("data-ready", "", {
       timeout: 30000,
@@ -116,7 +124,7 @@ test("version latest loads the newest model, and hop jumps, spins and lands wher
   await page.goto("/__hop");
   const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  expect(models).toEqual([expect.stringContaining("/character/v0.16/")]);
+  expect(models).toEqual([expect.stringContaining("/character/v0.17/")]);
   await page.waitForTimeout(300);
   const before = await character.screenshot();
 
@@ -402,7 +410,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     };
   });
   expect(facts).toEqual({
-    version: "v0.16",
+    version: "v0.17",
     accessories: ["drill"],
     pose: "show",
     view: "-40,70,1.2",
@@ -420,7 +428,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     await character.evaluate(
       (el) => (el as never as { version: string }).version,
     ),
-  ).toBe("v0.16");
+  ).toBe("v0.17");
   // `off` is never shown to a reader, whatever the address says.
   await page.goto("/embed/?version=latest&scene=library&face=off");
   await expect(character).not.toHaveAttribute("face", "off");
@@ -613,7 +621,7 @@ test("the studio offers every face and, for each scene, its accessories", async 
   await page.goto("/?life=off");
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(character).toHaveAttribute("version", "v0.16");
+  await expect(character).toHaveAttribute("version", "v0.17");
   // The stage reaches up behind the header, and must not take its links.
   await page.locator(".site-header .ask").click({ trial: true });
   const shot = async () => {

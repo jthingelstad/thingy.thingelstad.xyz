@@ -100,6 +100,12 @@ test("the page's scenes are the manifest's scenes, in the same order", () => {
     );
   }
 });
+test("a scene stays out of the models made before it", () => {
+  assert.equal(scene("kitchen"), "kitchen");
+  assert.equal(scene("kitchen", "v0.17"), "kitchen");
+  assert.equal(scene("kitchen", "v0.16"), "library");
+  assert.equal(scene("concert", "v0.15"), "concert");
+});
 test("every still a page can ask for is in the manifest", () => {
   const manifest = newestManifest();
   for (const key of Object.keys(SCENES) as (keyof typeof SCENES)[])
