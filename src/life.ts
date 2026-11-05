@@ -110,7 +110,7 @@ function bendAntenna(
 const SPHERE = 0.035;
 const STALK_TOP = 0.85;
 const FORWARD_REACH = 3;
-const SWING_LIMIT = 0.13;
+const SWING_LIMIT = 0.085;
 const TURN_LEVER = 0.3;
 
 type Held = {
@@ -321,12 +321,31 @@ export class Life {
     };
   }
 
-  /** Takes every addition off and leaves him exactly as the pose has him. */
-  stop(): void {
+  /** Whether nothing is moving but his breath, so he can be drawn less often. */
+  get settled(): boolean {
+    return (
+      this.#blendAt >= 1 &&
+      Math.abs(this.#yaw.v) + Math.abs(this.#pitch.v) < 0.06 &&
+      Math.abs(this.#nod.v) < 0.05 &&
+      this.#tipVelocity.lengthSq() < 0.0025
+    );
+  }
+
+  /** For one drawing: exactly as the pose has him, with nothing added. */
+  still(): void {
     this.restore();
     this.#uniform.value.set(0, 0, 0);
+  }
+
+  /** Takes every addition off and forgets what was moving. */
+  stop(): void {
+    this.still();
     this.#tip = undefined;
     this.#tipVelocity.set(0, 0, 0);
+    this.#yaw = { x: 0, v: 0 };
+    this.#pitch = { x: 0, v: 0 };
+    this.#nod = { x: 0, v: 0 };
+    this.#blendAt = 1;
   }
 
   #turnInModel(bone: THREE.Bone | undefined, turn: THREE.Quaternion): void {

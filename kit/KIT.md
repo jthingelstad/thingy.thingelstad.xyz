@@ -180,6 +180,7 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 | `light`       | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
 | `motion`      | `on` or `off`. It obeys reduced motion even when `on`                        |
 | `blink`       | `on` blinks the faces that can, never under reduced motion                   |
+| `life`        | `on` gives him small movements of his own. See [below](#small-movements)     |
 | `view`        | The angle he starts at, written as the frame's `view` is                     |
 | `zoom`        | `off` leaves the mouse wheel to the page                                     |
 | `poster`      | An image to show until the model is ready                                    |
@@ -190,13 +191,26 @@ It works in plain HTML or any framework. Change an attribute and he changes.
   `thingy-tap` on a press that barely moves, and `thingy-fallback` when he falls
   back to a still because 3D could not start.
 - **Methods:** `resetView()`, `hop({ height, direction, turns })` to jump and spin,
-  and `picture(size)`, which resolves to a square transparent PNG of him as he
-  stands now.
-- **Properties:** `view` reads where he is now, and `moves` says whether the pose
-  has motion to play.
+  and `picture(size)`, which resolves to a square transparent PNG of him in his
+  pose at this angle. With `life` on it leaves out his small movements and shows
+  his eyes open.
+- **Properties:** `view` reads where he is now, `moves` says whether the pose has
+  motion to play, `alive` says whether small movements are running, and
+  `lifeSettings` reads or sets how much he does them.
 - **Content security policy:** the host needs to be in `script-src` and
   `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,
   and `blob:` in `connect-src` and `img-src` for the textures.
+
+### Small movements
+
+`life="on"` lets him move a little on his own between poses. He breathes, blinks,
+looks toward the pointer and glances around, and his antenna swings when he turns.
+A new pose blends in instead of jumping, and his eyes close across a change of
+face. It is off unless you ask for it.
+
+It stops when he is off screen and never runs under reduced motion. It adds a
+little work for as long as he is on screen, so use it where he is the point of the
+page. The frame leaves it out, and Ask Thingy has none.
 
 ### A still that becomes him
 

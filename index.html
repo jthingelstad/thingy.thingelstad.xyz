@@ -96,6 +96,7 @@
             pose="present"
             light="off"
             motion="off"
+            life="on"
             ><img
               class="character-fallback"
               src="/character/v0.15/poses/library-present.webp"
@@ -189,6 +190,14 @@
                 ></span
                 ><span id="light-label">Light off</span></label
               >
+              <label class="light-control"
+                ><span>Little movements</span
+                ><input id="life" type="checkbox" role="switch" /><span
+                  class="switch"
+                  aria-hidden="true"
+                ></span
+                ><span id="life-label">Moving</span></label
+              >
               <div class="playback">
                 <button class="button primary" id="play" aria-pressed="false">
                   <span data-icon="play"></span
@@ -198,7 +207,7 @@
                 </button>
               </div>
               <p id="motion-note" class="motion-note" hidden>
-                Your reduced-motion setting is on. Poses stay still.
+                Your reduced-motion setting is on, so he stays still.
               </p>
             </div>
             <section

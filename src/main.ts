@@ -40,6 +40,7 @@ const state: Omit<CharacterState, "pose"> & {
   pose: AnyPose;
   accessories: string[];
   face: string;
+  life: boolean;
 } = {
   scene: firstScene,
   pose: first.pose,
@@ -50,6 +51,8 @@ const state: Omit<CharacterState, "pose"> & {
     : "original",
   light: params.get("light") === "on",
   motion: false,
+  // He is alive here unless someone has turned it off.
+  life: params.get("life") !== "off",
 };
 const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
 // A shared link brings the angle with it. Set before the element starts.
@@ -142,6 +145,8 @@ function studioAddress(): string {
   else url.searchParams.set("face", state.face);
   if (state.light) url.searchParams.set("light", "on");
   else url.searchParams.delete("light");
+  if (state.life) url.searchParams.delete("life");
+  else url.searchParams.set("life", "off");
   const view = turnedTo();
   if (view) url.searchParams.set("view", view);
   else url.searchParams.delete("view");
@@ -216,6 +221,10 @@ function syncCharacter(): void {
     `<strong>${chosen.label}.</strong> ${chosen.note}`;
   $("#light-label").textContent = state.light ? "Light on" : "Light off";
   $<HTMLInputElement>("#light").checked = state.light;
+  // Reduced motion wins, and the switch says so rather than promising otherwise.
+  const moving = state.life && !reduced.matches;
+  $("#life-label").textContent = moving ? "Moving" : "Still";
+  $<HTMLInputElement>("#life").checked = moving;
   $("#play-label").textContent = state.motion ? "Pause" : "Play";
   $("#play [data-icon]").innerHTML = icon(state.motion ? "pause" : "play");
   $("#play").setAttribute("aria-pressed", String(state.motion));
@@ -283,9 +292,15 @@ $("#light").addEventListener("change", () => {
   state.light = $<HTMLInputElement>("#light").checked;
   syncCharacter();
 });
+$("#life").addEventListener("change", () => {
+  state.life = $<HTMLInputElement>("#life").checked;
+  syncCharacter();
+});
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 function syncMotionPreference(): void {
   $("#motion-note").hidden = !reduced.matches;
+  $<HTMLInputElement>("#life").disabled = reduced.matches;
+  syncCharacter();
   syncPlay();
   if (reduced.matches) {
     state.motion = false;
