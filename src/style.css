@@ -249,10 +249,17 @@ h1 {
 .sheet-tabs {
   display: none;
 }
+/* Two columns, so seven scenes and eight accessories leave the poses in view. */
 #scene-options,
 #accessory-options {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 4px;
+}
+#accessory-options .accessory-option {
+  gap: 7px;
+  padding-inline: 8px;
+  white-space: nowrap;
 }
 .scene-option,
 .accessory-option {
@@ -901,6 +908,12 @@ footer p > span {
     overflow-x: auto;
     scrollbar-width: none;
   }
+  /* Seven scenes: all of them in view, never one hidden off the edge. */
+  #scene-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+  }
   .scene-option,
   .accessory-option,
   .pose-option {
@@ -917,6 +930,10 @@ footer p > span {
     font-size: 14px;
     font-weight: 400;
     white-space: nowrap;
+  }
+  .scene-option {
+    justify-content: center;
+    padding: 6px 2px;
   }
   .scene-option:has(:checked),
   .accessory-option[aria-pressed="true"] {
