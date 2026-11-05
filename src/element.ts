@@ -696,6 +696,10 @@ export class ThingyCharacter extends HTMLElement {
     if (life && this.#heldPose && now.clip + now.frame !== this.#heldPose)
       life.startBlend();
     this.#heldPose = now.clip + now.frame;
+    if (this.#life)
+      this.#life.steadyArms = accessoriesIn(this.scene).some(
+        (item) => now.accessories.includes(item.id) && item.steady,
+      );
     life?.restore();
     this.#mixer.stopAllAction();
     const action = this.#mixer.clipAction(clip);
@@ -709,8 +713,11 @@ export class ThingyCharacter extends HTMLElement {
     this.#action = action;
     const shown = shownNodes(this.scene, now.accessories);
     this.#model.traverse((part) => {
+      // An accessory of several materials has a node for each: <node>_<part>.
       if (part.name.startsWith("Thingy_Accessory_"))
-        part.visible = shown.includes(part.name);
+        part.visible = shown.some(
+          (node) => part.name === node || part.name.startsWith(`${node}_`),
+        );
     });
     this.#dirty = true;
     this.dispatchEvent(

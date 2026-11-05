@@ -16,10 +16,12 @@ the charcoal knuckle it sits against, or a lapel the shirt behind it. Only the
 contact shading sees the whole figure. --reuse-bakes skips the baking and starts
 from the raw channels of the last run, to change the grade without the wait.
 
-Accessories are chosen in the browser, so they cannot join the body. All of them
-share the body's atlas, and each stays its own mesh, Thingy_Accessory_<name>: the
+Accessories are chosen in the browser, so they cannot join the body. Those the rig
+switches share the body's atlas, and each stays its own mesh, Thingy_Accessory_<name>: the
 four workshop tools, the Outdoors backpack, the Concert headphones, and the ears that
 take the headphones' place. The rig's own switches say which parts belong to which.
+The build plate and phone are plain parts with their own materials, outside the atlas,
+and the small Thingy on the plate is a posed, lighter copy of the delivery body.
 The figure bakes with no accessory in it, so nothing leaves a shadow behind when it
 comes off. A tool overlaps the figure at rest, so it bakes with nothing else in the
 scene; anything else bakes against the figure it sits on.
@@ -265,6 +267,11 @@ if KEY == 'workshop':
     rig['tool'] = 0
     rig.update_tag()
     bpy.context.view_layer.update()
+# Things to hold that are not in the atlas: rig['prop_poses'] lists their clips.
+PROP_POSES = json.loads(rig['prop_poses']).get(KEY, {})
+for prop_name, prop_clips in PROP_POSES.items():
+    for pose_name, action in prop_clips.items():
+        source_actions[f'{prop_name}-{pose_name}'] = action
 if PART_OF:
     # Each bake chooses what is in the scene, so the switches must let go.
     for ob in visible:
@@ -791,6 +798,90 @@ for number, accessory in enumerate(ACCESSORIES, 1):
     keep_faces(part, number)
     accessory_meshes.append(part)
 keep_faces(body, 0)
+
+
+def take_prop(part_name, node):
+    """A part of something he holds, as the master has it, with its own plain material."""
+    source = bpy.data.objects['Prop · ' + part_name]
+    part = source.copy()
+    part.data = source.data.copy()
+    part.name = node
+    part.data.name = node + '_geometry'
+    part.hide_render = False
+    part.hide_viewport = False
+    scene.collection.objects.link(part)
+    part.data.uv_layers.new(name='WebUV')
+    accessory_meshes.append(part)
+
+
+def little_thingy(source, name, keep_material, target=None, hold='Thingy v06 · Hello', scale=.19):
+    """Himself, small, in one pose: the delivery mesh with the atlas it already has,
+    rigid on the plate's hand. The screen keeps his face material, so it changes with his."""
+    frame = json.loads(rig['plate_frame'])
+    use_action(bpy.data.actions[hold])
+    scene.frame_set(1)
+    rig.data.pose_position = 'POSE'
+    bpy.context.view_layer.update()
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    mesh = bpy.data.meshes.new_from_object(source.evaluated_get(depsgraph), preserve_all_data_layers=True, depsgraph=depsgraph)
+    rig.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+    place = (rig.data.bones[frame['bone']].matrix_local @ Matrix(frame['matrix'])
+             @ Matrix.Translation((0, 0, frame['top'] + frame['brim']))
+             @ Matrix.Scale(scale, 4) @ source.matrix_world)
+    mesh.transform(place)
+    # It keeps its UVs and loses the body's weights: it is one rigid print.
+    edit = bmesh.new()
+    edit.from_mesh(mesh)
+    if edit.verts.layers.deform.active:
+        edit.verts.layers.deform.remove(edit.verts.layers.deform.active)
+    edit.to_mesh(mesh)
+    edit.free()
+    mesh.materials.clear()
+    mesh.materials.append(keep_material)
+    mesh.polygons.foreach_set('material_index', [0] * len(mesh.polygons))
+    mesh.update()
+    ob = bpy.data.objects.new(name, mesh)
+    scene.collection.objects.link(ob)
+    # The mesh remembers the body's group names, and a bone's would be taken.
+    ob.vertex_groups.clear()
+    group = ob.vertex_groups.new(name=frame['bone'])
+    group.add(range(len(mesh.vertices)), 1, 'REPLACE')
+    if target and len(mesh.vertices) > target:
+        bpy.ops.object.select_all(action='DESELECT')
+        ob.select_set(True)
+        bpy.context.view_layer.objects.active = ob
+        modifier = ob.modifiers.new('Little', 'DECIMATE')
+        modifier.ratio = target / len(mesh.vertices)
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    # As for the body: a sliver with no area in the atlas has no tangent.
+    ob.data.calc_tangents(uvmap=ob.data.uv_layers.active.name)
+    tangents = np.zeros(len(ob.data.loops) * 3, np.float32)
+    ob.data.loops.foreach_get('tangent', tangents)
+    ob.data.free_tangents()
+    bad = np.linalg.norm(tangents.reshape(-1, 3), axis=1) < .5
+    slivers = [p.index for p in ob.data.polygons if bad[p.loop_start:p.loop_start + p.loop_total].any()]
+    if slivers:
+        edit = bmesh.new()
+        edit.from_mesh(ob.data)
+        edit.faces.ensure_lookup_table()
+        bmesh.ops.delete(edit, geom=[edit.faces[i] for i in slivers], context='FACES_ONLY')
+        edit.to_mesh(ob.data)
+        edit.free()
+    ob.data.name = name + '_geometry'
+    ob.modifiers.new('Armature', 'ARMATURE').object = rig
+    accessory_meshes.append(ob)
+
+
+if 'plate' in PROP_POSES:
+    take_prop('plate', 'Thingy_Accessory_plate')
+    take_prop('plate brim', 'Thingy_Accessory_plate_brim')
+    little_thingy(body, 'Thingy_Accessory_plate_him', surface, target=9000)
+    little_thingy(screen, 'Thingy_Accessory_plate_him_screen', face)
+if 'phone' in PROP_POSES:
+    take_prop('phone', 'Thingy_Accessory_phone')
+    take_prop('phone lens', 'Thingy_Accessory_phone_lens')
+    take_prop('phone screen', 'Thingy_Accessory_phone_screen')
 
 # The performances, then only the rig and the delivery meshes.
 for ob in sources:

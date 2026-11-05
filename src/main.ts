@@ -115,11 +115,13 @@ function syncSheet(): void {
     );
   $('[data-sheet-tab="accessories"]').hidden = !hasAccessories;
   $("#tab-scene").textContent = SCENES[state.scene].label;
-  const held = accessoriesIn(state.scene).find((item) =>
+  const held = accessoriesIn(state.scene).filter((item) =>
     state.accessories.includes(item.id),
   );
-  $("#tab-accessories").textContent = held
-    ? held.label
+  $("#tab-accessories").textContent = held.length
+    ? held.length > 1
+      ? `${held.length} on`
+      : held[0]!.label
     : slotsHere().find((slot) => slot.empty)
       ? "None"
       : "Off";

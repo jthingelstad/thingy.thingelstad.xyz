@@ -951,7 +951,7 @@ footer p > span {
     gap: 2px;
   }
   .sheet-tab {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;

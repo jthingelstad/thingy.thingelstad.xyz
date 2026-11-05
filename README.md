@@ -86,11 +86,13 @@ the component only draws the versions in `VERSIONS`.
 
 ## Rebuild the v0.16 Workshop
 
-v0.16 changes the Workshop only: `show` in front of him, a new `work` for the
-screwdriver, and `work` for the laptop, whose new bone turns it in his hand. Its
-other scenes and stills are v0.15's files. Only the pose changed, so this reuses
-v0.15's bakes: copy `local-only/bakes/v0.15/workshop` to
-`local-only/bakes/v0.16/workshop`, then:
+v0.16 changes the Workshop and Concert. In the Workshop, `show` sits in front of him,
+the screwdriver has a new `work`, the laptop has a `work` whose new bone turns it in
+his hand, and a build plate carries a small Thingy made from the delivery body itself.
+In Concert he has an iPhone, to `check` or `hold` up. The plate and phone are plain
+parts outside the atlas, so this reuses v0.15's bakes: copy
+`local-only/bakes/v0.15/workshop` and `concert` to `local-only/bakes/v0.16/`, then run
+the export once with `--scene workshop` and once with `--scene concert`:
 
 ```sh
 blender --background \
@@ -98,7 +100,8 @@ blender --background \
   --python-exit-code 1 --python tools/export_character_v016.py -- --scene workshop --reuse-bakes
 node tools/optimize-v016.mjs
 node tools/capture-poster-v016.mjs workshop/drill-show workshop/hammer-show \
-  workshop/screwdriver-show workshop/screwdriver-work workshop/laptop-work
+  workshop/screwdriver-show workshop/screwdriver-work workshop/laptop-work \
+  workshop/plate-carry workshop/plate-show
 ```
 
 ## Rebuild the v0.15 models

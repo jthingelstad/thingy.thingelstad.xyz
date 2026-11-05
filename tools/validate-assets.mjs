@@ -44,8 +44,10 @@ for (const version of ["v0.10", "v0.14", "v0.15", "v0.16"]) {
           `${key}: ${tool.node}`,
         );
     }
-    // From v0.16 the Workshop's laptop has a bone of its own, to turn in his hand.
-    const joints = version === "v0.16" && key === "workshop" ? 41 : 40;
+    // From v0.16 the Workshop's laptop has a bone of its own, to turn in his hand, and
+    // Concert is exported from the same rig.
+    const joints =
+      version === "v0.16" && ["workshop", "concert"].includes(key) ? 41 : 40;
     assert.equal(
       json.skins[0].joints.length,
       joints,

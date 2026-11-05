@@ -1,5 +1,5 @@
 // The delivery GLB for v0.16, from the raw export of tools/export_character_v016.py.
-// Only the Workshop changed. The other scenes in v0.16 are v0.15's files, byte for byte.
+// The Workshop and Concert changed. Library and Outdoors in v0.16 are v0.15's files, byte for byte.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -14,9 +14,12 @@ function withLicence(bytes) {
   const length = bytes.readUInt32LE(12);
   const json = JSON.parse(bytes.subarray(20, 20 + length).toString());
   json.asset.copyright = COPYRIGHT;
-  let text = JSON.stringify(json);
-  text += " ".repeat((4 - (text.length % 4)) % 4);
-  const chunk = Buffer.from(text);
+  // Material names aren't all ASCII, so the padding counts bytes.
+  const text = Buffer.from(JSON.stringify(json));
+  const chunk = Buffer.concat([
+    text,
+    Buffer.alloc((4 - (text.length % 4)) % 4, " "),
+  ]);
   const rest = bytes.subarray(20 + length);
   const head = Buffer.alloc(20);
   bytes.copy(head, 0, 0, 20);
@@ -25,32 +28,34 @@ function withLicence(bytes) {
   return Buffer.concat([head, chunk, rest]);
 }
 
-const input = `${root}local-only/bakes/v0.16/workshop/workshop.glb`;
-if (!existsSync(input)) throw new Error(`no raw export at ${input}`);
-execFileSync(
-  `${root}node_modules/.bin/gltf-transform`,
-  [
-    "optimize",
-    input,
-    `${out}/workshop.glb`,
-    "--compress",
-    "meshopt",
-    "--texture-compress",
-    "webp",
-    "--texture-size",
-    "2048",
-    "--simplify",
-    "false",
-    "--flatten",
-    "false",
-    "--join",
-    "false",
-    "--palette",
-    "false",
-  ],
-  { stdio: "inherit" },
-);
-writeFileSync(
-  `${out}/workshop.glb`,
-  withLicence(readFileSync(`${out}/workshop.glb`)),
-);
+for (const scene of ["workshop", "concert"]) {
+  const input = `${root}local-only/bakes/v0.16/${scene}/${scene}.glb`;
+  if (!existsSync(input)) throw new Error(`no raw export at ${input}`);
+  execFileSync(
+    `${root}node_modules/.bin/gltf-transform`,
+    [
+      "optimize",
+      input,
+      `${out}/${scene}.glb`,
+      "--compress",
+      "meshopt",
+      "--texture-compress",
+      "webp",
+      "--texture-size",
+      "2048",
+      "--simplify",
+      "false",
+      "--flatten",
+      "false",
+      "--join",
+      "false",
+      "--palette",
+      "false",
+    ],
+    { stdio: "inherit" },
+  );
+  writeFileSync(
+    `${out}/${scene}.glb`,
+    withLicence(readFileSync(`${out}/${scene}.glb`)),
+  );
+}

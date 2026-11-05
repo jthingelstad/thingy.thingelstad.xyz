@@ -190,6 +190,19 @@ test("each accessory keeps to the poses it was made for", () => {
   assert.deepEqual(posesFor("workshop", ["drill"]), ["carry", "show", "work"]);
   assert.deepEqual(posesFor("workshop", []), ["hello", "thinking", "rest"]);
   assert.deepEqual(posesFor("concert", ["headphones"]), Object.keys(POSES));
+  // The plate takes both hands, and the phone keeps his headphones on.
+  assert.equal(at("plate", "show").clip, "plate-show");
+  assert.equal(at("plate", "work").clip, "plate-carry");
+  assert.deepEqual(stageOf("concert", null, "check").accessories, [
+    "headphones",
+    "phone",
+  ]);
+  assert.equal(
+    stageOf("concert", "headphones,phone", "hold").clip,
+    "phone-hold",
+  );
+  assert.equal(stageOf("concert", "phone", "present").clip, "phone-check");
+  assert.equal(stageOf("concert", "headphones", "check").clip, "hello");
 });
 test("accessories stay in their own scene, and a scene gives what it gives", () => {
   assert.deepEqual(accessories("library", null), []);

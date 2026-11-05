@@ -133,6 +133,12 @@
         },
         "laptop-work": {
           "webp": "poses/workshop-laptop-work.webp"
+        },
+        "plate-carry": {
+          "webp": "poses/workshop-plate-carry.webp"
+        },
+        "plate-show": {
+          "webp": "poses/workshop-plate-show.webp"
         }
       },
       "toolClips": [
@@ -145,7 +151,9 @@
         "drill-carry",
         "drill-show",
         "drill-work",
-        "laptop-work"
+        "laptop-work",
+        "plate-carry",
+        "plate-show"
       ],
       "slots": [
         {
@@ -197,6 +205,15 @@
                 "present",
                 "work"
               ]
+            },
+            {
+              "id": "plate",
+              "label": "Build plate",
+              "node": "Thingy_Accessory_plate",
+              "poses": [
+                "carry",
+                "show"
+              ]
             }
           ]
         }
@@ -219,7 +236,25 @@
               "absentNode": "Thingy_Accessory_ears"
             }
           ]
+        },
+        {
+          "id": "hand",
+          "options": [
+            {
+              "id": "phone",
+              "label": "iPhone",
+              "node": "Thingy_Accessory_phone",
+              "poses": [
+                "check",
+                "hold"
+              ]
+            }
+          ]
         }
+      ],
+      "toolClips": [
+        "phone-check",
+        "phone-hold"
       ]
     }
   },
@@ -288,6 +323,14 @@
     },
     "work": {
       "label": "Work",
+      "stillFrame": 1
+    },
+    "check": {
+      "label": "Check",
+      "stillFrame": 1
+    },
+    "hold": {
+      "label": "Hold up",
       "stillFrame": 1
     }
   },

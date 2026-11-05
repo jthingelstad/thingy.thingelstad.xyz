@@ -265,7 +265,7 @@ Load `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
 decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
 in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
-shared rig of 40 joints. From v0.16 the Workshop has one more, for the laptop.
+shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for the laptop.
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
@@ -318,18 +318,22 @@ he has, separated by commas, or say `none`.
 | `outdoors` | `backpack`                       | Off       | `backpack`            |
 | `workshop` | `screwdriver`, `hammer`, `drill` | Empty     | Empty hands           |
 | `workshop` | `laptop`                         | Empty     | `laptop` in `present` |
+| `workshop` | `plate`                          | Empty     | Empty hands           |
 | `concert`  | `headphones`                     | Off       | `headphones`          |
+| `concert`  | `phone`                          | Off       | No phone              |
 
 Some accessories keep to the poses they were made for:
 
-| In the Workshop                  | Poses                       |
+| Accessory                        | Poses                       |
 | -------------------------------- | --------------------------- |
 | `screwdriver`, `hammer`, `drill` | `carry`, `show`, `work`     |
 | `laptop`                         | `present`, `work`           |
-| `none`                           | `hello`, `thinking`, `rest` |
+| `plate`                          | `carry`, `show`             |
+| `phone`                          | `check`, `hold`             |
+| `none`, in the Workshop          | `hello`, `thinking`, `rest` |
 
 `carry` holds the tool at his side, `show` holds it in front of him, and `work` is
-using it. The laptop's `present` turns its screen to you, and its `work` to him. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+using it. The laptop's `present` turns its screen to you, and its `work` to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. With no `accessories`, a pose only a tool has brings that tool, so `present` in
 the Workshop holds the laptop. Asking for a pose the accessory does not have moves
 him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
 An accessory a scene doesn't have is ignored. To read what he ended up with, use the

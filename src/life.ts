@@ -219,6 +219,9 @@ export class Life {
   /** Called when he has shifted his gaze a long way, which is when eyes tend to shut. */
   onBigGlance?: () => void;
 
+  /** Both hands on one thing: each arm's own drift would pull them off it. */
+  steadyArms = false;
+
   constructor(model: THREE.Object3D) {
     this.#model = model;
     const seen = new Set<THREE.Bone>();
@@ -537,7 +540,7 @@ export class Life {
    * the least of it and the hand the most, the way a loose arm hangs.
    */
   #stepArms(dt: number, frame: LifeFrame, breath: number, unit: number): void {
-    const amount = this.settings.arms;
+    const amount = this.steadyArms ? 0 : this.settings.arms;
     if (amount <= 0) return;
     this.#follow(this.#trail, this.#yaw.x, 3.2, dt);
     this.#follow(this.#flare, frame.busy ? 1 : 0, 7, dt);
