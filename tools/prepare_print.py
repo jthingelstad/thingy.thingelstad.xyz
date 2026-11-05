@@ -45,8 +45,8 @@ on his own oval base, {dims[0]:.0f} x {dims[1]:.0f} x {dims[2]:.0f} mm.
 
 Made for a Bambu Lab P2S with a 0.4 mm nozzle:
 """ + ''.join(f'  {k.capitalize()}: {v}\n' for k, v in SETTINGS.items()) + f"""
-He has not been test-printed yet. Expect to check supports under the coat
-hem and the head.
+Jamie has printed him. Check the supports under the coat hem and the head
+as you slice.
 
 Thingy is by Jamie Thingelstad. This print model is licensed CC BY-NC 4.0:
 print it, share it and change it, with credit, for non-commercial use.
