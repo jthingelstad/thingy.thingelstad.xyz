@@ -229,6 +229,11 @@ model.
     headphones. For live music, and for Supporting Membership.
   - **Outdoors:** a forest-green shell and an orange daypack. For
     hiking and the outdoors.
+  - **Kitchen:** a cream tee and a butcher-stripe apron. For cooking at home.
+  - **Winter:** a mustard parka, tangerine mittens and a fallen hood. For cold
+    days outside.
+  - **Cabin:** a red buffalo-check flannel over a cream tee. For time at the
+    cabin.
 - **Faces.** The screen shows the original (the illustration's wink), idle,
   thinking, found it, oops, two blinks, and off. What each face means:
   - idle: he is ready and listening;
@@ -284,3 +289,6 @@ paint him and remix him, credit Jamie, and don't sell him.
   - thingelstad.xyz, through `docs/THINGY.md`;
   - WT Builder, for the audio lines.
 - **Change Thingy here first,** then the surfaces.
+- **Licence.** This file is licensed
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): credit
+  Jamie Thingelstad, and do not use it commercially.
