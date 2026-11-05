@@ -448,7 +448,14 @@ test("reduced motion stays still and a missing 3D asset leaves a useful pose ima
   ).toBeGreaterThan(0);
 });
 
-type Alive = HTMLElement & { alive: boolean; picture(): Promise<Blob> };
+type Alive = HTMLElement & {
+  alive: boolean;
+  strained: boolean;
+  picture(): Promise<Blob>;
+};
+/** Moving, or stopped only because this machine can't keep up. */
+const meantToMove = (el: Element) =>
+  (el as Alive).alive || (el as Alive).strained;
 
 test("he moves a little in the viewer, unless you turn it off, and never in an embed", async ({
   page,
@@ -458,7 +465,7 @@ test("he moves a little in the viewer, unless you turn it off, and never in an e
   const alive = () => character.evaluate((el) => (el as Alive).alive);
   await page.goto("/?scene=workshop&pose=hello");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  expect(await alive()).toBe(true);
+  expect(await character.evaluate(meantToMove)).toBe(true);
   expect(page.url()).not.toContain("life=");
 
   await open(page, "more");
@@ -478,7 +485,7 @@ test("he moves a little in the viewer, unless you turn it off, and never in an e
   await open(page, "more");
   await expect(toggle).not.toBeChecked();
   await page.locator("label:has(#life)").click();
-  expect(await alive()).toBe(true);
+  expect(await character.evaluate(meantToMove)).toBe(true);
   expect(page.url()).not.toContain("life=");
 
   await page.goto("/embed/?scene=workshop&pose=hello&light=off&motion=off");
@@ -503,10 +510,38 @@ test("under reduced motion the switch is off the table and he stays still", asyn
   // Turning the setting off brings him back without a reload.
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect
-    .poll(() => character.evaluate((el) => (el as Alive).alive))
+    .poll(() => character.evaluate(meantToMove), { timeout: 30000 })
     .toBe(true);
   await expect(page.locator("#life")).toBeEnabled();
   await expect(page.locator("#life")).toBeChecked();
+});
+
+test("on a machine that can't keep up he stands still and the switch says so", async ({
+  page,
+}) => {
+  const character = page.locator("#main-thingy");
+  await page.goto("/?scene=workshop&pose=hello");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  // Every frame takes 150 ms, as it would on a machine with no graphics chip.
+  await page.evaluate(() => {
+    const slow = () => {
+      const until = performance.now() + 150;
+      while (performance.now() < until);
+      requestAnimationFrame(slow);
+    };
+    requestAnimationFrame(slow);
+  });
+  await expect
+    .poll(() => character.evaluate((el) => (el as Alive).strained), {
+      timeout: 30000,
+    })
+    .toBe(true);
+  expect(await character.evaluate((el) => (el as Alive).alive)).toBe(false);
+  await open(page, "more");
+  await expect(page.locator("#life-label")).toHaveText("Still");
+  // Not a lasting choice: the switch stays on and nothing goes in the address.
+  await expect(page.locator("#life")).toBeChecked();
+  expect(page.url()).not.toContain("life=");
 });
 
 test("a saved picture is the pose you chose, whatever he was doing", async ({
@@ -536,7 +571,7 @@ test("a saved picture is the pose you chose, whatever he was doing", async ({
   await page.waitForTimeout(800);
   expect(await picture()).toBe(still);
   // And he carries on afterward.
-  expect(await character.evaluate((el) => (el as Alive).alive)).toBe(true);
+  expect(await character.evaluate(meantToMove)).toBe(true);
 });
 
 test("the standalone component finds its assets when used by another origin", async ({

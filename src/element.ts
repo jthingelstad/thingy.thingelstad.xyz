@@ -3,7 +3,13 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { Life, LIFE_DEFAULTS, type LifeSettings } from "./life";
+import {
+  addStrain,
+  Life,
+  LIFE_DEFAULTS,
+  STRAIN_LIMIT,
+  type LifeSettings,
+} from "./life";
 import {
   ALL_POSES,
   FACES,
@@ -118,6 +124,9 @@ export class ThingyCharacter extends HTMLElement {
   #life?: Life;
   #lifeRunning = false;
   #sinceDrawn = 0;
+  #drewAt = 0;
+  #strain = 0;
+  #strained = false;
   #lifeSettings: LifeSettings = { ...LIFE_DEFAULTS };
   #pointer: { x: number; y: number } | null = null;
   #pointerUntil = 0;
@@ -154,7 +163,15 @@ export class ThingyCharacter extends HTMLElement {
   }
   /** Whether the small movements are running. Never under reduced motion. */
   get alive(): boolean {
-    return this.getAttribute("life") === "on" && !this.#reduced.matches;
+    return (
+      this.getAttribute("life") === "on" &&
+      !this.#reduced.matches &&
+      !this.#strained
+    );
+  }
+  /** Whether he stopped moving because this machine couldn't keep up. */
+  get strained(): boolean {
+    return this.#strained;
   }
   get lifeSettings(): LifeSettings {
     return { ...this.#lifeSettings };
@@ -222,8 +239,11 @@ export class ThingyCharacter extends HTMLElement {
       void this.#load();
     else if (name === "light") this.#setLight();
     else if (name === "motion") this.#setMotion();
-    else if (name === "life") this.#setLife();
-    else if (name === "face") this.#changeFace(before);
+    else if (name === "life") {
+      this.#strained = false;
+      this.#strain = 0;
+      this.#setLife();
+    } else if (name === "face") this.#changeFace(before);
     else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
     else if (name === "view") this.#setView();
@@ -887,9 +907,13 @@ export class ThingyCharacter extends HTMLElement {
     this.#clock.update();
     // Before the guard: a hop can carry him out of view, and he must still land.
     this.#stepHop();
-    if (!this.#visible || document.hidden || !this.#renderer) return;
+    if (!this.#visible || document.hidden || !this.#renderer) {
+      this.#drewAt = 0;
+      return;
+    }
     this.#controls?.update();
     const dt = Math.min(this.#clock.getDelta(), 0.05);
+    this.#watchStrain();
     const life = this.alive ? this.#life : undefined;
     if (life) {
       this.#sinceDrawn += dt;
@@ -910,6 +934,7 @@ export class ThingyCharacter extends HTMLElement {
           busy: Boolean(this.#hop),
         });
         this.#dirty = true;
+        this.#drewAt = performance.now();
       }
     } else if (this.playing) {
       this.#mixer?.update(dt);
@@ -924,6 +949,25 @@ export class ThingyCharacter extends HTMLElement {
       this.#dirty = false;
     }
   };
+
+  /**
+   * A machine that can't draw him quickly enough gets a still Thingy and a page
+   * that still works, rather than a stutter that takes the page down with it.
+   */
+  #watchStrain(): void {
+    if (!this.#drewAt) return;
+    this.#strain = addStrain(
+      this.#strain,
+      (performance.now() - this.#drewAt) / 1000,
+    );
+    this.#drewAt = 0;
+    if (this.#strain < STRAIN_LIMIT) return;
+    this.#strained = true;
+    this.#setLife();
+    this.dispatchEvent(
+      new CustomEvent("thingy-strained", { bubbles: true, composed: true }),
+    );
+  }
 
   #status(text: string): void {
     this.#root.querySelector(".status")!.textContent = text;

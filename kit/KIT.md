@@ -195,7 +195,9 @@ It works in plain HTML or any framework. Change an attribute and he changes.
   pose at this angle. With `life` on it leaves out his small movements and shows
   his eyes open.
 - **Properties:** `view` reads where he is now, `moves` says whether the pose has
-  motion to play, `alive` says whether small movements are running, and
+  motion to play, `alive` says whether small movements are running,
+  `strained` says he stopped them because the machine could not keep up (a
+  `thingy-strained` event says so too), and
   `lifeSettings` reads or sets how much he does them.
 - **Content security policy:** the host needs to be in `script-src` and
   `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,

@@ -222,9 +222,10 @@ function syncCharacter(): void {
   $("#light-label").textContent = state.light ? "Light on" : "Light off";
   $<HTMLInputElement>("#light").checked = state.light;
   // Reduced motion wins, and the switch says so rather than promising otherwise.
-  const moving = state.life && !reduced.matches;
+  const moving = state.life && !reduced.matches && !character.strained;
   $("#life-label").textContent = moving ? "Moving" : "Still";
-  $<HTMLInputElement>("#life").checked = moving;
+  // The switch keeps what was asked for; the label says what he is doing.
+  $<HTMLInputElement>("#life").checked = state.life && !reduced.matches;
   $("#play-label").textContent = state.motion ? "Pause" : "Play";
   $("#play [data-icon]").innerHTML = icon(state.motion ? "pause" : "play");
   $("#play").setAttribute("aria-pressed", String(state.motion));
@@ -322,6 +323,9 @@ function syncPlay(): void {
   }
 }
 character.addEventListener("thingy-change", syncPlay);
+character.addEventListener("thingy-strained", () => {
+  $("#life-label").textContent = "Still";
+});
 reduced.addEventListener("change", syncMotionPreference);
 $("#play").addEventListener("click", () => {
   state.motion = !state.motion;

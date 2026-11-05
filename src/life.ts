@@ -141,6 +141,20 @@ const scratch = {
   matrix: new THREE.Matrix4(),
 };
 
+/** A draw that takes longer than this, in seconds, is one he can't keep up with. */
+const SLOW_DRAW = 0.08;
+/** How many seconds of slow draws he allows before he stands still instead. */
+export const STRAIN_LIMIT = 1.5;
+
+/**
+ * Keeps count of how far behind a machine is falling. One long draw, from
+ * compiling a shader or loading a scene, can't end it alone; quick draws pay it
+ * back; only a machine that stays slow gets there.
+ */
+export function addStrain(strain: number, draw: number): number {
+  return Math.max(0, strain + (draw > SLOW_DRAW ? Math.min(draw, 0.5) : -draw));
+}
+
 export type LifeFrame = {
   camera: THREE.Camera;
   rect: { left: number; top: number; width: number; height: number };
