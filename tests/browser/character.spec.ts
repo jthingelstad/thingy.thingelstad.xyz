@@ -612,6 +612,38 @@ test("the standalone component finds its assets when used by another origin", as
   }
 });
 
+test("the new scenes each stand ready with their own accessories", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  for (const [name, standard, others] of [
+    ["Kitchen", "none", ["tongs", "whisk", "mug", "grill"]],
+    ["Winter", "scarf", []],
+    ["Cabin", "none", ["baton", "mug"]],
+  ] as const) {
+    await open(page, "scene");
+    await page.getByRole("radio", { name, exact: true }).check();
+    await expect(character).toHaveAttribute("scene", name.toLowerCase());
+    await expect(character).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    await expect(character).toHaveAttribute("accessories", standard);
+    for (const id of others)
+      await expect(page.locator(`[data-accessory="${id}"]`)).toHaveCount(1);
+  }
+  // Every scene is in view at once, on a phone too.
+  await open(page, "scene");
+  for (const name of ["Library", "Kitchen", "Winter", "Cabin"])
+    await expect(
+      page.getByRole("radio", { name, exact: true }),
+    ).toBeInViewport();
+  expect(errors).toEqual([]);
+});
+
 test("the studio offers every face and, for each scene, its accessories", async ({
   page,
 }) => {
@@ -640,9 +672,13 @@ test("the studio offers every face and, for each scene, its accessories", async 
   expect(original.equals(await shot())).toBe(false);
   expect(page.url()).toContain("face=curious");
 
-  // No accessories in the Library; the face stays through a change of scene.
-  await expect(page.locator("#accessories")).toBeHidden();
-  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
+  // The Library starts with empty hands; the face stays through a change of scene.
+  await open(page, "accessories");
+  await expect(page.locator('[data-accessory=""]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator('[data-accessory="book"]')).toBeVisible();
   await open(page, "scene");
   await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
@@ -703,7 +739,6 @@ test("the studio offers every face and, for each scene, its accessories", async 
   await page.getByRole("radio", { name: "Library", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(character).toHaveAttribute("accessories", "none");
-  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
   await page.goto("/?scene=workshop&accessories=hammer&pose=show&face=proud");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(page.locator('[data-accessory="hammer"]')).toHaveAttribute(
