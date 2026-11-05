@@ -100,6 +100,24 @@ test("the page's scenes are the manifest's scenes, in the same order", () => {
     );
   }
 });
+test("an older model's poster is a still that model has", () => {
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.15", "laptop"),
+    "/character/v0.15/poses/workshop-present.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "show", "/character/", "v0.15", "plate"),
+    "/character/v0.15/poses/workshop-present.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.15", "drill"),
+    "/character/v0.15/poses/workshop-drill-work.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.16", "laptop"),
+    "/character/v0.16/poses/workshop-laptop-work.webp",
+  );
+});
 test("every still a page can ask for is in the manifest", () => {
   const manifest = newestManifest();
   for (const key of Object.keys(SCENES) as (keyof typeof SCENES)[])
@@ -134,7 +152,8 @@ test("the component's newest model is the newest published directory", () => {
 });
 test("anything but a model the component draws means the newest, and nothing untrusted reaches a path", () => {
   const newest = VERSIONS.at(-1);
-  assert.equal(modelVersion("v0.15"), newest);
+  assert.equal(modelVersion(newest), newest);
+  assert.equal(modelVersion("v0.15"), "v0.15");
   for (const input of [
     null,
     "",
@@ -176,7 +195,9 @@ test("each accessory keeps to the poses it was made for", () => {
   assert.equal(at("hammer", "work").clip, "hammer-work");
   // A pose the tool has no grip for moves to the tool's first.
   assert.equal(at("hammer", "hello").clip, "hammer-carry");
-  assert.equal(at("laptop", "work").clip, "present");
+  assert.equal(at("laptop", "carry").clip, "present");
+  // The laptop turns round in his hand to work on it.
+  assert.equal(at("laptop", "work").clip, "laptop-work");
   assert.equal(at("none", "carry").clip, "hello");
   // Present in the Workshop brings the laptop, and asking for none really is none.
   assert.deepEqual(at(null, "present").accessories, ["laptop"]);
@@ -187,6 +208,19 @@ test("each accessory keeps to the poses it was made for", () => {
   assert.deepEqual(posesFor("workshop", ["drill"]), ["carry", "show", "work"]);
   assert.deepEqual(posesFor("workshop", []), ["hello", "thinking", "rest"]);
   assert.deepEqual(posesFor("concert", ["headphones"]), Object.keys(POSES));
+  // The plate takes both hands, and the phone keeps his headphones on.
+  assert.equal(at("plate", "show").clip, "plate-show");
+  assert.equal(at("plate", "work").clip, "plate-carry");
+  assert.deepEqual(stageOf("concert", null, "check").accessories, [
+    "headphones",
+    "phone",
+  ]);
+  assert.equal(
+    stageOf("concert", "headphones,phone", "hold").clip,
+    "phone-hold",
+  );
+  assert.equal(stageOf("concert", "phone", "present").clip, "phone-check");
+  assert.equal(stageOf("concert", "headphones", "check").clip, "hello");
 });
 test("accessories stay in their own scene, and a scene gives what it gives", () => {
   assert.deepEqual(accessories("library", null), []);

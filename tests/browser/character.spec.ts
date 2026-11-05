@@ -24,7 +24,7 @@ test("scenes, poses, playback, light and keyboard camera work on a real WebGL ch
     )
       errors.push(message.text());
   });
-  await page.goto("/");
+  await page.goto("/?life=off");
   // Keep browser-driven scrolling deterministic while WebGL motion remains on.
   await page.addStyleTag({
     content: "html { scroll-behavior: auto !important; }",
@@ -116,7 +116,7 @@ test("version latest loads the newest model, and hop jumps, spins and lands wher
   await page.goto("/__hop");
   const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  expect(models).toEqual([expect.stringContaining("/character/v0.15/")]);
+  expect(models).toEqual([expect.stringContaining("/character/v0.16/")]);
   await page.waitForTimeout(300);
   const before = await character.screenshot();
 
@@ -402,7 +402,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     };
   });
   expect(facts).toEqual({
-    version: "v0.15",
+    version: "v0.16",
     accessories: ["drill"],
     pose: "show",
     view: "-40,70,1.2",
@@ -420,7 +420,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     await character.evaluate(
       (el) => (el as never as { version: string }).version,
     ),
-  ).toBe("v0.15");
+  ).toBe("v0.16");
   // `off` is never shown to a reader, whatever the address says.
   await page.goto("/embed/?version=latest&scene=library&face=off");
   await expect(character).not.toHaveAttribute("face", "off");
@@ -446,6 +446,132 @@ test("reduced motion stays still and a missing 3D asset leaves a useful pose ima
   expect(
     await image.evaluate((el: HTMLImageElement) => el.naturalWidth),
   ).toBeGreaterThan(0);
+});
+
+type Alive = HTMLElement & {
+  alive: boolean;
+  strained: boolean;
+  picture(): Promise<Blob>;
+};
+/** Moving, or stopped only because this machine can't keep up. */
+const meantToMove = (el: Element) =>
+  (el as Alive).alive || (el as Alive).strained;
+
+test("he moves a little in the viewer, unless you turn it off, and never in an embed", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const character = page.locator("#main-thingy");
+  const alive = () => character.evaluate((el) => (el as Alive).alive);
+  await page.goto("/?scene=workshop&pose=hello");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(await character.evaluate(meantToMove)).toBe(true);
+  expect(page.url()).not.toContain("life=");
+
+  await open(page, "more");
+  const toggle = page.locator("#life");
+  await expect(toggle).toBeChecked();
+  await page.locator("label:has(#life)").click();
+  await expect(toggle).not.toBeChecked();
+  await expect(page.locator("#life-label")).toHaveText("Still");
+  expect(await alive()).toBe(false);
+  expect(page.url()).toContain("life=off");
+  await expect(page.locator("#embed-code")).not.toContainText("life");
+
+  // A link keeps the choice, and turning him back on takes it out of the link.
+  await page.reload();
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(await alive()).toBe(false);
+  await open(page, "more");
+  await expect(toggle).not.toBeChecked();
+  await page.locator("label:has(#life)").click();
+  expect(await character.evaluate(meantToMove)).toBe(true);
+  expect(page.url()).not.toContain("life=");
+
+  await page.goto("/embed/?scene=workshop&pose=hello&light=off&motion=off");
+  const embedded = page.locator("thingy-character");
+  await expect(embedded).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(await embedded.evaluate((el) => (el as Alive).alive)).toBe(false);
+});
+
+test("under reduced motion the switch is off the table and he stays still", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?scene=workshop&pose=hello");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  expect(await character.evaluate((el) => (el as Alive).alive)).toBe(false);
+  await open(page, "more");
+  await expect(page.locator("#life")).toBeDisabled();
+  await expect(page.locator("#life")).not.toBeChecked();
+  await expect(page.locator("#life-label")).toHaveText("Still");
+  await expect(page.locator("#motion-note")).toBeVisible();
+  // Turning the setting off brings him back without a reload.
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect
+    .poll(() => character.evaluate(meantToMove), { timeout: 30000 })
+    .toBe(true);
+  await expect(page.locator("#life")).toBeEnabled();
+  await expect(page.locator("#life")).toBeChecked();
+});
+
+test("on a machine that can't keep up he stands still and the switch says so", async ({
+  page,
+}) => {
+  const character = page.locator("#main-thingy");
+  await page.goto("/?scene=workshop&pose=hello");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  // Every frame takes 150 ms, as it would on a machine with no graphics chip.
+  await page.evaluate(() => {
+    const slow = () => {
+      const until = performance.now() + 150;
+      while (performance.now() < until);
+      requestAnimationFrame(slow);
+    };
+    requestAnimationFrame(slow);
+  });
+  await expect
+    .poll(() => character.evaluate((el) => (el as Alive).strained), {
+      timeout: 30000,
+    })
+    .toBe(true);
+  expect(await character.evaluate((el) => (el as Alive).alive)).toBe(false);
+  await open(page, "more");
+  await expect(page.locator("#life-label")).toHaveText("Still");
+  // Not a lasting choice: the switch stays on and nothing goes in the address.
+  await expect(page.locator("#life")).toBeChecked();
+  expect(page.url()).not.toContain("life=");
+});
+
+test("a saved picture is the pose you chose, whatever he was doing", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === "phone", "No pointer to follow on a phone");
+  test.setTimeout(120000);
+  const character = page.locator("#main-thingy");
+  const picture = () =>
+    character.evaluate(async (el) => {
+      const blob = await (el as Alive).picture(400);
+      const bytes = new Uint8Array(await blob.arrayBuffer());
+      return Array.from(bytes).join();
+    });
+  await page.goto("/?scene=workshop&pose=hello&face=idle&life=off");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const still = await picture();
+
+  await page.goto("/?scene=workshop&pose=hello&face=idle");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const box = await character.boundingBox();
+  if (!box) throw new Error("The character has no visible bounds");
+  await page.mouse.move(box.x + 5, box.y + 5);
+  await page.waitForTimeout(800);
+  expect(await picture()).toBe(still);
+  await page.mouse.move(box.x + box.width - 5, box.y + box.height - 5);
+  await page.waitForTimeout(800);
+  expect(await picture()).toBe(still);
+  // And he carries on afterward.
+  expect(await character.evaluate(meantToMove)).toBe(true);
 });
 
 test("the standalone component finds its assets when used by another origin", async ({
@@ -483,10 +609,11 @@ test("the studio offers every face and, for each scene, its accessories", async 
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  // These compare pictures, so he has to hold still between them.
+  await page.goto("/?life=off");
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(character).toHaveAttribute("version", "v0.15");
+  await expect(character).toHaveAttribute("version", "v0.16");
   // The stage reaches up behind the header, and must not take its links.
   await page.locator(".site-header .ask").click({ trial: true });
   const shot = async () => {

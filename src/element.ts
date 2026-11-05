@@ -4,6 +4,13 @@ import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import {
+  addStrain,
+  Life,
+  LIFE_DEFAULTS,
+  STRAIN_LIMIT,
+  type LifeSettings,
+} from "./life";
+import {
   ALL_POSES,
   FACES,
   HOME_CAMERA,
@@ -60,6 +67,9 @@ function dispose(root: THREE.Object3D): void {
 }
 
 const TURN = Math.PI * 2;
+/** How often to draw him with life on, in seconds, with a little slack for timing. */
+const BUSY_FRAME = 1 / 60 - 0.004;
+const QUIET_FRAME = 1 / 30 - 0.004;
 
 export type HopOptions = {
   /** How high he goes, in CSS pixels. The host moves, so he can leave his frame. */
@@ -85,6 +95,7 @@ export class ThingyCharacter extends HTMLElement {
     "poster",
     "view-label",
     "view",
+    "life",
   ];
   #root = this.attachShadow({ mode: "open" });
   #renderer?: THREE.WebGLRenderer;
@@ -106,8 +117,19 @@ export class ThingyCharacter extends HTMLElement {
   #generation = 0;
   #currentScene?: SceneKey;
   #currentVersion?: Version;
+  #heldPose = "";
   #faceMap?: THREE.Texture;
   #blinkTimer = 0;
+  #faceTimer = 0;
+  #life?: Life;
+  #lifeRunning = false;
+  #sinceDrawn = 0;
+  #drewAt = 0;
+  #strain = 0;
+  #strained = false;
+  #lifeSettings: LifeSettings = { ...LIFE_DEFAULTS };
+  #pointer: { x: number; y: number } | null = null;
+  #pointerUntil = 0;
   #press?: { x: number; y: number; at: number };
   #head?: THREE.Object3D;
   #beacon = new THREE.PointLight(0xff933f, 0, 1.2, 2);
@@ -138,6 +160,30 @@ export class ThingyCharacter extends HTMLElement {
   }
   get playing(): boolean {
     return this.getAttribute("motion") === "on" && !this.#reduced.matches;
+  }
+  /** Whether the small movements are running. Never under reduced motion. */
+  get alive(): boolean {
+    return (
+      this.getAttribute("life") === "on" &&
+      !this.#reduced.matches &&
+      !this.#strained
+    );
+  }
+  /** Whether he stopped moving because this machine couldn't keep up. */
+  get strained(): boolean {
+    return this.#strained;
+  }
+  get lifeSettings(): LifeSettings {
+    return { ...this.#lifeSettings };
+  }
+  set lifeSettings(value: Partial<LifeSettings>) {
+    this.#lifeSettings = { ...this.#lifeSettings, ...value };
+    if (this.#life) this.#life.settings = this.#lifeSettings;
+    this.#scheduleBlink();
+  }
+  /** How he is turned right now, while he is alive. */
+  get lifeState() {
+    return this.alive ? this.#life?.state : undefined;
   }
   get version(): Version {
     return modelVersion(this.getAttribute("version"));
@@ -193,10 +239,12 @@ export class ThingyCharacter extends HTMLElement {
       void this.#load();
     else if (name === "light") this.#setLight();
     else if (name === "motion") this.#setMotion();
-    else if (name === "face") {
-      this.#setFace();
-      this.#scheduleBlink();
-    } else if (name === "blink") this.#scheduleBlink();
+    else if (name === "life") {
+      this.#strained = false;
+      this.#strain = 0;
+      this.#setLife();
+    } else if (name === "face") this.#changeFace(before);
+    else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
     else if (name === "view") this.#setView();
     else if (name === "pose" || name === "accessories") this.#setPose();
@@ -242,9 +290,9 @@ export class ThingyCharacter extends HTMLElement {
   }
 
   /**
-   * A picture of him just as he stands now, square and transparent. It rejects
-   * if there is no model to draw. The frame is drawn and restored in one task,
-   * so nothing shows on the page.
+   * A picture of him in his pose and at this angle, square and transparent. It
+   * rejects if there is no model to draw. The frame is drawn and restored in one
+   * task, so nothing shows on the page.
    */
   picture(size = 1000): Promise<Blob> {
     const renderer = this.#renderer;
@@ -253,6 +301,13 @@ export class ThingyCharacter extends HTMLElement {
     const canvas = renderer.domElement;
     const ratio = renderer.getPixelRatio();
     const { left, right } = this.#camera;
+    // A picture is the pose he was given, not whatever moment it caught: eyes
+    // open, nothing added. The next frame carries on from here.
+    if (this.alive) {
+      this.#life?.still();
+      this.#setFace();
+      this.#sinceDrawn = 1;
+    }
     const pending = new Promise<Blob>((resolve, reject) => {
       renderer.setPixelRatio(1);
       renderer.setSize(size, size, false);
@@ -413,6 +468,26 @@ export class ThingyCharacter extends HTMLElement {
         },
         { signal: this.#abort.signal },
       );
+      // He attends to the pointer anywhere on the page, and to a tap for a moment.
+      window.addEventListener(
+        "pointermove",
+        (event) => {
+          if (!this.alive || this.#press || event.pointerType === "touch")
+            return;
+          this.#pointer = { x: event.clientX, y: event.clientY };
+          this.#pointerUntil = performance.now() + 2500;
+        },
+        { passive: true, signal: this.#abort.signal },
+      );
+      window.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (!this.alive) return;
+          this.#pointer = { x: event.clientX, y: event.clientY };
+          this.#pointerUntil = performance.now() + 2500;
+        },
+        { passive: true, signal: this.#abort.signal },
+      );
       canvas.addEventListener("keydown", this.#keyboard, {
         signal: this.#abort.signal,
       });
@@ -439,6 +514,7 @@ export class ThingyCharacter extends HTMLElement {
         "change",
         () => {
           if (this.#hop) this.#hop.duration = 0;
+          this.#setLife();
           this.#setPose();
           this.#scheduleBlink();
         },
@@ -551,6 +627,9 @@ export class ThingyCharacter extends HTMLElement {
       }
       this.#model = gltf.scene;
       this.#faceMap = undefined;
+      this.#life = undefined;
+      this.#lifeRunning = false;
+      this.#heldPose = "";
       this.#hop = undefined;
       this.#lift = 0;
       this.style.translate = "";
@@ -579,6 +658,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#mixer = new THREE.AnimationMixer(this.#model);
       this.#currentScene = selected;
       this.#currentVersion = version;
+      this.#setLife();
       this.#setPose();
       this.#setLight();
       this.#setFace();
@@ -606,8 +686,21 @@ export class ThingyCharacter extends HTMLElement {
   #setPose(): void {
     if (!this.#mixer || !this.#model) return;
     const now = this.#stage();
-    const clip = this.#clips.find((item) => item.name === now.clip);
+    // A pinned older model may not have a newer clip: v0.15 has no laptop-work.
+    const clip =
+      this.#clips.find((item) => item.name === now.clip) ??
+      this.#clips.find((item) => item.name === "present");
     if (!clip) return;
+    const life = this.alive ? this.#life : undefined;
+    // Only a change of pose moves him. Taking off a hat leaves him standing.
+    if (life && this.#heldPose && now.clip + now.frame !== this.#heldPose)
+      life.startBlend();
+    this.#heldPose = now.clip + now.frame;
+    if (this.#life)
+      this.#life.steadyArms = accessoriesIn(this.scene).some(
+        (item) => now.accessories.includes(item.id) && item.steady,
+      );
+    life?.restore();
     this.#mixer.stopAllAction();
     const action = this.#mixer.clipAction(clip);
     action.reset().setLoop(THREE.LoopRepeat, Infinity).play();
@@ -616,11 +709,15 @@ export class ThingyCharacter extends HTMLElement {
       : Math.min((now.frame - 1) / 24, clip.duration);
     action.paused = !this.playing;
     this.#mixer.update(0);
+    life?.capture();
     this.#action = action;
     const shown = shownNodes(this.scene, now.accessories);
     this.#model.traverse((part) => {
+      // An accessory of several materials has a node for each: <node>_<part>.
       if (part.name.startsWith("Thingy_Accessory_"))
-        part.visible = shown.includes(part.name);
+        part.visible = shown.some(
+          (node) => part.name === node || part.name.startsWith(`${node}_`),
+        );
     });
     this.#dirty = true;
     this.dispatchEvent(
@@ -657,29 +754,97 @@ export class ThingyCharacter extends HTMLElement {
   #setFace(closed = false): void {
     if (!this.#faceMap) return;
     const item = FACES[face(this.getAttribute("face"))];
-    const [x, y] = faceOffset(closed ? (item.blink ?? item.cell) : item.cell);
+    this.#showCell(closed ? (item.blink ?? item.cell) : item.cell);
+  }
+
+  #showCell(cell: number): void {
+    if (!this.#faceMap) return;
+    const [x, y] = faceOffset(cell);
     this.#faceMap.offset.set(x, y);
     this.#dirty = true;
+  }
+
+  /** While he is alive his eyes shut across a change of expression, and his head reacts. */
+  #changeFace(before: string | null): void {
+    clearTimeout(this.#faceTimer);
+    const wait = this.#lifeSettings.faceChange;
+    const life = this.alive ? this.#life : undefined;
+    if (!life || wait <= 0) {
+      this.#setFace();
+      this.#scheduleBlink();
+      life?.react();
+      return;
+    }
+    clearTimeout(this.#blinkTimer);
+    const old = FACES[face(before)];
+    const next = FACES[face(this.getAttribute("face"))];
+    this.#showCell(old.blink ?? next.blink ?? FACES.idle!.blink!);
+    this.#faceTimer = window.setTimeout(() => {
+      this.#setFace();
+      this.#scheduleBlink();
+      life.react();
+    }, wait);
+  }
+
+  /** Starts or stops the small movements, whichever now applies. */
+  #setLife(): void {
+    if (!this.#model) return;
+    if (this.alive && !this.#lifeRunning) {
+      if (!this.#life) {
+        this.#life = new Life(this.#model);
+        this.#life.settings = this.#lifeSettings;
+        this.#life.onBigGlance = () => this.#blinkNow();
+      } else this.#life.capture();
+      this.#lifeRunning = true;
+    } else if (!this.alive && this.#lifeRunning) {
+      this.#life?.stop();
+      this.#mixer?.update(0);
+      this.#lifeRunning = false;
+    }
+    this.#scheduleBlink();
+    this.#dirty = true;
+  }
+
+  #blinkNow(): void {
+    if (FACES[face(this.getAttribute("face"))].blink === undefined) return;
+    clearTimeout(this.#blinkTimer);
+    this.#setFace(true);
+    this.#blinkTimer = window.setTimeout(() => this.#scheduleBlink(), 120);
   }
 
   /** A blink every few seconds, only on request and never under reduced motion. */
   #scheduleBlink(): void {
     clearTimeout(this.#blinkTimer);
     this.#setFace();
+    const alive = this.alive;
     if (
-      this.getAttribute("blink") !== "on" ||
+      (this.getAttribute("blink") !== "on" && !alive) ||
       this.#reduced.matches ||
       !this.#faceMap ||
       FACES[face(this.getAttribute("face"))].blink === undefined
     )
       return;
+    const every = this.#lifeSettings.blinkEvery * 1000;
     this.#blinkTimer = window.setTimeout(
       () => {
         if (!this.#visible || document.hidden) return this.#scheduleBlink();
         this.#setFace(true);
-        this.#blinkTimer = window.setTimeout(() => this.#scheduleBlink(), 130);
+        const pair = alive && Math.random() < this.#lifeSettings.doubleBlink;
+        this.#blinkTimer = window.setTimeout(() => {
+          if (!pair) return this.#scheduleBlink();
+          this.#setFace();
+          this.#blinkTimer = window.setTimeout(() => {
+            this.#setFace(true);
+            this.#blinkTimer = window.setTimeout(
+              () => this.#scheduleBlink(),
+              110,
+            );
+          }, 130);
+        }, 130);
       },
-      2600 + Math.random() * 4200,
+      alive
+        ? every * (0.55 + Math.random() * 0.9)
+        : 2600 + Math.random() * 4200,
     );
   }
 
@@ -700,8 +865,11 @@ export class ThingyCharacter extends HTMLElement {
 
   #setMotion(): void {
     if (!this.#action) return;
+    const life = this.alive ? this.#life : undefined;
+    life?.restore();
     this.#action.paused = !this.playing;
     this.#mixer?.update(0);
+    life?.capture();
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
@@ -749,10 +917,37 @@ export class ThingyCharacter extends HTMLElement {
     this.#clock.update();
     // Before the guard: a hop can carry him out of view, and he must still land.
     this.#stepHop();
-    if (!this.#visible || document.hidden || !this.#renderer) return;
+    if (!this.#visible || document.hidden || !this.#renderer) {
+      this.#drewAt = 0;
+      return;
+    }
     this.#controls?.update();
-    if (this.playing) {
-      this.#mixer?.update(Math.min(this.#clock.getDelta(), 0.05));
+    const dt = Math.min(this.#clock.getDelta(), 0.05);
+    this.#watchStrain();
+    const life = this.alive ? this.#life : undefined;
+    if (life) {
+      this.#sinceDrawn += dt;
+      // Breathing looks the same at half the frames and costs half the battery.
+      const quiet = life.settled && !this.playing && !this.#hop;
+      if (this.#sinceDrawn >= (quiet ? QUIET_FRAME : BUSY_FRAME)) {
+        const step = Math.min(this.#sinceDrawn, 0.05);
+        this.#sinceDrawn = 0;
+        life.restore();
+        if (this.playing) this.#mixer?.update(step);
+        life.capture();
+        if (this.#pointer && performance.now() > this.#pointerUntil)
+          this.#pointer = null;
+        life.apply(step, {
+          camera: this.#camera,
+          rect: this.getBoundingClientRect(),
+          pointer: this.#press ? null : this.#pointer,
+          busy: Boolean(this.#hop),
+        });
+        this.#dirty = true;
+        this.#drewAt = performance.now();
+      }
+    } else if (this.playing) {
+      this.#mixer?.update(dt);
       this.#dirty = true;
     }
     if (this.#dirty) {
@@ -765,6 +960,25 @@ export class ThingyCharacter extends HTMLElement {
     }
   };
 
+  /**
+   * A machine that can't draw him quickly enough gets a still Thingy and a page
+   * that still works, rather than a stutter that takes the page down with it.
+   */
+  #watchStrain(): void {
+    if (!this.#drewAt) return;
+    this.#strain = addStrain(
+      this.#strain,
+      (performance.now() - this.#drewAt) / 1000,
+    );
+    this.#drewAt = 0;
+    if (this.#strain < STRAIN_LIMIT) return;
+    this.#strained = true;
+    this.#setLife();
+    this.dispatchEvent(
+      new CustomEvent("thingy-strained", { bubbles: true, composed: true }),
+    );
+  }
+
   #status(text: string): void {
     this.#root.querySelector(".status")!.textContent = text;
   }
@@ -773,6 +987,10 @@ export class ThingyCharacter extends HTMLElement {
     ++this.#generation;
     cancelAnimationFrame(this.#frame);
     clearTimeout(this.#blinkTimer);
+    clearTimeout(this.#faceTimer);
+    this.#life = undefined;
+    this.#lifeRunning = false;
+    this.#heldPose = "";
     this.#abort.abort();
     this.#observer?.disconnect();
     this.#intersection?.disconnect();

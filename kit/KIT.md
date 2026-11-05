@@ -172,7 +172,7 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 
 | Attribute     | Values                                                                       |
 | ------------- | ---------------------------------------------------------------------------- |
-| `version`     | `latest` or `v0.15`, with the `v`. Anything else is the newest               |
+| `version`     | `latest` or `v0.16`, with the `v`. Anything else is the newest               |
 | `scene`       | `library`, `outdoors`, `workshop`, `concert`                                 |
 | `pose`        | See [poses](#poses). Without one he stands in `present`, so set it           |
 | `face`        | See [faces](#faces)                                                          |
@@ -180,6 +180,7 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 | `light`       | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
 | `motion`      | `on` or `off`. It obeys reduced motion even when `on`                        |
 | `blink`       | `on` blinks the faces that can, never under reduced motion                   |
+| `life`        | `on` gives him small movements of his own. See [below](#small-movements)     |
 | `view`        | The angle he starts at, written as the frame's `view` is                     |
 | `zoom`        | `off` leaves the mouse wheel to the page                                     |
 | `poster`      | An image to show until the model is ready                                    |
@@ -190,13 +191,28 @@ It works in plain HTML or any framework. Change an attribute and he changes.
   `thingy-tap` on a press that barely moves, and `thingy-fallback` when he falls
   back to a still because 3D could not start.
 - **Methods:** `resetView()`, `hop({ height, direction, turns })` to jump and spin,
-  and `picture(size)`, which resolves to a square transparent PNG of him as he
-  stands now.
-- **Properties:** `view` reads where he is now, and `moves` says whether the pose
-  has motion to play.
+  and `picture(size)`, which resolves to a square transparent PNG of him in his
+  pose at this angle. With `life` on it leaves out his small movements and shows
+  his eyes open.
+- **Properties:** `view` reads where he is now, `moves` says whether the pose has
+  motion to play, `alive` says whether small movements are running,
+  `strained` says he stopped them because the machine could not keep up (a
+  `thingy-strained` event says so too), and
+  `lifeSettings` reads or sets how much he does them.
 - **Content security policy:** the host needs to be in `script-src` and
   `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,
   and `blob:` in `connect-src` and `img-src` for the textures.
+
+### Small movements
+
+`life="on"` lets him move a little on his own between poses. He breathes, blinks,
+looks toward the pointer and glances around, and his antenna swings when he turns.
+A new pose blends in instead of jumping, and his eyes close across a change of
+face. It is off unless you ask for it.
+
+It stops when he is off screen and never runs under reduced motion. It adds a
+little work for as long as he is on screen, so use it where he is the point of the
+page. The frame leaves it out, and Ask Thingy has none.
 
 ### A still that becomes him
 
@@ -249,7 +265,7 @@ Load `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
 decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
 in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
-shared rig of 40 joints.
+shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for the laptop.
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
@@ -302,18 +318,22 @@ he has, separated by commas, or say `none`.
 | `outdoors` | `backpack`                       | Off       | `backpack`            |
 | `workshop` | `screwdriver`, `hammer`, `drill` | Empty     | Empty hands           |
 | `workshop` | `laptop`                         | Empty     | `laptop` in `present` |
+| `workshop` | `plate`                          | Empty     | Empty hands           |
 | `concert`  | `headphones`                     | Off       | `headphones`          |
+| `concert`  | `phone`                          | Off       | No phone              |
 
 Some accessories keep to the poses they were made for:
 
-| In the Workshop                  | Poses                       |
+| Accessory                        | Poses                       |
 | -------------------------------- | --------------------------- |
 | `screwdriver`, `hammer`, `drill` | `carry`, `show`, `work`     |
-| `laptop`                         | `present`                   |
-| `none`                           | `hello`, `thinking`, `rest` |
+| `laptop`                         | `present`, `work`           |
+| `plate`                          | `carry`, `show`             |
+| `phone`                          | `check`, `hold`             |
+| `none`, in the Workshop          | `hello`, `thinking`, `rest` |
 
-`carry` holds the tool at his side, `show` holds it up, and `work` raises it to use
-it. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+`carry` holds the tool at his side, `show` holds it in front of him, and `work` is
+using it. The laptop's `present` turns its screen to you, and its `work` to him. The `phone` shows the Thingy Model page on Things I've built, on a screen turned to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. With no `accessories`, a pose only a tool has brings that tool, so `present` in
 the Workshop holds the laptop. Asking for a pose the accessory does not have moves
 him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
 An accessory a scene doesn't have is ignored. To read what he ended up with, use the
@@ -327,7 +347,7 @@ brings without changing. A slot holds one accessory at a time.
 | You want                  | Use                                     | Changes                                       |
 | ------------------------- | --------------------------------------- | --------------------------------------------- |
 | The newest Thingy, always | `version="latest"`, `character/latest/` | When this site does, within five minutes      |
-| One Thingy, for good      | `version="v0.15"`, `character/v0.15/`   | Never                                         |
+| One Thingy, for good      | `version="v0.16"`, `character/v0.16/`   | Never                                         |
 | His persona               | `persona.md`                            | When Jamie approves a change, within a minute |
 
 Use `latest` unless a page needs one model forever.

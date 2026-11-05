@@ -1,5 +1,5 @@
 /** Every model the component can draw, oldest first. Older files stay published. */
-export const VERSIONS = ["v0.15"] as const;
+export const VERSIONS = ["v0.15", "v0.16"] as const;
 export type Version = (typeof VERSIONS)[number];
 /** `version="latest"`, or no version at all, asks for the newest model. */
 export const LATEST = "latest";
@@ -53,6 +53,8 @@ export const TOOL_POSES = {
   carry: { label: "Carry", frame: 1 },
   show: { label: "Show", frame: 1 },
   work: { label: "Work", frame: 1 },
+  check: { label: "Check", frame: 1 },
+  hold: { label: "Hold up", frame: 1 },
 } as const;
 const HAND_TOOL_POSES = ["carry", "show", "work"] as const;
 export type Pose = keyof typeof POSES;
@@ -69,6 +71,8 @@ export type Accessory = {
   label: string;
   poses?: readonly AnyPose[];
   absent?: string;
+  /** Held in both hands, so his arms can't drift apart while he has it. */
+  steady?: boolean;
 };
 /**
  * A place for accessories, of which he has one at a time. With `empty` he can
@@ -123,7 +127,13 @@ export const SCENES = {
           { id: "screwdriver", label: "Screwdriver", poses: HAND_TOOL_POSES },
           { id: "hammer", label: "Hammer", poses: HAND_TOOL_POSES },
           { id: "drill", label: "Drill", poses: HAND_TOOL_POSES },
-          { id: "laptop", label: "Laptop", poses: ["present"] },
+          { id: "laptop", label: "Laptop", poses: ["present", "work"] },
+          {
+            id: "plate",
+            label: "Build plate",
+            poses: ["carry", "show"],
+            steady: true,
+          },
         ],
       },
     ],
@@ -135,6 +145,10 @@ export const SCENES = {
         id: "ears",
         standard: "headphones",
         options: [{ id: "headphones", label: "Headphones", absent: "ears" }],
+      },
+      {
+        id: "hand",
+        options: [{ id: "phone", label: "iPhone", poses: ["check", "hold"] }],
       },
     ],
   },
@@ -205,7 +219,12 @@ export function stageOf(
   let held = accessories(key, wantedAccessories);
   if (wantedAccessories == null && !posesFor(key, held).includes(asked)) {
     const fits = accessoriesIn(key).find((item) => item.poses?.includes(asked));
-    if (fits) held = [fits.id];
+    // It goes in its own slot, and whatever else he has stays on.
+    if (fits)
+      held = slotsOf(key).flatMap((slot) => {
+        if (slot === fits.slot) return [fits.id];
+        return held.filter((id) => slot.options.some((o) => o.id === id));
+      });
   }
   const offered = posesFor(key, held);
   const chosen = offered.includes(asked) ? asked : offered[0]!;
@@ -311,8 +330,8 @@ export type EmbedState = Omit<CharacterState, "pose"> & {
 export const MODEL_WEIGHT: Record<SceneKey, string> = {
   library: "2.5 MB",
   outdoors: "2.3 MB",
-  workshop: "2.3 MB",
-  concert: "2.3 MB",
+  workshop: "2.6 MB",
+  concert: "2.4 MB",
 };
 export function embedURL(
   state: EmbedState,
@@ -342,6 +361,12 @@ const CREDIT = `<p><small><a href="https://thingy.thingelstad.xyz/">Thingy</a> b
 export function iframeCode(state: EmbedState): string {
   return `<iframe src="${embedURL(state)}" title="Thingy, ${SCENES[state.scene].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>\n${CREDIT}`;
 }
+/** Stills newer than the first model that drew Scenes. An older model has `present`. */
+const STILL_SINCE: Record<string, Version> = {
+  "laptop-work": "v0.16",
+  "plate-carry": "v0.16",
+  "plate-show": "v0.16",
+};
 export function posterPath(
   key: SceneKey,
   selected: AnyPose = "present",
@@ -351,5 +376,9 @@ export function posterPath(
 ): string {
   const scene: Scene = SCENES[key];
   const { clip } = stageOf(key, held, selected);
-  return `${base}${version}/poses/${key}-${scene.posedStills ? clip : "present"}.webp`;
+  const since = STILL_SINCE[clip];
+  const hasStill =
+    scene.posedStills &&
+    (!since || VERSIONS.indexOf(version) >= VERSIONS.indexOf(since));
+  return `${base}${version}/poses/${key}-${hasStill ? clip : "present"}.webp`;
 }

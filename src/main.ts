@@ -40,6 +40,7 @@ const state: Omit<CharacterState, "pose"> & {
   pose: AnyPose;
   accessories: string[];
   face: string;
+  life: boolean;
 } = {
   scene: firstScene,
   pose: first.pose,
@@ -50,6 +51,8 @@ const state: Omit<CharacterState, "pose"> & {
     : "original",
   light: params.get("light") === "on",
   motion: false,
+  // He is alive here unless someone has turned it off.
+  life: params.get("life") !== "off",
 };
 const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
 // A shared link brings the angle with it. Set before the element starts.
@@ -112,11 +115,13 @@ function syncSheet(): void {
     );
   $('[data-sheet-tab="accessories"]').hidden = !hasAccessories;
   $("#tab-scene").textContent = SCENES[state.scene].label;
-  const held = accessoriesIn(state.scene).find((item) =>
+  const held = accessoriesIn(state.scene).filter((item) =>
     state.accessories.includes(item.id),
   );
-  $("#tab-accessories").textContent = held
-    ? held.label
+  $("#tab-accessories").textContent = held.length
+    ? held.length > 1
+      ? `${held.length} on`
+      : held[0]!.label
     : slotsHere().find((slot) => slot.empty)
       ? "None"
       : "Off";
@@ -142,6 +147,8 @@ function studioAddress(): string {
   else url.searchParams.set("face", state.face);
   if (state.light) url.searchParams.set("light", "on");
   else url.searchParams.delete("light");
+  if (state.life) url.searchParams.delete("life");
+  else url.searchParams.set("life", "off");
   const view = turnedTo();
   if (view) url.searchParams.set("view", view);
   else url.searchParams.delete("view");
@@ -216,6 +223,11 @@ function syncCharacter(): void {
     `<strong>${chosen.label}.</strong> ${chosen.note}`;
   $("#light-label").textContent = state.light ? "Light on" : "Light off";
   $<HTMLInputElement>("#light").checked = state.light;
+  // Reduced motion wins, and the switch says so rather than promising otherwise.
+  const moving = state.life && !reduced.matches && !character.strained;
+  $("#life-label").textContent = moving ? "Moving" : "Still";
+  // The switch keeps what was asked for; the label says what he is doing.
+  $<HTMLInputElement>("#life").checked = state.life && !reduced.matches;
   $("#play-label").textContent = state.motion ? "Pause" : "Play";
   $("#play [data-icon]").innerHTML = icon(state.motion ? "pause" : "play");
   $("#play").setAttribute("aria-pressed", String(state.motion));
@@ -283,9 +295,15 @@ $("#light").addEventListener("change", () => {
   state.light = $<HTMLInputElement>("#light").checked;
   syncCharacter();
 });
+$("#life").addEventListener("change", () => {
+  state.life = $<HTMLInputElement>("#life").checked;
+  syncCharacter();
+});
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 function syncMotionPreference(): void {
   $("#motion-note").hidden = !reduced.matches;
+  $<HTMLInputElement>("#life").disabled = reduced.matches;
+  syncCharacter();
   syncPlay();
   if (reduced.matches) {
     state.motion = false;
@@ -307,6 +325,9 @@ function syncPlay(): void {
   }
 }
 character.addEventListener("thingy-change", syncPlay);
+character.addEventListener("thingy-strained", () => {
+  $("#life-label").textContent = "Still";
+});
 reduced.addEventListener("change", syncMotionPreference);
 $("#play").addEventListener("click", () => {
   state.motion = !state.motion;

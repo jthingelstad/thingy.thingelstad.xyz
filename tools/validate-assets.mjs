@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import validator from "gltf-validator";
 const root = fileURLToPath(new URL("../", import.meta.url));
-for (const version of ["v0.10", "v0.14", "v0.15"]) {
+for (const version of ["v0.10", "v0.14", "v0.15", "v0.16"]) {
   const publicRoot = `${root}public/character/${version}/`;
   const manifest = JSON.parse(readFileSync(`${publicRoot}manifest.json`));
   if (manifest.faceSheet)
@@ -44,7 +44,15 @@ for (const version of ["v0.10", "v0.14", "v0.15"]) {
           `${key}: ${tool.node}`,
         );
     }
-    assert.equal(json.skins[0].joints.length, 40, `${key}: shared skeleton`);
+    // From v0.16 the Workshop's laptop has a bone of its own, to turn in his hand, and
+    // Concert is exported from the same rig.
+    const joints =
+      version === "v0.16" && ["workshop", "concert"].includes(key) ? 41 : 40;
+    assert.equal(
+      json.skins[0].joints.length,
+      joints,
+      `${key}: shared skeleton`,
+    );
     assert(
       json.materials.some((m) => m.name === "Thingy_Beacon"),
       `${key}: switchable beacon`,
@@ -111,7 +119,7 @@ for (const version of ["v0.10", "v0.14", "v0.15"]) {
       assert(statSync(`${publicRoot}${path}`).size > 100, path);
     }
     console.log(
-      `${version} ${key}: ${(bytes.length / 1e6).toFixed(2)} MB, 40 joints, ${json.animations.length} clips, valid GLB, reviewed metadata`,
+      `${version} ${key}: ${(bytes.length / 1e6).toFixed(2)} MB, ${json.skins[0].joints.length} joints, ${json.animations.length} clips, valid GLB, reviewed metadata`,
     );
   }
 }

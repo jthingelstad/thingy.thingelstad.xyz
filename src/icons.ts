@@ -19,9 +19,15 @@ const paths: Record<string, string> = {
     '<path d="M7 8a5 5 0 0 1 10 0v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1Z"/><path d="M10 3.300V2h4v1.300M9.500 14h5v3h-5ZM7 10H5v8h2M17 10h2v8h-2"/>',
   headphones:
     '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.500" y="14" width="4.500" height="7" rx="1.500"/><rect x="17" y="14" width="4.500" height="7" rx="1.500"/>',
+  plate:
+    '<path d="M2 18h20l-2 3H4Z"/><circle cx="12" cy="7" r="3.500"/><path d="M9 18l.5-4.500h5L15 18"/>',
+  phone:
+    '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
   carry: '<path d="M12 3v14M6 11l6 6 6-6M5 21h14"/>',
   show: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   work: '<path d="m13 3-8 11h6l-1 7 9-12h-6Z"/>',
+  check: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.500-4.500"/>',
+  hold: '<path d="M12 21V7M6 13l6-6 6 6M5 3h14"/>',
   play: '<path d="m8 5 11 7-11 7Z"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
   reset: '<path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/>',
