@@ -34,6 +34,8 @@ export type LifeSettings = {
   antennaBounce: number;
   /** How quickly the antenna comes to rest, 0 to 1. */
   antennaDamping: number;
+  /** How much his arms drift and trail the rest of him. 0 holds them to the pose. */
+  arms: number;
 };
 
 export const LIFE_DEFAULTS: LifeSettings = {
@@ -51,6 +53,7 @@ export const LIFE_DEFAULTS: LifeSettings = {
   antenna: 1,
   antennaBounce: 3.2,
   antennaDamping: 0.14,
+  arms: 1,
 };
 
 /** The way into a pose: a smooth start, and past the pose by `settle` before resting. */
@@ -115,6 +118,8 @@ const TURN_LEVER = 0.3;
 
 type Held = {
   bone: THREE.Bone;
+  /** The part of a pose change this bone sits out at the start, 0 to 1. */
+  lag: number;
   base: { p: THREE.Vector3; q: THREE.Quaternion; s: THREE.Vector3 };
   shown: { p: THREE.Vector3; q: THREE.Quaternion; s: THREE.Vector3 };
   from: { p: THREE.Vector3; q: THREE.Quaternion; s: THREE.Vector3 };
@@ -155,6 +160,27 @@ export function addStrain(strain: number, draw: number): number {
   return Math.max(0, strain + (draw > SLOW_DRAW ? Math.min(draw, 0.5) : -draw));
 }
 
+/** How long each part of the arm waits on a pose change: the hand comes last. */
+const ARM_LAG: Record<string, number> = {
+  forearm: 0.1,
+  hand: 0.18,
+  index: 0.22,
+  little: 0.22,
+  middle: 0.22,
+  ring: 0.22,
+  thumb: 0.22,
+};
+
+type Arm = {
+  /** 1 for his left, -1 for his right, so outward means the same on both. */
+  side: 1 | -1;
+  upper?: THREE.Bone;
+  fore?: THREE.Bone;
+  hand?: THREE.Bone;
+  /** Where this arm is in its own slow drift. */
+  seed: number;
+};
+
 export type LifeFrame = {
   camera: THREE.Camera;
   rect: { left: number; top: number; width: number; height: number };
@@ -174,6 +200,9 @@ export class Life {
   #head?: THREE.Bone;
   #clavicleL?: THREE.Bone;
   #clavicleR?: THREE.Bone;
+  #arms: Arm[] = [];
+  #flare = { x: 0, v: 0 };
+  #trail = { x: 0, v: 0 };
   #time = Math.random() * 100;
   #blendAt = 1;
   #yaw = { x: 0, v: 0 };
@@ -201,6 +230,7 @@ export class Life {
           base: pose3(),
           shown: pose3(),
           from: pose3(),
+          lag: ARM_LAG[part.name.split(".")[0]!] ?? 0,
         });
       }
     });
@@ -212,6 +242,13 @@ export class Life {
     this.#head = bone("head");
     this.#clavicleL = bone("clavicle.L");
     this.#clavicleR = bone("clavicle.R");
+    this.#arms = (["L", "R"] as const).map((end, index) => ({
+      side: end === "L" ? 1 : -1,
+      upper: bone(`upper_arm.${end}`),
+      fore: bone(`forearm.${end}`),
+      hand: bone(`hand.${end}`),
+      seed: index * 37 + Math.random() * 100,
+    }));
     this.capture();
     for (const held of this.#held) {
       held.shown.p.copy(held.base.p);
@@ -359,6 +396,8 @@ export class Life {
     this.#yaw = { x: 0, v: 0 };
     this.#pitch = { x: 0, v: 0 };
     this.#nod = { x: 0, v: 0 };
+    this.#flare = { x: 0, v: 0 };
+    this.#trail = { x: 0, v: 0 };
     this.#blendAt = 1;
   }
 
@@ -491,6 +530,47 @@ export class Life {
     this.#uniform.value.copy(scratch.vector).clampLength(0, SWING_LIMIT);
   }
 
+  /**
+   * Arms that hold their pose exactly are what make a figure look like a
+   * figure. Each drifts on its own clock, gives with his breath, trails his
+   * turns and his nods, and lifts away from him in a spin. The upper arm carries
+   * the least of it and the hand the most, the way a loose arm hangs.
+   */
+  #stepArms(dt: number, frame: LifeFrame, breath: number, unit: number): void {
+    const amount = this.settings.arms;
+    if (amount <= 0) return;
+    this.#follow(this.#trail, this.#yaw.x, 3.2, dt);
+    this.#follow(this.#flare, frame.busy ? 1 : 0, 7, dt);
+    const trail = this.#trail.x - this.#yaw.x;
+    const degree = THREE.MathUtils.degToRad(1);
+    for (const { side, upper, fore, hand, seed } of this.#arms) {
+      const drift = (speed: number, phase: number) =>
+        Math.sin(this.#time * speed + seed + phase) * 0.6 +
+        Math.sin(this.#time * speed * 2.3 + seed * 1.7 + phase) * 0.4;
+      const outward = side * degree * amount;
+      this.#turn(
+        upper,
+        drift(0.31, 0) * 2.2 * degree * amount +
+          this.#nod.x * unit * 3 * amount,
+        trail * 0.5 * amount,
+        outward * (drift(0.23, 2) * 1.6 + breath * 1.1 + this.#flare.x * 11),
+      );
+      this.#turn(
+        fore,
+        drift(0.37, 4) * 3.2 * degree * amount +
+          this.#nod.x * unit * 5 * amount,
+        trail * 0.7 * amount,
+        outward * this.#flare.x * 6,
+      );
+      this.#turn(
+        hand,
+        drift(0.47, 6) * 4.5 * degree * amount,
+        trail * 0.9 * amount,
+        outward * drift(0.41, 8) * 3,
+      );
+    }
+  }
+
   /** One frame's worth of everything. Call after `capture`, before drawing. */
   apply(dt: number, frame: LifeFrame): void {
     const settings = this.settings;
@@ -499,8 +579,11 @@ export class Life {
     if (blending)
       this.#blendAt = Math.min(this.#blendAt + dt / settings.blend, 1);
     else this.#blendAt = 1;
-    const amount = poseEase(this.#blendAt, settings.settle);
-    for (const { bone, base, shown, from } of this.#held) {
+    for (const { bone, base, shown, from, lag } of this.#held) {
+      const amount = poseEase(
+        THREE.MathUtils.clamp((this.#blendAt - lag) / (1 - lag), 0, 1),
+        settings.settle,
+      );
       if (this.#blendAt >= 1) {
         shown.p.copy(base.p);
         shown.q.copy(base.q);
@@ -537,6 +620,7 @@ export class Life {
     this.#turn(this.#chest, pitch * 0.12, yaw * 0.15, roll * 0.2);
     this.#turn(this.#neck, pitch * 0.33, yaw * 0.3, roll * 0.3);
     this.#turn(this.#head, pitch * 0.55, yaw * 0.55, roll * 0.5);
+    this.#stepArms(dt, frame, breath, unit);
     this.#stepAntenna(dt);
   }
 }
