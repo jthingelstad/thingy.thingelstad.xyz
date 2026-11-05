@@ -100,6 +100,24 @@ test("the page's scenes are the manifest's scenes, in the same order", () => {
     );
   }
 });
+test("an older model's poster is a still that model has", () => {
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.15", "laptop"),
+    "/character/v0.15/poses/workshop-present.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "show", "/character/", "v0.15", "plate"),
+    "/character/v0.15/poses/workshop-present.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.15", "drill"),
+    "/character/v0.15/poses/workshop-drill-work.webp",
+  );
+  assert.equal(
+    posterPath("workshop", "work", "/character/", "v0.16", "laptop"),
+    "/character/v0.16/poses/workshop-laptop-work.webp",
+  );
+});
 test("every still a page can ask for is in the manifest", () => {
   const manifest = newestManifest();
   for (const key of Object.keys(SCENES) as (keyof typeof SCENES)[])

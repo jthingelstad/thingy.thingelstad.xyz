@@ -361,6 +361,12 @@ const CREDIT = `<p><small><a href="https://thingy.thingelstad.xyz/">Thingy</a> b
 export function iframeCode(state: EmbedState): string {
   return `<iframe src="${embedURL(state)}" title="Thingy, ${SCENES[state.scene].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>\n${CREDIT}`;
 }
+/** Stills newer than the first model that drew Scenes. An older model has `present`. */
+const STILL_SINCE: Record<string, Version> = {
+  "laptop-work": "v0.16",
+  "plate-carry": "v0.16",
+  "plate-show": "v0.16",
+};
 export function posterPath(
   key: SceneKey,
   selected: AnyPose = "present",
@@ -370,5 +376,9 @@ export function posterPath(
 ): string {
   const scene: Scene = SCENES[key];
   const { clip } = stageOf(key, held, selected);
-  return `${base}${version}/poses/${key}-${scene.posedStills ? clip : "present"}.webp`;
+  const since = STILL_SINCE[clip];
+  const hasStill =
+    scene.posedStills &&
+    (!since || VERSIONS.indexOf(version) >= VERSIONS.indexOf(since));
+  return `${base}${version}/poses/${key}-${hasStill ? clip : "present"}.webp`;
 }
