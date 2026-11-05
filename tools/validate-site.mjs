@@ -27,8 +27,6 @@ const newestFiles = await walk(newest);
 assert.deepEqual(
   (await walk("dist/character/latest"))
     .map((file) => path.relative("dist/character/latest", file))
-    // The Ask Thingy alias from write-site-files, gone when that change lands.
-    .filter((file) => !file.startsWith("poses/librarian-"))
     .sort(),
   newestFiles.map((file) => path.relative(newest, file)).sort(),
   "character/latest is not the newest version's files",
