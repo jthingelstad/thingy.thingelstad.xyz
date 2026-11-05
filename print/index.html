@@ -78,6 +78,29 @@
         color: var(--muted);
         font-size: 15px;
       }
+      .print-real {
+        display: grid;
+        grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+        gap: 32px;
+        align-items: center;
+        border-top: 1px solid var(--line);
+        padding-block: 40px;
+      }
+      .print-real figure {
+        margin: 0;
+      }
+      .print-real img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+      }
+      @media (max-width: 700px) {
+        .print-real {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 16px;
+        }
+      }
       .print-hero img,
       .print-views img {
         width: 100%;
@@ -263,6 +286,25 @@
           <figcaption>The face, raised</figcaption>
         </figure>
       </section>
+      <section class="print-real" aria-labelledby="real-title">
+        <figure>
+          <img
+            src="/print/v0.13/printed.webp"
+            alt="A cream one-colour 3D print of Thingy standing on his oval base on a dark counter, one finger raised, his face and antenna clearly formed."
+            width="1200"
+            height="1458"
+            loading="lazy"
+          />
+        </figure>
+        <div class="print-copy">
+          <h2 id="real-title">The first print.</h2>
+          <p>
+            This is Jamie’s print of this file, in one colour. The face and
+            antenna came through clearly. The raised hand and the badge
+            lettering are the finest details, and they softened the most.
+          </p>
+        </div>
+      </section>
       <section class="print-details">
         <div class="print-copy">
           <h2>On a Bambu Lab P2S</h2>
@@ -307,10 +349,8 @@
             <li>An oval base, 89 × 55 mm, keeps him standing.</li>
           </ul>
           <p>
-            This is the first version of the file, and Jamie has printed him.
-            Check the supports under the coat hem and the head as you slice. The
-            raised hand and the badge lettering are the finest details, so they
-            soften the most in print.
+            This is the first version of the file. Check the supports under the
+            coat hem and the head as you slice.
           </p>
         </div>
       </section>
