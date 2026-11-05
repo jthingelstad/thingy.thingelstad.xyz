@@ -12,13 +12,13 @@
         "stills from character/latest/"
       ],
       "stills": [
-        "librarian-hello",
-        "librarian-hello-idle",
-        "librarian-present-idle",
-        "librarian-present-proud",
-        "librarian-rest-delighted",
-        "librarian-rest-idle",
-        "librarian-thinking-curious"
+        "library-hello",
+        "library-hello-idle",
+        "library-present-idle",
+        "library-present-proud",
+        "library-rest-delighted",
+        "library-rest-idle",
+        "library-thinking-curious"
       ],
       "keeps": [
         "AGENTS.md: what each face means here, and which faces a tap may show",

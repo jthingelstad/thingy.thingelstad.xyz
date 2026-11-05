@@ -15,6 +15,10 @@ const paths: Record<string, string> = {
     '<path d="M3 5h12v8H3Z"/><path d="M15 7h3l4 2-4 2h-3M6 13l-1 8h5l2-8"/>',
   laptop:
     '<rect x="5" y="4" width="14" height="11" rx="1.5"/><path d="M2 20h20l-3-5H5Z"/>',
+  backpack:
+    '<path d="M7 8a5 5 0 0 1 10 0v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1Z"/><path d="M10 3.300V2h4v1.300M9.500 14h5v3h-5ZM7 10H5v8h2M17 10h2v8h-2"/>',
+  headphones:
+    '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.500" y="14" width="4.500" height="7" rx="1.500"/><rect x="17" y="14" width="4.500" height="7" rx="1.500"/>',
   carry: '<path d="M12 3v14M6 11l6 6 6-6M5 21h14"/>',
   show: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   work: '<path d="m13 3-8 11h6l-1 7 9-12h-6Z"/>',

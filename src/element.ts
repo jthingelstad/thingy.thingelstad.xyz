@@ -7,21 +7,21 @@ import {
   ALL_POSES,
   FACES,
   HOME_CAMERA,
-  OUTFITS,
-  TOOLS,
+  SCENES,
   VIEW_LIMITS,
+  accessoriesIn,
   anyPose,
   face,
   faceOffset,
   modelVersion,
-  outfit,
   parseView,
+  scene,
+  shownNodes,
   stageOf,
   posterPath,
   viewValue,
   type AnyPose,
-  type Outfit,
-  type Tool,
+  type SceneKey,
   type Version,
 } from "./config";
 
@@ -72,9 +72,9 @@ export type HopOptions = {
 /** A framework-independent character. All model and decoder requests stay local. */
 export class ThingyCharacter extends HTMLElement {
   static observedAttributes = [
-    "outfit",
+    "scene",
     "pose",
-    "tool",
+    "accessories",
     "light",
     "motion",
     "asset-base",
@@ -104,7 +104,7 @@ export class ThingyCharacter extends HTMLElement {
   #visible = true;
   #dirty = true;
   #generation = 0;
-  #currentOutfit?: Outfit;
+  #currentScene?: SceneKey;
   #currentVersion?: Version;
   #faceMap?: THREE.Texture;
   #blinkTimer = 0;
@@ -123,14 +123,14 @@ export class ThingyCharacter extends HTMLElement {
   #lift = 0;
   #reduced = matchMedia("(prefers-reduced-motion: reduce)");
 
-  get outfit(): Outfit {
-    return outfit(this.getAttribute("outfit"));
+  get scene(): SceneKey {
+    return scene(this.getAttribute("scene"));
   }
   get pose(): AnyPose {
     return this.#stage().pose;
   }
-  get tool(): Tool {
-    return this.#stage().tool;
+  get accessories(): string[] {
+    return this.#stage().accessories;
   }
   /** Whether the current pose has any motion to play. Some are a single frame. */
   get moves(): boolean {
@@ -140,7 +140,7 @@ export class ThingyCharacter extends HTMLElement {
     return this.getAttribute("motion") === "on" && !this.#reduced.matches;
   }
   get version(): Version {
-    return modelVersion(this.getAttribute("version"), this.outfit);
+    return modelVersion(this.getAttribute("version"));
   }
   get zoomable(): boolean {
     return this.getAttribute("zoom") !== "off";
@@ -167,9 +167,8 @@ export class ThingyCharacter extends HTMLElement {
 
   #stage() {
     return stageOf(
-      this.outfit,
-      this.version,
-      this.getAttribute("tool"),
+      this.scene,
+      this.getAttribute("accessories"),
       anyPose(this.getAttribute("pose")),
     );
   }
@@ -190,7 +189,7 @@ export class ThingyCharacter extends HTMLElement {
     if (before === after) return;
     if (!this.isConnected || !this.#renderer) return;
     this.#updatePoster();
-    if (name === "outfit" || name === "asset-base" || name === "version")
+    if (name === "scene" || name === "asset-base" || name === "version")
       void this.#load();
     else if (name === "light") this.#setLight();
     else if (name === "motion") this.#setMotion();
@@ -200,7 +199,7 @@ export class ThingyCharacter extends HTMLElement {
     } else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
     else if (name === "view") this.#setView();
-    else if (name === "pose" || name === "tool") this.#setPose();
+    else if (name === "pose" || name === "accessories") this.#setPose();
   }
 
   /** A spin still dying away from a drag would carry him off a set angle. */
@@ -313,20 +312,24 @@ export class ThingyCharacter extends HTMLElement {
 
   #updatePoster(): void {
     const now = this.#stage();
+    const having = accessoriesIn(this.scene)
+      .filter((item) => now.accessories.includes(item.id))
+      .map((item) => item.label.toLowerCase())
+      .join(" and ");
     this.setAttribute(
       "aria-label",
-      `Thingy, ${OUTFITS[this.outfit].label}, ${ALL_POSES[now.pose].label}${now.tool === "none" ? "" : `, with ${TOOLS[now.tool].label.toLowerCase()}`}`,
+      `Thingy, ${SCENES[this.scene].label}, ${ALL_POSES[now.pose].label}${having ? `, with ${having}` : ""}`,
     );
     const poster = this.#root.querySelector("img");
     if (poster)
       poster.src =
         this.getAttribute("poster") ||
         posterPath(
-          this.outfit,
+          this.scene,
           now.pose,
           this.assetBase,
           this.version,
-          this.getAttribute("tool"),
+          this.getAttribute("accessories"),
         );
   }
 
@@ -520,10 +523,10 @@ export class ThingyCharacter extends HTMLElement {
 
   async #load(): Promise<void> {
     const generation = ++this.#generation;
-    const selected = this.outfit;
+    const selected = this.scene;
     const version = this.version;
     if (
-      selected === this.#currentOutfit &&
+      selected === this.#currentScene &&
       version === this.#currentVersion &&
       this.#model
     )
@@ -574,7 +577,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#scene.add(this.#model);
       this.#clips = gltf.animations;
       this.#mixer = new THREE.AnimationMixer(this.#model);
-      this.#currentOutfit = selected;
+      this.#currentScene = selected;
       this.#currentVersion = version;
       this.#setPose();
       this.#setLight();
@@ -586,7 +589,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#dirty = true;
       this.dispatchEvent(
         new CustomEvent("thingy-ready", {
-          detail: { outfit: selected },
+          detail: { scene: selected },
           bubbles: true,
           composed: true,
         }),
@@ -614,16 +617,19 @@ export class ThingyCharacter extends HTMLElement {
     action.paused = !this.playing;
     this.#mixer.update(0);
     this.#action = action;
-    const laptop = this.#model.getObjectByName("Thingy_Laptop");
-    if (laptop) laptop.visible = now.pose === "present";
-    for (const name of Object.keys(TOOLS)) {
-      const part = this.#model.getObjectByName(`Thingy_Tool_${name}`);
-      if (part) part.visible = name === now.tool;
-    }
+    const shown = shownNodes(this.scene, now.accessories);
+    this.#model.traverse((part) => {
+      if (part.name.startsWith("Thingy_Accessory_"))
+        part.visible = shown.includes(part.name);
+    });
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
-        detail: { pose: now.pose, tool: now.tool, motion: this.playing },
+        detail: {
+          pose: now.pose,
+          accessories: now.accessories,
+          motion: this.playing,
+        },
         bubbles: true,
         composed: true,
       }),
@@ -699,7 +705,11 @@ export class ThingyCharacter extends HTMLElement {
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
-        detail: { pose: this.pose, tool: this.tool, motion: this.playing },
+        detail: {
+          pose: this.pose,
+          accessories: this.accessories,
+          motion: this.playing,
+        },
         bubbles: true,
         composed: true,
       }),
@@ -776,7 +786,7 @@ export class ThingyCharacter extends HTMLElement {
     this.#renderer?.dispose();
     this.#renderer = undefined;
     this.#model = undefined;
-    this.#currentOutfit = undefined;
+    this.#currentScene = undefined;
     this.#currentVersion = undefined;
     this.#faceMap = undefined;
     this.#shadow = undefined;

@@ -3,12 +3,14 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import validator from "gltf-validator";
 const root = fileURLToPath(new URL("../", import.meta.url));
-for (const version of ["v0.10", "v0.14"]) {
+for (const version of ["v0.10", "v0.14", "v0.15"]) {
   const publicRoot = `${root}public/character/${version}/`;
   const manifest = JSON.parse(readFileSync(`${publicRoot}manifest.json`));
   if (manifest.faceSheet)
     assert(statSync(`${publicRoot}${manifest.faceSheet}`).size > 100);
-  for (const [key, outfit] of Object.entries(manifest.outfits)) {
+  for (const [key, outfit] of Object.entries(
+    manifest.scenes ?? manifest.outfits,
+  )) {
     const bytes = readFileSync(`${publicRoot}${outfit.model}`);
     assert(bytes.length < 6 * 1024 * 1024, `${key}: delivery budget exceeded`);
     const jsonLength = bytes.readUInt32LE(12);
@@ -22,7 +24,19 @@ for (const version of ["v0.10", "v0.14"]) {
       json.animations.map((a) => a.name).sort(),
       [...Object.keys(manifest.poses), ...(outfit.toolClips ?? [])].sort(),
     );
-    if (outfit.toolClips) {
+    if (manifest.license) {
+      assert.equal(manifest.license.name, "CC BY-NC 4.0", "manifest licence");
+      assert.match(json.asset.copyright, /CC BY-NC 4\.0/, `${key}: licence`);
+    }
+    // Each accessory is its own mesh, so a page can show or hide it.
+    for (const slot of outfit.slots ?? [])
+      for (const option of slot.options)
+        for (const name of [option.node, option.absentNode].filter(Boolean))
+          assert(
+            json.nodes.some((n) => n.name === name && n.mesh !== undefined),
+            `${key}: ${name}`,
+          );
+    if (outfit.toolClips && manifest.tools) {
       // Each tool is its own mesh, so a page can show one at a time.
       for (const tool of Object.values(manifest.tools).filter((t) => t.node))
         assert(

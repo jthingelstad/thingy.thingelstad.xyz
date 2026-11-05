@@ -60,7 +60,7 @@ test("caching keeps entry points short and hashed bundles long", () => {
   for (const file of [
     "character/latest/librarian.glb",
     "character/latest/manifest.json",
-    "character/latest/poses/librarian-hello.webp",
+    "character/latest/poses/library-hello.webp",
   ])
     assert.equal(cacheControl(file), "public, max-age=300", file);
   for (const file of [

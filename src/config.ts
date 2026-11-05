@@ -1,31 +1,8 @@
-export const VERSION = "v0.10";
-/** Every published model, oldest first. An outfit a version lacks stays on VERSION. */
-export const VERSIONS = {
-  "v0.10": ["librarian", "trail", "workshop", "concert"],
-  "v0.14": ["librarian", "trail", "workshop", "concert"],
-} as const;
-export type Version = keyof typeof VERSIONS;
-/** `version="latest"` asks for the newest model that outfit has. */
+/** Every model the component can draw, oldest first. Older files stay published. */
+export const VERSIONS = ["v0.15"] as const;
+export type Version = (typeof VERSIONS)[number];
+/** `version="latest"`, or no version at all, asks for the newest model. */
 export const LATEST = "latest";
-export const OUTFITS = {
-  librarian: {
-    label: "Librarian",
-    description:
-      "Navy wool, an orange bow tie, and a pocket full of useful things.",
-  },
-  trail: {
-    label: "Trail companion",
-    description: "A forest-green shell, a daypack, and room for another route.",
-  },
-  workshop: {
-    label: "Workshop Builder",
-    description: "Canvas, rolled sleeves, and something to show you.",
-  },
-  concert: {
-    label: "Concert companion",
-    description: "Headphones on. Listening closely.",
-  },
-} as const;
 export const POSES = {
   hello: { label: "Hello", frame: 49 },
   present: { label: "Present", frame: 1 },
@@ -78,29 +55,102 @@ export const TOOL_POSES = {
   work: { label: "Work", frame: 1 },
 } as const;
 const HAND_TOOL_POSES = ["carry", "show", "work"] as const;
-export const TOOLS = {
-  none: { label: "Empty hands", poses: ["hello", "thinking", "rest"] },
-  screwdriver: { label: "Screwdriver", poses: HAND_TOOL_POSES },
-  hammer: { label: "Hammer", poses: HAND_TOOL_POSES },
-  drill: { label: "Drill", poses: HAND_TOOL_POSES },
-  laptop: { label: "Laptop", poses: ["present"] },
-} as const;
-export type Outfit = keyof typeof OUTFITS;
 export type Pose = keyof typeof POSES;
 export type ToolPose = keyof typeof TOOL_POSES;
 export type AnyPose = Pose | ToolPose;
-export type Tool = keyof typeof TOOLS;
 export const ALL_POSES = { ...POSES, ...TOOL_POSES } as const;
+/**
+ * One thing he can have with him. The model has a mesh for it, named
+ * Thingy_Accessory_<id>. `poses` keeps it to the poses it was made for, and
+ * `absent` names the mesh that takes its place when it comes off.
+ */
+export type Accessory = {
+  id: string;
+  label: string;
+  poses?: readonly AnyPose[];
+  absent?: string;
+};
+/**
+ * A place for accessories, of which he has one at a time. With `empty` he can
+ * have none of them, and the page offers that as a choice. With no `empty` and one
+ * accessory, the page offers it as on or off. `standard` is what he has unless
+ * told otherwise.
+ */
+export type Slot = {
+  id: string;
+  options: readonly Accessory[];
+  empty?: { label: string; poses?: readonly AnyPose[] };
+  standard?: string;
+};
+/**
+ * Where he is, what he is wearing there, and what he can have with him. To add a
+ * scene, add it here and publish a model with its name: the page and the embed
+ * offer whatever this says.
+ */
+export type Scene = {
+  label: string;
+  /** Has a still for each pose. Any other scene's only still is `present`. */
+  posedStills?: boolean;
+  slots: readonly Slot[];
+};
+export const SCENES = {
+  library: {
+    label: "Library",
+    posedStills: true,
+    slots: [],
+  },
+  outdoors: {
+    label: "Outdoors",
+    slots: [
+      {
+        id: "pack",
+        standard: "backpack",
+        options: [{ id: "backpack", label: "Backpack" }],
+      },
+    ],
+  },
+  workshop: {
+    label: "Workshop",
+    posedStills: true,
+    slots: [
+      {
+        id: "hand",
+        empty: {
+          label: "Empty hands",
+          poses: ["hello", "thinking", "rest"],
+        },
+        options: [
+          { id: "screwdriver", label: "Screwdriver", poses: HAND_TOOL_POSES },
+          { id: "hammer", label: "Hammer", poses: HAND_TOOL_POSES },
+          { id: "drill", label: "Drill", poses: HAND_TOOL_POSES },
+          { id: "laptop", label: "Laptop", poses: ["present"] },
+        ],
+      },
+    ],
+  },
+  concert: {
+    label: "Concert",
+    slots: [
+      {
+        id: "ears",
+        standard: "headphones",
+        options: [{ id: "headphones", label: "Headphones", absent: "ears" }],
+      },
+    ],
+  },
+} as const satisfies Record<string, Scene>;
+export type SceneKey = keyof typeof SCENES;
+export const SCENE_KEYS = Object.keys(SCENES) as SceneKey[];
 export type CharacterState = {
-  outfit: Outfit;
+  scene: SceneKey;
   pose: Pose;
   light: boolean;
   motion: boolean;
 };
-export function outfit(value: string | null | undefined): Outfit {
-  return value && Object.hasOwn(OUTFITS, value)
-    ? (value as Outfit)
-    : "librarian";
+export function scene(value: string | null | undefined): SceneKey {
+  return value && Object.hasOwn(SCENES, value)
+    ? (value as SceneKey)
+    : "library";
 }
 export function pose(value: string | null | undefined): Pose {
   return value && Object.hasOwn(POSES, value) ? (value as Pose) : "present";
@@ -111,44 +161,85 @@ export function anyPose(value: string | null | undefined): AnyPose {
     ? (value as AnyPose)
     : "present";
 }
-export function tool(value: string | null | undefined): Tool {
-  return value && Object.hasOwn(TOOLS, value) ? (value as Tool) : "none";
-}
-/** Only the v0.14 Workshop Builder has tools he can change in the browser. */
-export function hasTools(key: Outfit, version: Version): boolean {
-  return key === "workshop" && version !== "v0.10";
+const slotsOf = (key: SceneKey): readonly Slot[] => SCENES[key].slots;
+/** Every accessory a scene has, with the slot it goes in. */
+export function accessoriesIn(key: SceneKey): (Accessory & { slot: Slot })[] {
+  return slotsOf(key).flatMap((slot) =>
+    slot.options.map((option) => ({ ...option, slot })),
+  );
 }
 /**
- * What he is actually doing, given what was asked. A tool has its own poses, so
- * asking for another moves to the tool's first. With no tool named, `present` is
- * the laptop, as it always has been on the Workshop Builder.
+ * What an `accessories` value asks for in this scene: a comma list, or `none`.
+ * Anything a scene doesn't have is dropped, and a slot keeps its first. With
+ * no value at all he has what the scene gives him.
+ */
+export function accessories(
+  key: SceneKey,
+  value: string | null | undefined,
+): string[] {
+  if (value == null)
+    return slotsOf(key).flatMap((slot) =>
+      slot.standard ? [slot.standard] : [],
+    );
+  const asked = value.split(",").map((word) => word.trim());
+  return slotsOf(key).flatMap((slot) => {
+    const held = slot.options.find((option) => asked.includes(option.id));
+    return held ? [held.id] : [];
+  });
+}
+/** An `accessories` value: never empty, because no value means something else. */
+export function accessoriesValue(held: readonly string[]): string {
+  return held.length ? held.join(",") : "none";
+}
+/**
+ * What he is actually doing, given what was asked. An accessory can have its own
+ * poses, so asking for another moves to its first. With no accessory named, `present`
+ * in the Workshop brings the laptop, the one thing he presents with.
  */
 export function stageOf(
-  key: Outfit,
-  version: Version,
-  wantedTool: string | null | undefined,
+  key: SceneKey,
+  wantedAccessories: string | null | undefined,
   wantedPose: string | null | undefined,
-): { tool: Tool; pose: AnyPose; clip: string; frame: number } {
+): { accessories: string[]; pose: AnyPose; clip: string; frame: number } {
   const asked = anyPose(wantedPose);
-  if (!hasTools(key, version)) {
-    const still = Object.hasOwn(POSES, asked) ? (asked as Pose) : "present";
-    return {
-      tool: "none",
-      pose: still,
-      clip: still,
-      frame: POSES[still].frame,
-    };
+  let held = accessories(key, wantedAccessories);
+  if (wantedAccessories == null && !posesFor(key, held).includes(asked)) {
+    const fits = accessoriesIn(key).find((item) => item.poses?.includes(asked));
+    if (fits) held = [fits.id];
   }
-  const held =
-    wantedTool == null && asked === "present" ? "laptop" : tool(wantedTool);
-  const poses: readonly AnyPose[] = TOOLS[held].poses;
-  const chosen = poses.includes(asked) ? asked : poses[0];
+  const offered = posesFor(key, held);
+  const chosen = offered.includes(asked) ? asked : offered[0]!;
+  const tool = accessoriesIn(key).find(
+    (item) => held.includes(item.id) && item.poses,
+  );
   return {
-    tool: held,
+    accessories: held,
     pose: chosen,
-    clip: chosen in TOOL_POSES ? `${held}-${chosen}` : chosen,
+    clip: chosen in TOOL_POSES ? `${tool!.id}-${chosen}` : chosen,
     frame: ALL_POSES[chosen].frame,
   };
+}
+/** The poses a page may offer, given what he has with him. */
+export function posesFor(key: SceneKey, held: readonly string[]): AnyPose[] {
+  const limited = accessoriesIn(key).find(
+    (item) => held.includes(item.id) && item.poses,
+  );
+  if (limited) return [...limited.poses!];
+  const empty = slotsOf(key).find(
+    (slot) =>
+      slot.empty?.poses && !slot.options.some((o) => held.includes(o.id)),
+  );
+  return [...(empty?.empty?.poses ?? (Object.keys(POSES) as Pose[]))];
+}
+/** The accessory meshes to show, by name, given what he has with him. */
+export function shownNodes(key: SceneKey, held: readonly string[]): string[] {
+  return accessoriesIn(key).flatMap((item) =>
+    held.includes(item.id)
+      ? [`Thingy_Accessory_${item.id}`]
+      : item.absent
+        ? [`Thingy_Accessory_${item.absent}`]
+        : [],
+  );
 }
 export function face(value: string | null | undefined): string {
   return value && Object.hasOwn(FACES, value) ? value : "original";
@@ -158,21 +249,10 @@ export function faceOffset(cell: number): [number, number] {
   const { columns, rows } = FACE_ATLAS;
   return [(cell % columns) / columns, Math.floor(cell / columns) / rows];
 }
-export function modelVersion(
-  value: string | null | undefined,
-  key: Outfit,
-): Version {
-  if (value === LATEST)
-    return (Object.keys(VERSIONS) as Version[])
-      .filter((version) =>
-        (VERSIONS[version] as readonly string[]).includes(key),
-      )
-      .at(-1) as Version;
-  return value &&
-    Object.hasOwn(VERSIONS, value) &&
-    (VERSIONS[value as Version] as readonly string[]).includes(key)
+export function modelVersion(value: string | null | undefined): Version {
+  return (VERSIONS as readonly string[]).includes(value ?? "")
     ? (value as Version)
-    : VERSION;
+    : VERSIONS.at(-1)!;
 }
 /** Where the camera stands: degrees round him, degrees from straight above, zoom. */
 export type View = { azimuth: number; polar: number; zoom: number };
@@ -219,20 +299,20 @@ export const HOME_VIEW = viewValue({
     Math.PI,
   zoom: 1,
 });
-/** What an embed can say. With no `version` it stays v0.10, as it always has. */
+/** What an embed can say. */
 export type EmbedState = Omit<CharacterState, "pose"> & {
   pose: AnyPose;
   version?: string;
-  tool?: Tool;
+  accessories?: readonly string[];
   face?: string;
   view?: string;
 };
-/** The published size of each outfit on the newest model, as a page offers it. */
-export const MODEL_WEIGHT: Record<Outfit, string> = {
-  librarian: "2.5 MB",
-  trail: "1.7 MB",
-  workshop: "2.1 MB",
-  concert: "1.8 MB",
+/** The published size of each scene on the newest model, as a page offers it. */
+export const MODEL_WEIGHT: Record<SceneKey, string> = {
+  library: "2.5 MB",
+  outdoors: "2.3 MB",
+  workshop: "2.3 MB",
+  concert: "2.3 MB",
 };
 export function embedURL(
   state: EmbedState,
@@ -241,8 +321,14 @@ export function embedURL(
   const url = new URL("/embed/", origin);
   const search = new URLSearchParams();
   if (state.version) search.set("version", state.version);
-  search.set("outfit", state.outfit);
-  if (state.tool && state.tool !== "none") search.set("tool", state.tool);
+  search.set("scene", state.scene);
+  // The scene's own accessories need no saying, unless it is a pose that brings them.
+  if (
+    state.accessories &&
+    state.accessories.join() !==
+      stageOf(state.scene, null, state.pose).accessories.join()
+  )
+    search.set("accessories", accessoriesValue(state.accessories));
   search.set("pose", state.pose);
   if (state.face && state.face !== "original") search.set("face", state.face);
   search.set("light", state.light ? "on" : "off");
@@ -254,15 +340,16 @@ export function embedURL(
 // The licence asks for credit, so the code a page takes carries it.
 const CREDIT = `<p><small><a href="https://thingy.thingelstad.xyz/">Thingy</a> by <a href="https://www.thingelstad.com/">Jamie Thingelstad</a>, <a rel="license" href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></small></p>`;
 export function iframeCode(state: EmbedState): string {
-  return `<iframe src="${embedURL(state)}" title="Thingy, ${OUTFITS[state.outfit].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>\n${CREDIT}`;
+  return `<iframe src="${embedURL(state)}" title="Thingy, ${SCENES[state.scene].label}" width="360" height="400" loading="lazy" style="border:0;background:transparent"></iframe>\n${CREDIT}`;
 }
 export function posterPath(
-  key: Outfit,
+  key: SceneKey,
   selected: AnyPose = "present",
   base = "/character/",
-  version: Version = VERSION,
+  version: Version = VERSIONS.at(-1)!,
   held?: string | null,
 ): string {
-  const { clip } = stageOf(key, version, held, selected);
-  return `${base}${version}/poses/${key}-${key === "workshop" ? clip : "present"}.webp`;
+  const scene: Scene = SCENES[key];
+  const { clip } = stageOf(key, held, selected);
+  return `${base}${version}/poses/${key}-${scene.posedStills ? clip : "present"}.webp`;
 }

@@ -1,14 +1,13 @@
 import "./element";
-import { FACE_CHOICES, anyPose, outfit } from "./config";
+import { FACE_CHOICES, anyPose, scene } from "./config";
 const params = new URLSearchParams(location.search);
 const character = document.createElement("thingy-character");
 character.setAttribute("asset-base", "/character/");
-character.setAttribute("outfit", outfit(params.get("outfit")));
+character.setAttribute("scene", scene(params.get("scene")));
 character.setAttribute("pose", anyPose(params.get("pose")));
 character.setAttribute("light", params.get("light") === "on" ? "on" : "off");
 character.setAttribute("motion", params.get("motion") === "on" ? "on" : "off");
-// With none of these an address means what it always has: v0.10, as he was.
-for (const name of ["version", "tool", "view"]) {
+for (const name of ["version", "accessories", "view"]) {
   const value = params.get(name);
   if (value) character.setAttribute(name, value);
 }

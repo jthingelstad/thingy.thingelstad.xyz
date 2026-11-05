@@ -15,7 +15,7 @@ he changes here, a project that follows these addresses changes with him.
 | Part             | What it is                                                                                                                 | Where                                                                                                            |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | His persona      | Who he is, how he talks, and what he never does. The authority on him                                                      | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
-| His model        | Rigged glTF 2.0, in four outfits, with faces and tools                                                                     | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
+| His model        | Rigged glTF 2.0, in four scenes, with faces and accessories                                                                | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
 | His pictures     | Transparent stills, with no code to run                                                                                    | `https://thingy.thingelstad.xyz/character/latest/poses/<name>.webp`                                              |
 | A frame          | An iframe with him in it, with no code to run                                                                              | `https://thingy.thingelstad.xyz/embed/`                                                                          |
 | A component      | The `<thingy-character>` web component, for any framework                                                                  | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
@@ -25,23 +25,23 @@ he changes here, a project that follows these addresses changes with him.
 | His illustration | The original drawing, in the librarian's jacket. The authority on how he looks. A 220 KB PNG, for `og:image` and app icons | `https://thingy.thingelstad.xyz/thingy-original.png`                                                             |
 
 To try him without writing anything, use [the stage](https://thingy.thingelstad.xyz/).
-Dress him and turn him, then **Bring him along** gives you the code, a picture
+Choose a scene and turn him, then **Bring him along** gives you the code, a picture
 or a link for exactly what you see.
 
 ## Start with his job
 
 Thingy is the same character everywhere, and each place gives him a job. The job
-picks the outfit and how much of his personality comes through. The jobs he has
+picks the scene and how much of his personality comes through. The jobs he has
 today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-works):
 
-| Job                           | Outfit                       | Use `outfit=`                         |
-| ----------------------------- | ---------------------------- | ------------------------------------- |
-| Librarian                     | Librarian                    | `librarian`                           |
-| Builder and record keeper     | Workshop Builder             | `workshop`, with a `tool` for the job |
-| Host of Supporting Membership | Concert companion            | `concert`                             |
-| Narrator of the audio edition | None, since he is only heard |                                       |
+| Job                           | Scene                  | Use `scene=`                               |
+| ----------------------------- | ---------------------- | ------------------------------------------ |
+| Librarian                     | Library                | `library`                                  |
+| Builder and record keeper     | Workshop               | `workshop`, with `accessories` for the job |
+| Host of Supporting Membership | Concert                | `concert`                                  |
+| Narrator of the audio edition | None, he is only heard |                                            |
 
-The Trail companion, `trail`, is an outfit with no job yet.
+`outdoors` is a scene with no job yet.
 
 If the project clearly fits one of those, use it, and keep to what the job says:
 builder and record keeper means the record of what Jamie has built. If you aren't
@@ -106,25 +106,25 @@ Each of these follows the newest Thingy as written here. See
 ```html
 <img
   src="https://thingy.thingelstad.xyz/character/latest/poses/workshop-hello.webp"
-  alt="Thingy, the Workshop Builder, waving hello"
+  alt="Thingy in the Workshop, waving hello"
   width="240"
   height="240"
 />
 ```
 
-The name is `<outfit>-<pose>.webp`, 1000 px square and transparent, with a tool or a
+The name is `<scene>-<pose>.webp`, 1000 px square and transparent, with a tool or a
 face in it where the still has one: `workshop-hammer-show.webp`,
-`librarian-rest-delighted.webp`.
+`library-rest-delighted.webp`.
 
-- **Every outfit has `present`.** The Trail companion and Concert companion have
-  only that, named by `poster` in the manifest. In `workshop-present` he holds the
-  laptop.
-- **The Librarian's stills also have faces, and the Workshop Builder's have tools.**
-  `stills` for each outfit in the
+- **Every scene has `present`.** Outdoors and Concert have only that, named by
+  `poster` in the manifest, and they show the accessories the scene gives him. In
+  `workshop-present` he holds the laptop.
+- **The Library's stills also have faces, and the Workshop's have tools.**
+  `stills` for each scene in the
   [manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
   them. A still shows the `original` face unless its name gives another.
 - **For anything with no still,** use the frame or the component, which draw any
-  outfit, pose, tool and face. **Download picture** on the stage also draws one, but
+  scene, pose, accessory and face. **Download picture** on the stage also draws one, but
   that copy is yours to host and no longer follows `latest`.
 - **Your policy and your background.** A strict content security policy needs the
   host in `img-src`. He is made for a light page: on a very dark one, his legs and
@@ -136,8 +136,8 @@ face in it where the still has one: `workshop-hammer-show.webp`,
 
 ```html
 <iframe
-  src="https://thingy.thingelstad.xyz/embed/?version=latest&outfit=workshop&tool=hammer&pose=show&face=proud&light=off&motion=off"
-  title="Thingy, the Workshop Builder"
+  src="https://thingy.thingelstad.xyz/embed/?version=latest&scene=workshop&accessories=hammer&pose=show&face=proud&light=off&motion=off"
+  title="Thingy in the Workshop"
   width="360"
   height="400"
   loading="lazy"
@@ -147,10 +147,10 @@ face in it where the still has one: `workshop-hammer-show.webp`,
 
 It is transparent, with no controls around him, and runs nothing on your page, so
 a strict content security policy needs only the host in `frame-src`. It takes
-`version`, `outfit`, `pose`, `tool`, `face`, `light`, `motion` and `view`. Always
-pass `version=latest` or a numbered version with its `v`: with none, or with `0.14`,
-the frame shows v0.10 without warning, which has no faces or tools. `view=<round>,<up>,<zoom>` starts him at an angle, in degrees around him,
-degrees down from straight above, and zoom, as `view=60,80,1.2`.
+`version`, `scene`, `accessories`, `pose`, `face`, `light`, `motion` and `view`.
+Anything `version` doesn't recognize means the newest model. `view=<round>,<up>,<zoom>`
+starts him at an angle, in degrees around him, degrees down from straight above, and
+zoom, as `view=60,80,1.2`.
 
 ### The component
 
@@ -158,7 +158,7 @@ degrees down from straight above, and zoom, as `view=60,80,1.2`.
 <script type="module" src="https://thingy.thingelstad.xyz/thingy.js"></script>
 <thingy-character
   version="latest"
-  outfit="librarian"
+  scene="library"
   pose="hello"
   face="idle"
   light="off"
@@ -169,21 +169,21 @@ degrees down from straight above, and zoom, as `view=60,80,1.2`.
 
 It works in plain HTML or any framework. Change an attribute and he changes.
 
-| Attribute    | Values                                                                       |
-| ------------ | ---------------------------------------------------------------------------- |
-| `version`    | `latest` or `v0.14`, with the `v`. Anything else shows v0.10 without warning |
-| `outfit`     | `librarian`, `workshop`, `concert`, `trail`                                  |
-| `pose`       | See [poses](#poses). Without one he stands in `present`, so set it           |
-| `face`       | See [faces](#faces)                                                          |
-| `tool`       | See [tools](#tools). Workshop outfit only                                    |
-| `light`      | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
-| `motion`     | `on` or `off`. It obeys reduced motion even when `on`                        |
-| `blink`      | `on` blinks the faces that can, never under reduced motion                   |
-| `view`       | The angle he starts at, written as the frame's `view` is                     |
-| `zoom`       | `off` leaves the mouse wheel to the page                                     |
-| `poster`     | An image to show until the model is ready                                    |
-| `view-label` | The canvas's accessible name                                                 |
-| `asset-base` | Another directory to load the models from, when hosting the files yourself   |
+| Attribute     | Values                                                                       |
+| ------------- | ---------------------------------------------------------------------------- |
+| `version`     | `latest` or `v0.15`, with the `v`. Anything else is the newest               |
+| `scene`       | `library`, `outdoors`, `workshop`, `concert`                                 |
+| `pose`        | See [poses](#poses). Without one he stands in `present`, so set it           |
+| `face`        | See [faces](#faces)                                                          |
+| `accessories` | See [accessories](#accessories). A comma list, or `none`                     |
+| `light`       | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
+| `motion`      | `on` or `off`. It obeys reduced motion even when `on`                        |
+| `blink`       | `on` blinks the faces that can, never under reduced motion                   |
+| `view`        | The angle he starts at, written as the frame's `view` is                     |
+| `zoom`        | `off` leaves the mouse wheel to the page                                     |
+| `poster`      | An image to show until the model is ready                                    |
+| `view-label`  | The canvas's accessible name                                                 |
+| `asset-base`  | Another directory to load the models from, when hosting the files yourself   |
 
 - **Events:** `thingy-ready`, `thingy-change`, `thingy-view` as he turns,
   `thingy-tap` on a press that barely moves, and `thingy-fallback` when he falls
@@ -208,7 +208,7 @@ stays if anything fails. Ask Thingy's front page does this, in
 <div style="position:relative;width:240px;height:240px">
   <img
     id="thingy-still"
-    src="https://thingy.thingelstad.xyz/character/latest/poses/librarian-hello.webp"
+    src="https://thingy.thingelstad.xyz/character/latest/poses/library-hello.webp"
     alt="Thingy, waving"
     width="240"
     height="240"
@@ -224,7 +224,7 @@ stays if anything fails. Ask Thingy's front page does this, in
       await import("https://thingy.thingelstad.xyz/thingy.js");
       const thingy = document.createElement("thingy-character");
       thingy.setAttribute("version", "latest");
-      thingy.setAttribute("outfit", "librarian");
+      thingy.setAttribute("scene", "library");
       thingy.setAttribute("pose", "hello");
       thingy.setAttribute("zoom", "off");
       thingy.setAttribute("poster", still.src);
@@ -244,7 +244,7 @@ stays if anything fails. Ask Thingy's front page does this, in
 
 ### The model
 
-Load `https://thingy.thingelstad.xyz/character/latest/<outfit>.glb` with
+Load `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
 decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
 in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
@@ -252,19 +252,21 @@ shared rig of 40 joints.
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
-- **Tools** are skinned nodes in `workshop.glb`, named `Thingy_Tool_<name>`, with
-  clips named `<tool>-<pose>`. Show one node at a time.
+- **Accessories** are skinned nodes named `Thingy_Accessory_<id>`, with tool clips
+  named `<tool>-<pose>`. Show the ones he has and hide the rest. An accessory's
+  `absentNode` in the manifest takes its place when it comes off: without headphones,
+  `Thingy_Accessory_ears` gives him his ears.
 - **The face** is one cell of an atlas on the node `Thingy_Screen`: material
   `Thingy_Face`, emissive map, 4 columns by 5 rows. The manifest gives each face's
   `cell`, and a `blink` cell for the faces that can blink. `faces.webp` is the same
   atlas, small, for a page offering the faces.
 - **The antenna** is the material `Thingy_Beacon`.
 
-## Poses, faces and tools
+## Poses, faces and accessories
 
 ### Poses
 
-`hello`, `present`, `thinking` and `rest`, in every outfit. On a page where people
+`hello`, `present`, `thinking` and `rest`, in every scene. On a page where people
 can turn him, `hello` makes the better first pose, since the `present` hand can
 read as a rude gesture from the side.
 
@@ -287,27 +289,44 @@ read as a rude gesture from the side.
 A face means what it says here, so show `found-it` only when he found something.
 There is also `off`, which is never shown to a reader.
 
-### Tools
+### Accessories
 
-For the `workshop` outfit:
+What he can have with him depends on the scene. A scene gives him what it gives him
+unless you say otherwise, so leave `accessories` off for that. Otherwise name what
+he has, separated by commas, or say `none`.
 
-| Tool                             | Poses                       |
+| Scene      | Accessories                      | With none | Unless told otherwise |
+| ---------- | -------------------------------- | --------- | --------------------- |
+| `library`  | None                             |           |                       |
+| `outdoors` | `backpack`                       | Off       | `backpack`            |
+| `workshop` | `screwdriver`, `hammer`, `drill` | Empty     | Empty hands           |
+| `workshop` | `laptop`                         | Empty     | `laptop` in `present` |
+| `concert`  | `headphones`                     | Off       | `headphones`          |
+
+Some accessories keep to the poses they were made for:
+
+| In the Workshop                  | Poses                       |
 | -------------------------------- | --------------------------- |
 | `screwdriver`, `hammer`, `drill` | `carry`, `show`, `work`     |
 | `laptop`                         | `present`                   |
 | `none`                           | `hello`, `thinking`, `rest` |
 
 `carry` holds the tool at his side, `show` holds it up, and `work` raises it to use
-it. Leave `tool` off and `present` holds the laptop. Asking for a pose the tool does
-not have moves him to the tool's first pose. Tool poses are single frames, so
-`motion` has nothing to play.
+it. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+the Workshop holds the laptop. Asking for a pose the accessory does not have moves
+him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
+An accessory a scene doesn't have is ignored. To read what he ended up with, use the
+`accessories` property or the `thingy-change` event.
+
+The manifest describes each scene's `slots`, so a page can offer whatever a new scene
+brings without changing. A slot holds one accessory at a time.
 
 ## Follow him or keep him
 
 | You want                  | Use                                     | Changes                                       |
 | ------------------------- | --------------------------------------- | --------------------------------------------- |
 | The newest Thingy, always | `version="latest"`, `character/latest/` | When this site does, within five minutes      |
-| One Thingy, for good      | `version="v0.14"`, `character/v0.14/`   | Never                                         |
+| One Thingy, for good      | `version="v0.15"`, `character/v0.15/`   | Never                                         |
 | His persona               | `persona.md`                            | When Jamie approves a change, within a minute |
 
 Use `latest` unless a page needs one model forever.
@@ -329,8 +348,10 @@ fail first.
 What this site keeps to:
 
 - Published addresses stay. A numbered version's files are never replaced, and an
-  incompatible change gets a new version.
-- Pose, outfit and face names stay.
+  incompatible change gets a new version. The component draws v0.15 on. The older
+  files, v0.10 and v0.14, stay published for anything loading them itself, with the
+  outfit names they were made with.
+- Pose, scene and face names stay.
 - `character/latest/` holds what the newest version holds, at the same names.
 - `https://thingy.thingelstad.xyz/revision.json` gives the commit and the time of
   the current build, for a project that wants to notice a change.
@@ -344,7 +365,7 @@ Two sites to read as examples:
   page. The rules it keeps are in its
   [AGENTS.md](https://github.com/jthingelstad/thingy.thingelstad.com/blob/main/AGENTS.md).
 - **Things I've Built** ([code](https://github.com/jthingelstad/thingelstad.xyz))
-  follows `latest` with stills alone, and keeps its job, outfit and register in
+  follows `latest` with stills alone, and keeps its job, scene and register in
   [docs/THINGY.md](https://github.com/jthingelstad/thingelstad.xyz/blob/main/docs/THINGY.md),
   a good pattern for a new project to copy.
 
@@ -384,5 +405,5 @@ marks.
   [`persona.md`](https://thingy.thingelstad.xyz/persona.md) before writing anything
   in his voice.
 - [`manifest.json`](https://thingy.thingelstad.xyz/character/latest/manifest.json)
-  is the machine-readable list of outfits, poses, faces, tools and stills. Trust it
+  is the machine-readable list of scenes, poses, faces, accessories and stills. Trust it
   over this page if they ever differ.

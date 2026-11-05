@@ -8,20 +8,20 @@ import {
   HOME_VIEW,
   LATEST,
   MODEL_WEIGHT,
-  OUTFITS,
   POSES,
-  TOOLS,
+  SCENES,
+  accessoriesIn,
+  accessoriesValue,
   anyPose,
-  hasTools,
   iframeCode,
-  stageOf,
-  outfit,
   parseView,
+  posesFor,
   posterPath,
+  scene,
+  stageOf,
   type AnyPose,
   type CharacterState,
-  type Tool,
-  type Version,
+  type Slot,
 } from "./config";
 import { icon } from "./icons";
 
@@ -30,23 +30,20 @@ const $ = <T extends HTMLElement = HTMLElement>(selector: string): T =>
 for (const node of document.querySelectorAll<HTMLElement>("[data-icon]"))
   node.innerHTML = icon(node.dataset.icon!);
 const params = new URLSearchParams(location.search);
-/** The studio shows the newest model, the one with faces and tools. */
-const MODEL: Version = "v0.14";
-const firstOutfit = outfit(params.get("outfit"));
+const firstScene = scene(params.get("scene"));
 const first = stageOf(
-  firstOutfit,
-  MODEL,
-  params.get("tool"),
+  firstScene,
+  params.get("accessories"),
   params.get("pose"),
 );
 const state: Omit<CharacterState, "pose"> & {
   pose: AnyPose;
-  tool: Tool;
+  accessories: string[];
   face: string;
 } = {
-  outfit: firstOutfit,
+  scene: firstScene,
   pose: first.pose,
-  tool: first.tool,
+  accessories: first.accessories,
   // A face must be one a reader may choose, whatever the address says.
   face: Object.hasOwn(FACE_CHOICES, params.get("face") ?? "")
     ? params.get("face")!
@@ -58,18 +55,40 @@ const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
 // A shared link brings the angle with it. Set before the element starts.
 if (parseView(params.get("view")))
   character.setAttribute("view", params.get("view")!);
-$("#outfit-options").innerHTML = Object.entries(OUTFITS)
+$("#scene-options").innerHTML = Object.entries(SCENES)
   .map(
     ([id, item]) =>
-      `<label class="outfit-option"><input type="radio" name="outfit" value="${id}" ${id === state.outfit ? "checked" : ""}><span>${item.label}</span></label>`,
+      `<label class="scene-option"><input type="radio" name="scene" value="${id}" ${id === state.scene ? "checked" : ""}><span>${item.label}</span></label>`,
   )
   .join("");
-$("#tool-options").innerHTML = Object.entries(TOOLS)
-  .map(
-    ([id, item]) =>
-      `<button class="tool-option" data-tool="${id}" aria-pressed="false">${icon(id)}<span>${item.label}</span></button>`,
-  )
-  .join("");
+const slotsHere = (): readonly Slot[] => SCENES[state.scene].slots;
+/** A slot with one thing in it is on or off; a slot with several is a choice. */
+function accessoryButtons(slot: Slot): string {
+  const button = (id: string, label: string) =>
+    `<button class="accessory-option" data-slot="${slot.id}" data-accessory="${id}" aria-pressed="false">${icon(id || "none")}<span>${label}</span></button>`;
+  return [
+    ...(slot.empty ? [button("", slot.empty.label)] : []),
+    ...slot.options.map((option) => button(option.id, option.label)),
+  ].join("");
+}
+function syncAccessories(): void {
+  const options = $("#accessory-options");
+  if (options.dataset.scene !== state.scene) {
+    options.innerHTML = slotsHere().map(accessoryButtons).join("");
+    options.dataset.scene = state.scene;
+  }
+  for (const button of options.querySelectorAll<HTMLElement>(
+    "[data-accessory]",
+  )) {
+    const id = button.dataset.accessory!;
+    const slot = slotsHere().find((item) => item.id === button.dataset.slot)!;
+    const heldHere = slot.options.some((o) => state.accessories.includes(o.id));
+    button.setAttribute(
+      "aria-pressed",
+      String(id ? state.accessories.includes(id) : !heldHere),
+    );
+  }
+}
 $("#face-options").innerHTML = Object.entries(FACE_CHOICES)
   .map(([id, item]) => {
     const { cell } = FACES[id];
@@ -80,25 +99,27 @@ $("#face-options").innerHTML = Object.entries(FACE_CHOICES)
   })
   .join("");
 
-function posesOnOffer(): readonly AnyPose[] {
-  return hasTools(state.outfit, MODEL)
-    ? TOOLS[state.tool].poses
-    : (Object.keys(POSES) as AnyPose[]);
-}
 /** The sheet's tabs say what is chosen; only the phone and tablet layouts show them. */
 function syncSheet(): void {
   const controls = $("#controls");
-  const toolsOn = hasTools(state.outfit, MODEL);
-  if (!toolsOn && controls.dataset.tab === "tool")
-    controls.dataset.tab = "outfit";
+  const hasAccessories = slotsHere().length > 0;
+  if (!hasAccessories && controls.dataset.tab === "accessories")
+    controls.dataset.tab = "scene";
   for (const tab of document.querySelectorAll<HTMLElement>("[data-sheet-tab]"))
     tab.setAttribute(
       "aria-expanded",
       String(tab.dataset.sheetTab === controls.dataset.tab),
     );
-  $('[data-sheet-tab="tool"]').hidden = !toolsOn;
-  $("#tab-outfit").textContent = OUTFITS[state.outfit].label.split(" ")[0]!;
-  $("#tab-tool").textContent = TOOLS[state.tool].label.split(" ")[0]!;
+  $('[data-sheet-tab="accessories"]').hidden = !hasAccessories;
+  $("#tab-scene").textContent = SCENES[state.scene].label;
+  const held = accessoriesIn(state.scene).find((item) =>
+    state.accessories.includes(item.id),
+  );
+  $("#tab-accessories").textContent = held
+    ? held.label
+    : slotsHere().find((slot) => slot.empty)
+      ? "None"
+      : "Off";
   $("#tab-pose").textContent = ALL_POSES[state.pose].label;
   $("#tab-face").textContent = FACE_CHOICES[state.face]!.label;
 }
@@ -111,10 +132,12 @@ function turnedTo(): string | undefined {
 function studioAddress(): string {
   const url = new URL(location.href);
   url.hash = "";
-  url.searchParams.set("outfit", state.outfit);
+  url.searchParams.set("scene", state.scene);
   url.searchParams.set("pose", state.pose);
-  if (state.tool === "none") url.searchParams.delete("tool");
-  else url.searchParams.set("tool", state.tool);
+  const standard = stageOf(state.scene, null, state.pose).accessories;
+  if (state.accessories.join() === standard.join())
+    url.searchParams.delete("accessories");
+  else url.searchParams.set("accessories", accessoriesValue(state.accessories));
   if (state.face === "original") url.searchParams.delete("face");
   else url.searchParams.set("face", state.face);
   if (state.light) url.searchParams.set("light", "on");
@@ -140,12 +163,14 @@ const IDLE_WORDS = {
 /** He has changed, so "copied" and "saved" no longer describe him. */
 function syncBring(): void {
   syncTaken();
-  const bits: string[] = [OUTFITS[state.outfit].label];
-  if (state.tool !== "none") bits.push(TOOLS[state.tool].label.toLowerCase());
+  const bits: string[] = [SCENES[state.scene].label];
+  for (const item of accessoriesIn(state.scene))
+    if (state.accessories.includes(item.id))
+      bits.push(item.label.toLowerCase());
   bits.push(ALL_POSES[state.pose].label, FACE_CHOICES[state.face]!.label);
   $("#bring-summary").textContent = `${bits.join(", ")}.`;
   for (const node of document.querySelectorAll(".bring-weight"))
-    node.textContent = MODEL_WEIGHT[state.outfit];
+    node.textContent = MODEL_WEIGHT[state.scene];
   for (const [selector, words] of Object.entries(IDLE_WORDS))
     $(selector).textContent = words;
   for (const way of document.querySelectorAll<HTMLElement>(".way"))
@@ -155,9 +180,15 @@ function syncCharacter(): void {
   for (const [name, value] of Object.entries(state))
     character.setAttribute(
       name,
-      typeof value === "boolean" ? (value ? "on" : "off") : value,
+      Array.isArray(value)
+        ? accessoriesValue(value)
+        : typeof value === "boolean"
+          ? value
+            ? "on"
+            : "off"
+          : value,
     );
-  const offered = posesOnOffer();
+  const offered = posesFor(state.scene, state.accessories);
   const options = $("#pose-options");
   if (options.dataset.offered !== offered.join())
     options.innerHTML = offered
@@ -172,13 +203,9 @@ function syncCharacter(): void {
       "aria-pressed",
       String(button.dataset.pose === state.pose),
     );
-  $("#tools").hidden = !hasTools(state.outfit, MODEL);
+  $("#accessories").hidden = !slotsHere().length;
+  syncAccessories();
   syncSheet();
-  for (const button of document.querySelectorAll<HTMLElement>("[data-tool]"))
-    button.setAttribute(
-      "aria-pressed",
-      String(button.dataset.tool === state.tool),
-    );
   for (const button of document.querySelectorAll<HTMLElement>("[data-face]"))
     button.setAttribute(
       "aria-pressed",
@@ -209,21 +236,34 @@ function toggleSheet(tab: string): void {
   syncSheet();
 }
 $("#bring-toggle").addEventListener("click", () => toggleSheet("bring"));
-$("#outfit-options").addEventListener("change", (event) => {
-  state.outfit = outfit((event.target as HTMLInputElement).value);
-  const now = stageOf(state.outfit, MODEL, null, state.pose);
+$("#scene-options").addEventListener("change", (event) => {
+  state.scene = scene((event.target as HTMLInputElement).value);
+  // He arrives with what the scene gives him.
+  const now = stageOf(state.scene, null, state.pose);
   state.pose = now.pose;
-  state.tool = now.tool;
+  state.accessories = now.accessories;
   syncCharacter();
 });
-$("#tool-options").addEventListener("click", (event) => {
-  const button = (event.target as Element).closest<HTMLElement>("[data-tool]");
-  if (button) {
-    const now = stageOf(state.outfit, MODEL, button.dataset.tool, state.pose);
-    state.tool = now.tool;
-    state.pose = now.pose;
-    syncCharacter();
-  }
+$("#accessory-options").addEventListener("click", (event) => {
+  const button = (event.target as Element).closest<HTMLElement>(
+    "[data-accessory]",
+  );
+  if (!button) return;
+  const id = button.dataset.accessory!;
+  const slot = slotsHere().find((item) => item.id === button.dataset.slot)!;
+  const others = state.accessories.filter(
+    (held) => !slot.options.some((option) => option.id === held),
+  );
+  // One thing a slot holds is a switch; of several, the one chosen replaces the last.
+  const on = !slot.empty && state.accessories.includes(id);
+  const now = stageOf(
+    state.scene,
+    accessoriesValue(id && !on ? [...others, id] : others),
+    state.pose,
+  );
+  state.accessories = now.accessories;
+  state.pose = now.pose;
+  syncCharacter();
 });
 $("#face-options").addEventListener("click", (event) => {
   const button = (event.target as Element).closest<HTMLElement>("[data-face]");
@@ -339,9 +379,12 @@ $("#download").addEventListener("click", async () => {
     const picture = await character.picture();
     const link = document.createElement("a");
     link.href = URL.createObjectURL(picture);
-    const name = [state.outfit, state.tool, state.pose, state.face].filter(
-      (word) => word !== "none" && word !== "original",
-    );
+    const name = [
+      state.scene,
+      ...state.accessories,
+      state.pose,
+      state.face,
+    ].filter((word) => word !== "original");
     link.download = `thingy-${name.join("-")}.png`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(link.href), 10000);
@@ -355,6 +398,6 @@ $("#builder-lineup").innerHTML = (
 )
   .map(
     (id) =>
-      `<figure><img src="${posterPath("workshop", id)}" alt="Workshop Builder, ${POSES[id].label}" width="240" height="240" loading="lazy"><figcaption>${POSES[id].label}</figcaption></figure>`,
+      `<figure><img src="${posterPath("workshop", id)}" alt="Workshop, ${POSES[id].label}" width="240" height="240" loading="lazy"><figcaption>${POSES[id].label}</figcaption></figure>`,
   )
   .join("");
