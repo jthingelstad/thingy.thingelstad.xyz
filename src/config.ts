@@ -418,13 +418,13 @@ export type EmbedState = Omit<CharacterState, "pose"> & {
 };
 /** The published size of each scene on the newest model, as a page offers it. */
 export const MODEL_WEIGHT: Record<SceneKey, string> = {
-  library: "2.5 MB",
-  outdoors: "2.3 MB",
-  workshop: "2.6 MB",
-  concert: "2.4 MB",
-  kitchen: "0 MB",
-  winter: "0 MB",
-  cabin: "0 MB",
+  library: "2.6 MB",
+  outdoors: "2.4 MB",
+  workshop: "2.7 MB",
+  concert: "2.5 MB",
+  kitchen: "2.2 MB",
+  winter: "2.1 MB",
+  cabin: "2.1 MB",
 };
 export function embedURL(
   state: EmbedState,

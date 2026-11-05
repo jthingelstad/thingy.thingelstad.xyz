@@ -105,6 +105,7 @@ test("a scene stays out of the models made before it", () => {
   assert.equal(scene("kitchen", "v0.17"), "kitchen");
   assert.equal(scene("kitchen", "v0.16"), "library");
   assert.equal(scene("concert", "v0.15"), "concert");
+});
 test("an older model's poster is a still that model has", () => {
   assert.equal(
     posterPath("workshop", "work", "/character/", "v0.15", "laptop"),

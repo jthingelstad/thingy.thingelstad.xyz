@@ -59,6 +59,18 @@
         },
         "thinking-curious": {
           "webp": "poses/library-thinking-curious.webp"
+        },
+        "book-read": {
+          "webp": "poses/library-book-read.webp"
+        },
+        "book-show": {
+          "webp": "poses/library-book-show.webp"
+        },
+        "mug-carry": {
+          "webp": "poses/library-mug-carry.webp"
+        },
+        "mug-sip": {
+          "webp": "poses/library-mug-sip.webp"
         }
       },
       "slots": [
@@ -211,6 +223,18 @@
         },
         "plate-show": {
           "webp": "poses/workshop-plate-show.webp"
+        },
+        "mug-carry": {
+          "webp": "poses/workshop-mug-carry.webp"
+        },
+        "mug-sip": {
+          "webp": "poses/workshop-mug-sip.webp"
+        },
+        "candle-carry": {
+          "webp": "poses/workshop-candle-carry.webp"
+        },
+        "candle-show": {
+          "webp": "poses/workshop-candle-show.webp"
         }
       },
       "toolClips": [
