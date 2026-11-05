@@ -10,6 +10,7 @@ import {
   MODEL_WEIGHT,
   POSES,
   SCENES,
+  SCENE_LINES,
   accessoriesIn,
   accessoriesValue,
   anyPose,
@@ -18,6 +19,7 @@ import {
   posesFor,
   posterPath,
   scene,
+  shuffled,
   stageOf,
   type AnyPose,
   type CharacterState,
@@ -58,21 +60,26 @@ const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
 // A shared link brings the angle with it. Set before the element starts.
 if (parseView(params.get("view")))
   character.setAttribute("view", params.get("view")!);
+const TICK =
+  '<svg class="choice-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4.500 4.500L19 7"/></svg>';
+/** He stands in the scene's clothes on its poster, so it makes his portrait. */
+const scenePortrait = (id: string): string =>
+  posterPath(id as keyof typeof SCENES, "present");
 $("#scene-options").innerHTML = Object.entries(SCENES)
   .map(
     ([id, item]) =>
-      `<label class="scene-option"><input type="radio" name="scene" value="${id}" ${id === state.scene ? "checked" : ""}><span>${item.label}</span></label>`,
+      `<label class="scene-option"><input type="radio" name="scene" value="${id}" ${id === state.scene ? "checked" : ""}><img class="scene-thumb" src="${scenePortrait(id)}" alt="" width="40" height="40" loading="lazy"><span>${item.label}</span>${TICK}</label>`,
   )
   .join("");
 const slotsHere = (): readonly Slot[] => SCENES[state.scene].slots;
 /** A slot with one thing in it is on or off; a slot with several is a choice. */
 function accessoryButtons(slot: Slot): string {
   const button = (id: string, label: string) =>
-    `<button class="accessory-option" data-slot="${slot.id}" data-accessory="${id}" aria-pressed="false">${icon(id || "none")}<span>${label}</span></button>`;
-  return [
+    `<button type="button" class="accessory-option" data-slot="${slot.id}" data-accessory="${id}" aria-pressed="false">${icon(id || "none")}<span>${label}</span>${TICK}</button>`;
+  return `<div class="choice-group">${[
     ...(slot.empty ? [button("", slot.empty.label)] : []),
     ...slot.options.map((option) => button(option.id, option.label)),
-  ].join("");
+  ].join("")}</div>`;
 }
 function syncAccessories(): void {
   const options = $("#accessory-options");
@@ -102,7 +109,7 @@ $("#face-options").innerHTML = Object.entries(FACE_CHOICES)
   })
   .join("");
 
-/** The sheet's tabs say what is chosen; only the phone and tablet layouts show them. */
+/** The sheet's tabs say what is chosen. */
 function syncSheet(): void {
   const controls = $("#controls");
   const hasAccessories = slotsHere().length > 0;
@@ -115,6 +122,7 @@ function syncSheet(): void {
     );
   $('[data-sheet-tab="accessories"]').hidden = !hasAccessories;
   $("#tab-scene").textContent = SCENES[state.scene].label;
+  $("#scene-line").textContent = SCENE_LINES[state.scene];
   const held = accessoriesIn(state.scene).filter((item) =>
     state.accessories.includes(item.id),
   );
@@ -210,6 +218,10 @@ function syncCharacter(): void {
       "aria-pressed",
       String(button.dataset.pose === state.pose),
     );
+  for (const radio of document.querySelectorAll<HTMLInputElement>(
+    'input[name="scene"]',
+  ))
+    radio.checked = radio.value === state.scene;
   $("#accessories").hidden = !slotsHere().length;
   syncAccessories();
   syncSheet();
@@ -226,6 +238,8 @@ function syncCharacter(): void {
   // Reduced motion wins, and the switch says so rather than promising otherwise.
   const moving = state.life && !reduced.matches && !character.strained;
   $("#life-label").textContent = moving ? "Moving" : "Still";
+  // Only worth saying aloud when the switch is on and he isn't moving.
+  $("#life-label").classList.toggle("sr-only", moving || !state.life);
   // The switch keeps what was asked for; the label says what he is doing.
   $<HTMLInputElement>("#life").checked = state.life && !reduced.matches;
   $("#play-label").textContent = state.motion ? "Pause" : "Play";
@@ -248,6 +262,34 @@ function toggleSheet(tab: string): void {
   syncSheet();
 }
 $("#bring-toggle").addEventListener("click", () => toggleSheet("bring"));
+
+/** A choice of one closes the list, so he comes back into view. A switch leaves it. */
+function chosen(): void {
+  const controls = $("#controls");
+  const tab = controls.dataset.tab;
+  controls.dataset.tab = "none";
+  syncSheet();
+  $(`[data-sheet-tab="${tab}"]`).focus({ preventScroll: true });
+}
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    (event.target as Element).closest?.("#controls") &&
+    $("#controls").dataset.tab !== "none"
+  )
+    chosen();
+});
+// Arrow keys walk the radios without closing the panel, so he can be looked at in each.
+$("#scene-options").addEventListener("click", (event) => {
+  if (
+    (event as MouseEvent).detail > 0 &&
+    (event.target as Element).matches("input")
+  )
+    chosen();
+});
+$("#scene-options").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") chosen();
+});
 $("#scene-options").addEventListener("change", (event) => {
   state.scene = scene((event.target as HTMLInputElement).value);
   // He arrives with what the scene gives him.
@@ -276,6 +318,7 @@ $("#accessory-options").addEventListener("click", (event) => {
   state.accessories = now.accessories;
   state.pose = now.pose;
   syncCharacter();
+  if (slot.empty || slot.options.length > 1) chosen();
 });
 $("#face-options").addEventListener("click", (event) => {
   const button = (event.target as Element).closest<HTMLElement>("[data-face]");
@@ -290,6 +333,10 @@ $("#pose-options").addEventListener("click", (event) => {
     state.pose = anyPose(button.dataset.pose);
     syncCharacter();
   }
+});
+$("#shuffle").addEventListener("click", () => {
+  Object.assign(state, shuffled(state.scene));
+  syncCharacter();
 });
 $("#light").addEventListener("change", () => {
   state.light = $<HTMLInputElement>("#light").checked;
@@ -377,18 +424,14 @@ async function copy(
   words: string,
 ): Promise<void> {
   const label = button.querySelector("b")!;
-  const way = button.closest(".way")!;
   try {
     await navigator.clipboard.writeText(text);
     label.textContent = words;
   } catch {
-    label.textContent = "Select the text below to copy";
-    way.setAttribute("data-shown", "");
+    label.textContent = "Select the text above to copy";
   }
 }
 $("#copy").addEventListener("click", async () => {
-  // What was copied stays readable under the button.
-  $("#copy").closest(".way")!.setAttribute("data-shown", "");
   await copy(embedCode(), $("#copy"), "Embed copied");
 });
 $("#copy-link").addEventListener("click", () =>

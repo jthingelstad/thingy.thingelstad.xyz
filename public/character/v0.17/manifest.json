@@ -1,0 +1,638 @@
+{
+  "version": "0.17",
+  "format": "glTF 2.0",
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "animationFps": 24,
+  "defaultPose": "present",
+  "poses": {
+    "hello": {
+      "label": "Hello",
+      "stillFrame": 49
+    },
+    "present": {
+      "label": "Present",
+      "stillFrame": 1
+    },
+    "thinking": {
+      "label": "Thinking",
+      "stillFrame": 37
+    },
+    "rest": {
+      "label": "At rest",
+      "stillFrame": 1
+    }
+  },
+  "scenes": {
+    "library": {
+      "label": "Library",
+      "model": "library.glb",
+      "poster": "poses/library-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/library-hello.webp"
+        },
+        "present": {
+          "webp": "poses/library-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/library-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/library-rest.webp"
+        },
+        "hello-idle": {
+          "webp": "poses/library-hello-idle.webp"
+        },
+        "present-idle": {
+          "webp": "poses/library-present-idle.webp"
+        },
+        "present-proud": {
+          "webp": "poses/library-present-proud.webp"
+        },
+        "rest-delighted": {
+          "webp": "poses/library-rest-delighted.webp"
+        },
+        "rest-idle": {
+          "webp": "poses/library-rest-idle.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/library-thinking-curious.webp"
+        },
+        "book-read": {
+          "webp": "poses/library-book-read.webp"
+        },
+        "book-show": {
+          "webp": "poses/library-book-show.webp"
+        },
+        "mug-carry": {
+          "webp": "poses/library-mug-carry.webp"
+        },
+        "mug-sip": {
+          "webp": "poses/library-mug-sip.webp"
+        }
+      },
+      "slots": [
+        {
+          "id": "hand",
+          "options": [
+            {
+              "id": "book",
+              "label": "Book",
+              "node": "Thingy_Accessory_book",
+              "poses": [
+                "read",
+                "show"
+              ],
+              "steady": true
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            }
+          ],
+          "empty": {
+            "label": "Empty hands"
+          }
+        }
+      ],
+      "toolClips": [
+        "book-read",
+        "book-show",
+        "mug-carry",
+        "mug-sip"
+      ]
+    },
+    "outdoors": {
+      "label": "Outdoors",
+      "model": "outdoors.glb",
+      "poster": "poses/outdoors-present.webp",
+      "slots": [
+        {
+          "id": "pack",
+          "standard": "backpack",
+          "options": [
+            {
+              "id": "backpack",
+              "label": "Backpack",
+              "node": "Thingy_Accessory_backpack"
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "options": [
+            {
+              "id": "helmet",
+              "label": "Bike helmet",
+              "node": "Thingy_Accessory_helmet"
+            }
+          ]
+        },
+        {
+          "id": "neck",
+          "options": [
+            {
+              "id": "camera",
+              "label": "Camera",
+              "node": "Thingy_Accessory_camera"
+            }
+          ]
+        },
+        {
+          "id": "hand",
+          "options": [
+            {
+              "id": "baton",
+              "label": "Kubb baton",
+              "node": "Thingy_Accessory_baton",
+              "poses": [
+                "carry",
+                "throw"
+              ]
+            }
+          ]
+        }
+      ],
+      "toolClips": [
+        "baton-carry",
+        "baton-throw"
+      ]
+    },
+    "workshop": {
+      "label": "Workshop",
+      "model": "workshop.glb",
+      "poster": "poses/workshop-present.webp",
+      "stills": {
+        "hello": {
+          "webp": "poses/workshop-hello.webp"
+        },
+        "present": {
+          "webp": "poses/workshop-present.webp"
+        },
+        "thinking": {
+          "webp": "poses/workshop-thinking.webp"
+        },
+        "rest": {
+          "webp": "poses/workshop-rest.webp"
+        },
+        "present-proud": {
+          "webp": "poses/workshop-present-proud.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/workshop-thinking-curious.webp"
+        },
+        "screwdriver-carry": {
+          "webp": "poses/workshop-screwdriver-carry.webp"
+        },
+        "screwdriver-show": {
+          "webp": "poses/workshop-screwdriver-show.webp"
+        },
+        "screwdriver-work": {
+          "webp": "poses/workshop-screwdriver-work.webp"
+        },
+        "hammer-carry": {
+          "webp": "poses/workshop-hammer-carry.webp"
+        },
+        "hammer-show": {
+          "webp": "poses/workshop-hammer-show.webp"
+        },
+        "hammer-work": {
+          "webp": "poses/workshop-hammer-work.webp"
+        },
+        "drill-carry": {
+          "webp": "poses/workshop-drill-carry.webp"
+        },
+        "drill-show": {
+          "webp": "poses/workshop-drill-show.webp"
+        },
+        "drill-work": {
+          "webp": "poses/workshop-drill-work.webp"
+        },
+        "laptop-work": {
+          "webp": "poses/workshop-laptop-work.webp"
+        },
+        "plate-carry": {
+          "webp": "poses/workshop-plate-carry.webp"
+        },
+        "plate-show": {
+          "webp": "poses/workshop-plate-show.webp"
+        },
+        "mug-carry": {
+          "webp": "poses/workshop-mug-carry.webp"
+        },
+        "mug-sip": {
+          "webp": "poses/workshop-mug-sip.webp"
+        },
+        "candle-carry": {
+          "webp": "poses/workshop-candle-carry.webp"
+        },
+        "candle-show": {
+          "webp": "poses/workshop-candle-show.webp"
+        }
+      },
+      "toolClips": [
+        "screwdriver-carry",
+        "screwdriver-show",
+        "screwdriver-work",
+        "hammer-carry",
+        "hammer-show",
+        "hammer-work",
+        "drill-carry",
+        "drill-show",
+        "drill-work",
+        "laptop-work",
+        "plate-carry",
+        "plate-show",
+        "mug-carry",
+        "mug-sip",
+        "candle-carry",
+        "candle-show"
+      ],
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands",
+            "poses": [
+              "hello",
+              "thinking",
+              "rest"
+            ]
+          },
+          "options": [
+            {
+              "id": "screwdriver",
+              "label": "Screwdriver",
+              "node": "Thingy_Accessory_screwdriver",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "hammer",
+              "label": "Hammer",
+              "node": "Thingy_Accessory_hammer",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "drill",
+              "label": "Drill",
+              "node": "Thingy_Accessory_drill",
+              "poses": [
+                "carry",
+                "show",
+                "work"
+              ]
+            },
+            {
+              "id": "laptop",
+              "label": "Laptop",
+              "node": "Thingy_Accessory_laptop",
+              "poses": [
+                "present",
+                "work"
+              ]
+            },
+            {
+              "id": "plate",
+              "label": "3D Printing",
+              "node": "Thingy_Accessory_plate",
+              "poses": [
+                "carry",
+                "show"
+              ]
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            },
+            {
+              "id": "candle",
+              "label": "Candle",
+              "node": "Thingy_Accessory_candle",
+              "poses": [
+                "carry",
+                "show"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "printer",
+          "options": [
+            {
+              "id": "printer",
+              "label": "3D printer",
+              "node": "Thingy_Accessory_printer"
+            }
+          ]
+        }
+      ]
+    },
+    "concert": {
+      "label": "Concert",
+      "model": "concert.glb",
+      "poster": "poses/concert-present.webp",
+      "slots": [
+        {
+          "id": "ears",
+          "standard": "headphones",
+          "options": [
+            {
+              "id": "headphones",
+              "label": "Headphones",
+              "node": "Thingy_Accessory_headphones",
+              "absent": "ears",
+              "absentNode": "Thingy_Accessory_ears"
+            }
+          ]
+        },
+        {
+          "id": "neck",
+          "options": [
+            {
+              "id": "scarf",
+              "label": "Scarf",
+              "node": "Thingy_Accessory_scarf"
+            }
+          ]
+        },
+        {
+          "id": "hand",
+          "options": [
+            {
+              "id": "phone",
+              "label": "iPhone",
+              "node": "Thingy_Accessory_phone",
+              "poses": [
+                "check",
+                "hold"
+              ]
+            },
+            {
+              "id": "mic",
+              "label": "Microphone",
+              "node": "Thingy_Accessory_mic",
+              "poses": [
+                "speak",
+                "hold"
+              ]
+            }
+          ],
+          "empty": {
+            "label": "Empty hands"
+          }
+        }
+      ],
+      "toolClips": [
+        "phone-check",
+        "phone-hold",
+        "mic-speak",
+        "mic-hold"
+      ]
+    },
+    "kitchen": {
+      "label": "Kitchen",
+      "model": "kitchen.glb",
+      "poster": "poses/kitchen-present.webp",
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands"
+          },
+          "options": [
+            {
+              "id": "tongs",
+              "label": "Tongs",
+              "node": "Thingy_Accessory_tongs",
+              "poses": [
+                "carry",
+                "work"
+              ]
+            },
+            {
+              "id": "whisk",
+              "label": "Whisk",
+              "node": "Thingy_Accessory_whisk",
+              "poses": [
+                "carry",
+                "work"
+              ]
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "grill",
+          "options": [
+            {
+              "id": "grill",
+              "label": "Grill",
+              "node": "Thingy_Accessory_grill"
+            }
+          ]
+        }
+      ],
+      "toolClips": [
+        "tongs-carry",
+        "tongs-work",
+        "whisk-carry",
+        "whisk-work",
+        "mug-carry",
+        "mug-sip"
+      ]
+    },
+    "winter": {
+      "label": "Winter",
+      "model": "winter.glb",
+      "poster": "poses/winter-present.webp",
+      "slots": [
+        {
+          "id": "neck",
+          "standard": "scarf",
+          "options": [
+            {
+              "id": "scarf",
+              "label": "Scarf",
+              "node": "Thingy_Accessory_scarf"
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "options": [
+            {
+              "id": "hat",
+              "label": "Stocking hat",
+              "node": "Thingy_Accessory_hat"
+            }
+          ]
+        }
+      ]
+    },
+    "cabin": {
+      "label": "Cabin",
+      "model": "cabin.glb",
+      "poster": "poses/cabin-present.webp",
+      "slots": [
+        {
+          "id": "hand",
+          "empty": {
+            "label": "Empty hands"
+          },
+          "options": [
+            {
+              "id": "baton",
+              "label": "Kubb baton",
+              "node": "Thingy_Accessory_baton",
+              "poses": [
+                "carry",
+                "throw"
+              ]
+            },
+            {
+              "id": "mug",
+              "label": "Mug",
+              "node": "Thingy_Accessory_mug",
+              "poses": [
+                "carry",
+                "sip"
+              ]
+            }
+          ]
+        }
+      ],
+      "toolClips": [
+        "baton-carry",
+        "baton-throw",
+        "mug-carry",
+        "mug-sip"
+      ]
+    }
+  },
+  "faceAtlas": {
+    "material": "Thingy_Face",
+    "map": "emissive",
+    "columns": 4,
+    "rows": 5
+  },
+  "faces": {
+    "original": {
+      "cell": 0,
+      "blink": 5
+    },
+    "idle": {
+      "cell": 1,
+      "blink": 6
+    },
+    "thinking": {
+      "cell": 2
+    },
+    "found-it": {
+      "cell": 3
+    },
+    "oops": {
+      "cell": 4
+    },
+    "off": {
+      "cell": 7
+    },
+    "delighted": {
+      "cell": 8
+    },
+    "curious": {
+      "cell": 9,
+      "blink": 14
+    },
+    "proud": {
+      "cell": 10
+    },
+    "eager": {
+      "cell": 11,
+      "blink": 15
+    },
+    "sympathetic": {
+      "cell": 12,
+      "blink": 16
+    },
+    "sheepish": {
+      "cell": 13
+    }
+  },
+  "runtimeMaterials": {
+    "beacon": "Thingy_Beacon",
+    "face": "Thingy_Face"
+  },
+  "notes": "A web derivative of the v0.17 character: the cloth is baked on to a lighter body, the screen shows one cell of the face atlas, and each accessory is its own mesh, named Thingy_Accessory_<id>, so a page can show or hide it. A slot gives what a scene can have with it, and an accessory's `absent` mesh takes its place when it comes off. faces.webp is the same atlas, small, for a page that offers the faces. This is not a printable model.",
+  "toolPoses": {
+    "carry": {
+      "label": "Carry",
+      "stillFrame": 1
+    },
+    "show": {
+      "label": "Show",
+      "stillFrame": 1
+    },
+    "work": {
+      "label": "Work",
+      "stillFrame": 1
+    },
+    "check": {
+      "label": "Check",
+      "stillFrame": 1
+    },
+    "hold": {
+      "label": "Hold up",
+      "stillFrame": 1
+    },
+    "read": {
+      "label": "Read",
+      "stillFrame": 1
+    },
+    "sip": {
+      "label": "Sip",
+      "stillFrame": 1
+    },
+    "speak": {
+      "label": "Speak",
+      "stillFrame": 1
+    },
+    "throw": {
+      "label": "Throw",
+      "stillFrame": 1
+    }
+  },
+  "faceSheet": "faces.webp",
+  "license": {
+    "name": "CC BY-NC 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "attribution": "Thingy by Jamie Thingelstad"
+  }
+}

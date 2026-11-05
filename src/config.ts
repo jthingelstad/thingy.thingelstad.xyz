@@ -1,5 +1,5 @@
 /** Every model the component can draw, oldest first. Older files stay published. */
-export const VERSIONS = ["v0.15", "v0.16"] as const;
+export const VERSIONS = ["v0.15", "v0.16", "v0.17"] as const;
 export type Version = (typeof VERSIONS)[number];
 /** `version="latest"`, or no version at all, asks for the newest model. */
 export const LATEST = "latest";
@@ -55,8 +55,19 @@ export const TOOL_POSES = {
   work: { label: "Work", frame: 1 },
   check: { label: "Check", frame: 1 },
   hold: { label: "Hold up", frame: 1 },
+  read: { label: "Read", frame: 1 },
+  sip: { label: "Sip", frame: 1 },
+  speak: { label: "Speak", frame: 1 },
+  throw: { label: "Throw", frame: 1 },
 } as const;
 const HAND_TOOL_POSES = ["carry", "show", "work"] as const;
+const EMPTY_HANDS = { label: "Empty hands" };
+const MUG = { id: "mug", label: "Mug", poses: ["carry", "sip"] } as const;
+const BATON = {
+  id: "baton",
+  label: "Kubb baton",
+  poses: ["carry", "throw"],
+} as const;
 export type Pose = keyof typeof POSES;
 export type ToolPose = keyof typeof TOOL_POSES;
 export type AnyPose = Pose | ToolPose;
@@ -95,13 +106,24 @@ export type Scene = {
   label: string;
   /** Has a still for each pose. Any other scene's only still is `present`. */
   posedStills?: boolean;
+  /** The first model with this scene. An older model has only what it was made with. */
+  since?: Version;
   slots: readonly Slot[];
 };
 export const SCENES = {
   library: {
     label: "Library",
     posedStills: true,
-    slots: [],
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "book", label: "Book", poses: ["read", "show"], steady: true },
+          MUG,
+        ],
+      },
+    ],
   },
   outdoors: {
     label: "Outdoors",
@@ -110,6 +132,18 @@ export const SCENES = {
         id: "pack",
         standard: "backpack",
         options: [{ id: "backpack", label: "Backpack" }],
+      },
+      {
+        id: "head",
+        options: [{ id: "helmet", label: "Bike helmet" }],
+      },
+      {
+        id: "neck",
+        options: [{ id: "camera", label: "Camera" }],
+      },
+      {
+        id: "hand",
+        options: [BATON],
       },
     ],
   },
@@ -130,11 +164,17 @@ export const SCENES = {
           { id: "laptop", label: "Laptop", poses: ["present", "work"] },
           {
             id: "plate",
-            label: "Build plate",
+            label: "3D Printing",
             poses: ["carry", "show"],
             steady: true,
           },
+          MUG,
+          { id: "candle", label: "Candle", poses: ["carry", "show"] },
         ],
+      },
+      {
+        id: "printer",
+        options: [{ id: "printer", label: "3D printer" }],
       },
     ],
   },
@@ -147,8 +187,61 @@ export const SCENES = {
         options: [{ id: "headphones", label: "Headphones", absent: "ears" }],
       },
       {
+        id: "neck",
+        options: [{ id: "scarf", label: "Scarf" }],
+      },
+      {
         id: "hand",
-        options: [{ id: "phone", label: "iPhone", poses: ["check", "hold"] }],
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "phone", label: "iPhone", poses: ["check", "hold"] },
+          { id: "mic", label: "Microphone", poses: ["speak", "hold"] },
+        ],
+      },
+    ],
+  },
+  kitchen: {
+    label: "Kitchen",
+    since: "v0.17",
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [
+          { id: "tongs", label: "Tongs", poses: ["carry", "work"] },
+          { id: "whisk", label: "Whisk", poses: ["carry", "work"] },
+          MUG,
+        ],
+      },
+      {
+        id: "grill",
+        options: [{ id: "grill", label: "Grill" }],
+      },
+    ],
+  },
+  winter: {
+    label: "Winter",
+    since: "v0.17",
+    slots: [
+      {
+        id: "neck",
+        standard: "scarf",
+        options: [{ id: "scarf", label: "Scarf" }],
+      },
+      {
+        id: "head",
+        options: [{ id: "hat", label: "Stocking hat" }],
+      },
+    ],
+  },
+  cabin: {
+    label: "Cabin",
+    since: "v0.17",
+    slots: [
+      {
+        id: "hand",
+        empty: EMPTY_HANDS,
+        options: [BATON, MUG],
       },
     ],
   },
@@ -161,10 +254,15 @@ export type CharacterState = {
   light: boolean;
   motion: boolean;
 };
-export function scene(value: string | null | undefined): SceneKey {
-  return value && Object.hasOwn(SCENES, value)
-    ? (value as SceneKey)
-    : "library";
+export function scene(
+  value: string | null | undefined,
+  version: Version = VERSIONS.at(-1)!,
+): SceneKey {
+  if (!value || !Object.hasOwn(SCENES, value)) return "library";
+  const since = (SCENES[value as SceneKey] as Scene).since;
+  return since && VERSIONS.indexOf(version) < VERSIONS.indexOf(since)
+    ? "library"
+    : (value as SceneKey);
 }
 export function pose(value: string | null | undefined): Pose {
   return value && Object.hasOwn(POSES, value) ? (value as Pose) : "present";
@@ -326,12 +424,67 @@ export type EmbedState = Omit<CharacterState, "pose"> & {
   face?: string;
   view?: string;
 };
+/** What he is in each scene, for the line under the title. Always Thingy follows it. */
+export const SCENE_LINES: Record<SceneKey, string> = {
+  library: "A librarian.",
+  outdoors: "A trail companion.",
+  workshop: "A builder.",
+  concert: "A concert companion.",
+  kitchen: "A home cook.",
+  winter: "A winter walker.",
+  cabin: "A cabin regular.",
+};
+/**
+ * Somewhere else, with something else: a new scene, what each of its slots holds, a
+ * pose those allow and a face a reader may choose. Pass `random` to pin it in a test.
+ */
+export function shuffled(
+  from: SceneKey,
+  random: () => number = Math.random,
+): {
+  scene: SceneKey;
+  accessories: string[];
+  pose: AnyPose;
+  face: string;
+  light: boolean;
+} {
+  const pick = <T>(items: readonly T[]): T =>
+    items[Math.floor(random() * items.length)]!;
+  const next = pick(SCENE_KEYS.filter((key) => key !== from));
+  const held = slotsOf(next).flatMap((slot) => {
+    // A switch stays as the scene has it more often than not.
+    if (!slot.empty && slot.options.length === 1)
+      return random() < (slot.standard ? 0.8 : 0.5)
+        ? [slot.options[0]!.id]
+        : [];
+    const one = pick([
+      ...slot.options.map((option) => option.id),
+      ...(slot.empty ? [null] : []),
+    ]);
+    return one ? [one] : [];
+  });
+  const stage = stageOf(
+    next,
+    accessoriesValue(held),
+    pick(posesFor(next, held)),
+  );
+  return {
+    scene: next,
+    accessories: stage.accessories,
+    pose: stage.pose,
+    face: pick(Object.keys(FACE_CHOICES)),
+    light: random() < 0.5,
+  };
+}
 /** The published size of each scene on the newest model, as a page offers it. */
 export const MODEL_WEIGHT: Record<SceneKey, string> = {
-  library: "2.5 MB",
-  outdoors: "2.3 MB",
-  workshop: "2.6 MB",
-  concert: "2.4 MB",
+  library: "2.6 MB",
+  outdoors: "2.4 MB",
+  workshop: "3.0 MB",
+  concert: "2.5 MB",
+  kitchen: "2.3 MB",
+  winter: "2.3 MB",
+  cabin: "2.1 MB",
 };
 export function embedURL(
   state: EmbedState,
@@ -366,6 +519,12 @@ const STILL_SINCE: Record<string, Version> = {
   "laptop-work": "v0.16",
   "plate-carry": "v0.16",
   "plate-show": "v0.16",
+  "mug-carry": "v0.17",
+  "mug-sip": "v0.17",
+  "book-read": "v0.17",
+  "book-show": "v0.17",
+  "candle-carry": "v0.17",
+  "candle-show": "v0.17",
 };
 export function posterPath(
   key: SceneKey,

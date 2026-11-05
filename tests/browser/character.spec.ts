@@ -1,10 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createServer } from "node:http";
 
-/** On a phone one group of controls is open at a time: open the one a step needs. */
+/** One group of controls is open at a time: open the one a step needs. */
 async function open(page: Page, tab: string): Promise<void> {
-  const button = page.locator(`[data-sheet-tab="${tab}"]`);
-  if (!(await button.isVisible())) return;
+  const button = page.locator(`[data-sheet-tab="${tab}"]`).first();
   if ((await button.getAttribute("aria-expanded")) !== "true")
     await button.click();
 }
@@ -37,13 +36,22 @@ test("scenes, poses, playback, light and keyboard camera work on a real WebGL ch
     path: `/tmp/thingy-home-${info.project.name}.png`,
     fullPage: true,
   });
-  await open(page, "scene");
-  for (const name of ["Outdoors", "Workshop", "Concert", "Library"]) {
+  for (const name of [
+    "Outdoors",
+    "Workshop",
+    "Concert",
+    "Kitchen",
+    "Winter",
+    "Cabin",
+    "Library",
+  ]) {
+    await open(page, "scene");
     await page.getByRole("radio", { name, exact: true }).check();
     await expect(character).toHaveAttribute("data-ready", "", {
       timeout: 30000,
     });
   }
+  await open(page, "scene");
   await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   // Present is the laptop's, and it comes with that one pose.
@@ -116,7 +124,7 @@ test("version latest loads the newest model, and hop jumps, spins and lands wher
   await page.goto("/__hop");
   const character = page.locator("#library");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  expect(models).toEqual([expect.stringContaining("/character/v0.16/")]);
+  expect(models).toEqual([expect.stringContaining("/character/v0.17/")]);
   await page.waitForTimeout(300);
   const before = await character.screenshot();
 
@@ -317,8 +325,7 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(page.locator("#embed-code")).toContainText("face=eager");
 
   // The picture comes from the stage: square, a real PNG, transparent corners.
-  if (info.project.name === "phone")
-    await page.locator('#bring-ways [data-way="picture"]').click();
+  await page.locator('#bring-ways [data-way="picture"]').click();
   const download = page.waitForEvent("download");
   await page.locator("#download").click();
   const saved = await download;
@@ -360,8 +367,7 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(character).toHaveAttribute("data-ready", "");
 
   // The link opens this page set up the same way, at the same angle.
-  if (info.project.name === "phone")
-    await page.locator('#bring-ways [data-way="link"]').click();
+  await page.locator('#bring-ways [data-way="link"]').click();
   await page.locator("#copy-link").click();
   await expect(page.locator("#copy-link-label")).toHaveText("Link copied");
   const link = await page.evaluate(() => navigator.clipboard.readText());
@@ -402,7 +408,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     };
   });
   expect(facts).toEqual({
-    version: "v0.16",
+    version: "v0.17",
     accessories: ["drill"],
     pose: "show",
     view: "-40,70,1.2",
@@ -420,7 +426,7 @@ test("the embed follows latest with the face, accessory and angle it was given, 
     await character.evaluate(
       (el) => (el as never as { version: string }).version,
     ),
-  ).toBe("v0.16");
+  ).toBe("v0.17");
   // `off` is never shown to a reader, whatever the address says.
   await page.goto("/embed/?version=latest&scene=library&face=off");
   await expect(character).not.toHaveAttribute("face", "off");
@@ -604,6 +610,39 @@ test("the standalone component finds its assets when used by another origin", as
   }
 });
 
+test("the new scenes each stand ready with their own accessories", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  for (const [name, standard, others] of [
+    ["Kitchen", "none", ["tongs", "whisk", "mug", "grill"]],
+    ["Winter", "scarf", ["hat"]],
+    ["Workshop", "laptop", ["plate", "printer"]],
+    ["Cabin", "none", ["baton", "mug"]],
+  ] as const) {
+    await open(page, "scene");
+    await page.getByRole("radio", { name, exact: true }).check();
+    await expect(character).toHaveAttribute("scene", name.toLowerCase());
+    await expect(character).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    await expect(character).toHaveAttribute("accessories", standard);
+    for (const id of others)
+      await expect(page.locator(`[data-accessory="${id}"]`)).toHaveCount(1);
+  }
+  // Every scene is in view at once, on a phone too.
+  await open(page, "scene");
+  for (const name of ["Library", "Kitchen", "Winter", "Cabin"])
+    await expect(
+      page.getByRole("radio", { name, exact: true }),
+    ).toBeInViewport();
+  expect(errors).toEqual([]);
+});
+
 test("the studio offers every face and, for each scene, its accessories", async ({
   page,
 }) => {
@@ -613,7 +652,7 @@ test("the studio offers every face and, for each scene, its accessories", async 
   await page.goto("/?life=off");
   const character = page.locator("#main-thingy");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
-  await expect(character).toHaveAttribute("version", "v0.16");
+  await expect(character).toHaveAttribute("version", "v0.17");
   // The stage reaches up behind the header, and must not take its links.
   await page.locator(".site-header .ask").click({ trial: true });
   const shot = async () => {
@@ -632,9 +671,13 @@ test("the studio offers every face and, for each scene, its accessories", async 
   expect(original.equals(await shot())).toBe(false);
   expect(page.url()).toContain("face=curious");
 
-  // No accessories in the Library; the face stays through a change of scene.
-  await expect(page.locator("#accessories")).toBeHidden();
-  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
+  // The Library starts with empty hands; the face stays through a change of scene.
+  await open(page, "accessories");
+  await expect(page.locator('[data-accessory=""]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator('[data-accessory="book"]')).toBeVisible();
   await open(page, "scene");
   await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
@@ -695,7 +738,6 @@ test("the studio offers every face and, for each scene, its accessories", async 
   await page.getByRole("radio", { name: "Library", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(character).toHaveAttribute("accessories", "none");
-  await expect(page.locator('[data-sheet-tab="accessories"]')).toBeHidden();
   await page.goto("/?scene=workshop&accessories=hammer&pose=show&face=proud");
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(page.locator('[data-accessory="hammer"]')).toHaveAttribute(
@@ -708,17 +750,45 @@ test("the studio offers every face and, for each scene, its accessories", async 
   );
   await page.goto("/?face=off");
   await expect(character).toHaveAttribute("face", "original");
-  // On a phone the open group closes again, leaving him the whole stage.
-  const faceTab = page.locator('[data-sheet-tab="face"]');
-  if (await faceTab.isVisible()) {
-    await faceTab.click();
-    await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
-    await expect(page.locator("#faces")).toBeHidden();
-  }
+  // The open group closes again, leaving him the whole stage.
+  await page.locator('[data-sheet-tab="face"]').click();
+  await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
+  await expect(page.locator("#faces")).toBeHidden();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Shuffle sets him up somewhere else, and the line and address follow", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(page.locator("#scene-line")).toHaveText("A librarian.");
+  let was = "library";
+  for (let turn = 0; turn < 3; turn++) {
+    const line = await page.locator("#scene-line").textContent();
+    await page.locator("#shuffle").click();
+    await expect(character).not.toHaveAttribute("scene", was);
+    await expect(character).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    was = (await character.getAttribute("scene"))!;
+    await expect(page.locator(`input[value="${was}"]`)).toBeChecked();
+    expect(page.url()).toContain(`scene=${was}`);
+    await expect(page.locator(`[data-face="off"]`)).toHaveCount(0);
+    expect(await character.getAttribute("face")).not.toBe("off");
+    // Each scene has its own line, and a shuffle may come back to the Library later.
+    await expect(page.locator("#scene-line")).not.toHaveText(line!);
+  }
+  // What he has on is exactly what the sheet says.
+  await open(page, "scene");
+  await expect(page.locator(`input[value="${was}"]`)).toBeChecked();
   expect(errors).toEqual([]);
 });

@@ -10,6 +10,9 @@ import {
   posesFor,
   shownNodes,
   SCENES,
+  SCENE_KEYS,
+  SCENE_LINES,
+  shuffled,
   embedURL,
   iframeCode,
   face,
@@ -99,6 +102,12 @@ test("the page's scenes are the manifest's scenes, in the same order", () => {
       key,
     );
   }
+});
+test("a scene stays out of the models made before it", () => {
+  assert.equal(scene("kitchen"), "kitchen");
+  assert.equal(scene("kitchen", "v0.17"), "kitchen");
+  assert.equal(scene("kitchen", "v0.16"), "library");
+  assert.equal(scene("concert", "v0.15"), "concert");
 });
 test("an older model's poster is a still that model has", () => {
   assert.equal(
@@ -453,4 +462,49 @@ test("a persona change opens a checklist of what each surface keeps", async () =
   assert.match(body, /commit\/abc123/);
   assert.match(body, /## Kept \(o\/kept\)\n\n- \[ \] prompts\/a\.md: words/);
   assert.doesNotMatch(body, /Follows/);
+});
+
+test("a shuffle is always somewhere else, and always something he can do", () => {
+  // Any sequence of numbers, from the bottom of the range to the very top.
+  for (const from of SCENE_KEYS)
+    for (const seed of [0, 0.1, 0.25, 0.5, 0.75, 0.999999])
+      for (const step of [0, 0.13, 0.37, 0.61]) {
+        let at = seed;
+        const random = () => (at = (at + step) % 1);
+        const got = shuffled(from, random);
+        assert.notEqual(got.scene, from);
+        assert.ok(Object.hasOwn(FACE_CHOICES, got.face));
+        assert.notEqual(got.face, "off");
+        assert.ok(posesFor(got.scene, got.accessories).includes(got.pose));
+        const made = stageOf(
+          got.scene,
+          accessoriesValue(got.accessories),
+          got.pose,
+        );
+        assert.deepEqual(made.accessories, got.accessories);
+        assert.equal(made.pose, got.pose);
+      }
+  // A long run reaches every scene and takes the things he can have off too.
+  const seen = new Set<string>();
+  const held = new Set<string>();
+  // Seeded, so a run of bad luck can't fail this.
+  let number = 12345;
+  const seeded = () => {
+    number = (number * 1103515245 + 12345) % 2147483648;
+    return number / 2147483648;
+  };
+  for (let turn = 0; turn < 400; turn++) {
+    const got = shuffled("library", seeded);
+    seen.add(got.scene);
+    for (const id of got.accessories) held.add(id);
+  }
+  assert.equal(seen.size, SCENE_KEYS.length - 1);
+  for (const id of ["printer", "grill", "hat", "plate", "phone"])
+    assert.ok(held.has(id), id);
+});
+
+test("every scene has its line under the title", () => {
+  assert.deepEqual(Object.keys(SCENE_LINES).sort(), [...SCENE_KEYS].sort());
+  for (const line of Object.values(SCENE_LINES))
+    assert.match(line, /^An? .+\.$/);
 });

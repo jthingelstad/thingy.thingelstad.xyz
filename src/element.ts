@@ -146,7 +146,7 @@ export class ThingyCharacter extends HTMLElement {
   #reduced = matchMedia("(prefers-reduced-motion: reduce)");
 
   get scene(): SceneKey {
-    return scene(this.getAttribute("scene"));
+    return scene(this.getAttribute("scene"), this.version);
   }
   get pose(): AnyPose {
     return this.#stage().pose;
