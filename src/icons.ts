@@ -21,7 +21,8 @@ const paths: Record<string, string> = {
     '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.500" y="14" width="4.500" height="7" rx="1.500"/><rect x="17" y="14" width="4.500" height="7" rx="1.500"/>',
   plate:
     '<path d="M2 18h20l-2 3H4Z"/><circle cx="12" cy="7" r="3.500"/><path d="M9 18l.5-4.500h5L15 18"/>',
-  phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  phone:
+    '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
   carry: '<path d="M12 3v14M6 11l6 6 6-6M5 21h14"/>',
   show: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   work: '<path d="m13 3-8 11h6l-1 7 9-12h-6Z"/>',
