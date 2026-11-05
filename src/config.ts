@@ -1,5 +1,5 @@
 /** Every model the component can draw, oldest first. Older files stay published. */
-export const VERSIONS = ["v0.15"] as const;
+export const VERSIONS = ["v0.15", "v0.16"] as const;
 export type Version = (typeof VERSIONS)[number];
 /** `version="latest"`, or no version at all, asks for the newest model. */
 export const LATEST = "latest";
@@ -123,7 +123,7 @@ export const SCENES = {
           { id: "screwdriver", label: "Screwdriver", poses: HAND_TOOL_POSES },
           { id: "hammer", label: "Hammer", poses: HAND_TOOL_POSES },
           { id: "drill", label: "Drill", poses: HAND_TOOL_POSES },
-          { id: "laptop", label: "Laptop", poses: ["present"] },
+          { id: "laptop", label: "Laptop", poses: ["present", "work"] },
         ],
       },
     ],

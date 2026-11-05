@@ -52,7 +52,7 @@ present on About, thinking on Search, and rest on its 404 page.
 
 ## Stable asset addresses
 
-`public/character/v0.15/manifest.json` is the delivery contract. Scene IDs are
+`public/character/v0.16/manifest.json` is the delivery contract. Scene IDs are
 `library`, `outdoors`, `workshop`, and `concert`. Pose IDs are `hello`, `present`,
 `thinking`, and `rest`. `light` and `motion` accept `on` or `off`.
 
@@ -83,6 +83,23 @@ changes. The contract tests hold the two together.
 
 `v0.10` and `v0.14` keep their files, under the outfit names they were made with, but
 the component only draws the versions in `VERSIONS`.
+
+## Rebuild the v0.16 Workshop
+
+v0.16 changes the Workshop only: `show` in front of him, a new `work` for the
+screwdriver, and `work` for the laptop, whose new bone turns it in his hand. Its
+other scenes and stills are v0.15's files. Only the pose changed, so this reuses
+v0.15's bakes: copy `local-only/bakes/v0.15/workshop` to
+`local-only/bakes/v0.16/workshop`, then:
+
+```sh
+blender --background \
+  ../thingy-character/source/Thingy-wardrobe-v0.16.blend \
+  --python-exit-code 1 --python tools/export_character_v016.py -- --scene workshop --reuse-bakes
+node tools/optimize-v016.mjs
+node tools/capture-poster-v016.mjs workshop/drill-show workshop/hammer-show \
+  workshop/screwdriver-show workshop/screwdriver-work workshop/laptop-work
+```
 
 ## Rebuild the v0.15 models
 

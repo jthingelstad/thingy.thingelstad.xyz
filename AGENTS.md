@@ -10,7 +10,7 @@ projects take him from here, starting with the librarian at
 - The approved Blender master lives in the sibling character-art repository:
   `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`, and
   `-v0.14.blend` for the Librarian, and the private `jthingelstad/thingy-character`
-  repository holds `Thingy-wardrobe-v0.15.blend` for Scenes. Never overwrite them. Export scripts
+  repository holds `Thingy-wardrobe-v0.15.blend` for Scenes and `Thingy-wardrobe-v0.16.blend` for the v0.16 tool poses. Never overwrite them. Export scripts
   operate in memory and write derivatives here.
 - `persona/THINGY.md` is Thingy's persona and the authority for him on every
   surface (approved by Jamie, November 3, 2026). Edit it only on Jamie's word;
@@ -25,7 +25,7 @@ projects take him from here, starting with the librarian at
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.
-- `public/character/v0.15/` is the newest, and `v0.10/` and `v0.14/` stay published
+- `public/character/v0.16/` is the newest, and `v0.15/`, `v0.10/` and `v0.14/` stay published
   under their outfit names. The component draws only the versions in `VERSIONS`.
   To add a scene, add it to `SCENES` in `src/config.ts` and the manifest, and
   publish its model and `present` still: the pages have no per-scene code.

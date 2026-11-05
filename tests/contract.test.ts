@@ -134,7 +134,8 @@ test("the component's newest model is the newest published directory", () => {
 });
 test("anything but a model the component draws means the newest, and nothing untrusted reaches a path", () => {
   const newest = VERSIONS.at(-1);
-  assert.equal(modelVersion("v0.15"), newest);
+  assert.equal(modelVersion(newest), newest);
+  assert.equal(modelVersion("v0.15"), "v0.15");
   for (const input of [
     null,
     "",
@@ -176,7 +177,9 @@ test("each accessory keeps to the poses it was made for", () => {
   assert.equal(at("hammer", "work").clip, "hammer-work");
   // A pose the tool has no grip for moves to the tool's first.
   assert.equal(at("hammer", "hello").clip, "hammer-carry");
-  assert.equal(at("laptop", "work").clip, "present");
+  assert.equal(at("laptop", "carry").clip, "present");
+  // The laptop turns round in his hand to work on it.
+  assert.equal(at("laptop", "work").clip, "laptop-work");
   assert.equal(at("none", "carry").clip, "hello");
   // Present in the Workshop brings the laptop, and asking for none really is none.
   assert.deepEqual(at(null, "present").accessories, ["laptop"]);

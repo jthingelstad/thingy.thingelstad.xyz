@@ -172,7 +172,7 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 
 | Attribute     | Values                                                                       |
 | ------------- | ---------------------------------------------------------------------------- |
-| `version`     | `latest` or `v0.15`, with the `v`. Anything else is the newest               |
+| `version`     | `latest` or `v0.16`, with the `v`. Anything else is the newest               |
 | `scene`       | `library`, `outdoors`, `workshop`, `concert`                                 |
 | `pose`        | See [poses](#poses). Without one he stands in `present`, so set it           |
 | `face`        | See [faces](#faces)                                                          |
@@ -265,7 +265,7 @@ Load `https://thingy.thingelstad.xyz/character/latest/<scene>.glb` with
 [Three.js GLTFLoader](https://threejs.org/docs/pages/GLTFLoader) and its Meshopt
 decoder. Files are served with `Access-Control-Allow-Origin: *`. They are glTF 2.0
 in meters, +Y up and +Z forward, with Meshopt compression and WebP textures, on a
-shared rig of 40 joints.
+shared rig of 40 joints. From v0.16 the Workshop has one more, for the laptop.
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
@@ -325,11 +325,11 @@ Some accessories keep to the poses they were made for:
 | In the Workshop                  | Poses                       |
 | -------------------------------- | --------------------------- |
 | `screwdriver`, `hammer`, `drill` | `carry`, `show`, `work`     |
-| `laptop`                         | `present`                   |
+| `laptop`                         | `present`, `work`           |
 | `none`                           | `hello`, `thinking`, `rest` |
 
-`carry` holds the tool at his side, `show` holds it up, and `work` raises it to use
-it. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+`carry` holds the tool at his side, `show` holds it in front of him, and `work` is
+using it. The laptop's `present` turns its screen to you, and its `work` to him. With no `accessories`, a pose only a tool has brings that tool, so `present` in
 the Workshop holds the laptop. Asking for a pose the accessory does not have moves
 him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
 An accessory a scene doesn't have is ignored. To read what he ended up with, use the
@@ -343,7 +343,7 @@ brings without changing. A slot holds one accessory at a time.
 | You want                  | Use                                     | Changes                                       |
 | ------------------------- | --------------------------------------- | --------------------------------------------- |
 | The newest Thingy, always | `version="latest"`, `character/latest/` | When this site does, within five minutes      |
-| One Thingy, for good      | `version="v0.15"`, `character/v0.15/`   | Never                                         |
+| One Thingy, for good      | `version="v0.16"`, `character/v0.16/`   | Never                                         |
 | His persona               | `persona.md`                            | When Jamie approves a change, within a minute |
 
 Use `latest` unless a page needs one model forever.

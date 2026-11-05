@@ -686,7 +686,10 @@ export class ThingyCharacter extends HTMLElement {
   #setPose(): void {
     if (!this.#mixer || !this.#model) return;
     const now = this.#stage();
-    const clip = this.#clips.find((item) => item.name === now.clip);
+    // A pinned older model may not have a newer clip: v0.15 has no laptop-work.
+    const clip =
+      this.#clips.find((item) => item.name === now.clip) ??
+      this.#clips.find((item) => item.name === "present");
     if (!clip) return;
     const life = this.alive ? this.#life : undefined;
     // Only a change of pose moves him. Taking off a hat leaves him standing.
