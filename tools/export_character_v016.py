@@ -810,7 +810,10 @@ def take_prop(part_name, node):
     part.hide_render = False
     part.hide_viewport = False
     scene.collection.objects.link(part)
-    part.data.uv_layers.new(name='WebUV')
+    if part.data.uv_layers:
+        part.data.uv_layers[0].name = 'WebUV'
+    else:
+        part.data.uv_layers.new(name='WebUV')
     accessory_meshes.append(part)
 
 

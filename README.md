@@ -89,7 +89,7 @@ the component only draws the versions in `VERSIONS`.
 v0.16 changes the Workshop and Concert. In the Workshop, `show` sits in front of him,
 the screwdriver has a new `work`, the laptop has a `work` whose new bone turns it in
 his hand, and a build plate carries a small Thingy made from the delivery body itself.
-In Concert he has an iPhone, to `check` or `hold` up. The plate and phone are plain
+In Concert he has an iPhone, to `check` or `hold` up. Its screen is a phone-width capture of the Thingy Model page on Things I've built, kept with the master. The plate and phone are plain
 parts outside the atlas, so this reuses v0.15's bakes: copy
 `local-only/bakes/v0.15/workshop` and `concert` to `local-only/bakes/v0.16/`, then run
 the export once with `--scene workshop` and once with `--scene concert`:

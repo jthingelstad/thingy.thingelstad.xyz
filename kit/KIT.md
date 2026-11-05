@@ -333,7 +333,7 @@ Some accessories keep to the poses they were made for:
 | `none`, in the Workshop          | `hello`, `thinking`, `rest` |
 
 `carry` holds the tool at his side, `show` holds it in front of him, and `work` is
-using it. The laptop's `present` turns its screen to you, and its `work` to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. With no `accessories`, a pose only a tool has brings that tool, so `present` in
+using it. The laptop's `present` turns its screen to you, and its `work` to him. The `phone` shows the Thingy Model page on Things I've built, on a screen turned to him. The `plate` is a build plate with a small Thingy on it, held in both hands, and he wears the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. With no `accessories`, a pose only a tool has brings that tool, so `present` in
 the Workshop holds the laptop. Asking for a pose the accessory does not have moves
 him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
 An accessory a scene doesn't have is ignored. To read what he ended up with, use the
