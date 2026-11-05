@@ -15,24 +15,26 @@ const directory = `${root}public/character/v0.15`;
 const manifest = JSON.parse(readFileSync(`${directory}/manifest.json`, "utf8"));
 const names = process.argv.slice(2);
 const wanted = names.length ? names : ["outdoors", "workshop", "concert"];
-// A Workshop clip is a pose, <pose>-<face> or <tool>-<pose>.
-const workshopShot = (clip) => {
+// A still's clip is a pose, <pose>-<face> or <tool>-<pose>.
+const shot = (scene, clip) => {
   const [first, second] = clip.split("-");
-  if (!second) return { scene: "workshop", clip, pose: first };
+  if (!second) return { scene, clip, pose: first };
   if (first in manifest.poses)
-    return { scene: "workshop", clip, pose: first, face: second };
-  return { scene: "workshop", clip, pose: second, tool: first };
+    return { scene, clip, pose: first, face: second };
+  return { scene, clip, pose: second, tool: first };
 };
 const shots = wanted.flatMap((name) => {
   const [scene, one] = name.split("/");
   if (one) {
     if (!manifest.scenes[scene]?.stills?.[one])
       throw new Error(`${name} is not in the manifest`);
-    return [workshopShot(one)];
+    return [shot(scene, one)];
   }
   if (scene !== "workshop")
     return [{ scene, clip: "present", pose: "present" }];
-  return Object.keys(manifest.scenes.workshop.stills).map(workshopShot);
+  return Object.keys(manifest.scenes.workshop.stills).map((clip) =>
+    shot("workshop", clip),
+  );
 });
 const browser = await chromium.launch({
   args: ["--use-angle=metal", "--enable-gpu"],
