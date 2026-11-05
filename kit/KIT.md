@@ -119,8 +119,9 @@ face in it where the still has one: `workshop-hammer-show.webp`,
 - **Every scene has `present`.** Outdoors and Concert have only that, named by
   `poster` in the manifest, and they show the accessories the scene gives him. In
   `workshop-present` he holds the laptop.
-- **The Library's stills also have faces, and the Workshop's have tools.**
-  `stills` for each scene in the
+- **The Library's stills also have faces, and the Workshop's have tools and two
+  faces for his job there:** `workshop-present-proud` and
+  `workshop-thinking-curious`. `stills` for each scene in the
   [manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
   them. A still shows the `original` face unless its name gives another.
 - **For anything with no still,** use the frame or the component, which draw any

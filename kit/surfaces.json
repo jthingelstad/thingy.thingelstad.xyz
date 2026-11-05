@@ -73,10 +73,15 @@
       "job": "Builder and record keeper",
       "follows": ["stills from character/latest/"],
       "stills": [
+        "workshop-drill-work",
+        "workshop-hammer-show",
         "workshop-hello",
         "workshop-present",
+        "workshop-present-proud",
         "workshop-rest",
-        "workshop-thinking"
+        "workshop-screwdriver-carry",
+        "workshop-thinking",
+        "workshop-thinking-curious"
       ],
       "keeps": [
         "docs/THINGY.md: his job, outfit and register on this site",
