@@ -527,6 +527,7 @@ h1 {
 }
 .switch {
   order: 1;
+  pointer-events: none;
   width: 48px;
   height: 28px;
   position: relative;
