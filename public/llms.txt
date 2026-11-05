@@ -30,7 +30,7 @@ Everything here is licensed CC BY-NC 4.0 (https://creativecommons.org/licenses/b
 
 - [Meet Thingy](https://thingy.thingelstad.xyz/): turn the character around, change scene, accessories, pose and face, switch the antenna light, and copy the embed, a picture or a link for what stands on the stage
 - [Workshop Builder integration examples](https://thingy.thingelstad.xyz/examples/workshop.html): the four Workshop poses as images, and a live component
-- [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0. [Print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) has the sizes and SHA-256 sums. Not test-printed yet.
+- [Print Thingy](https://thingy.thingelstad.xyz/print/): a 180 mm one-colour print model (3MF and zipped STL), settings for a Bambu Lab P2S, licensed CC BY-NC 4.0. [Print manifest, v0.13](https://thingy.thingelstad.xyz/print/v0.13/manifest.json) has the sizes and SHA-256 sums.
 
 ## Where he works
 
