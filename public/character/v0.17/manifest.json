@@ -308,7 +308,7 @@
             },
             {
               "id": "plate",
-              "label": "Build plate",
+              "label": "3D Printing",
               "node": "Thingy_Accessory_plate",
               "poses": [
                 "carry",
@@ -472,6 +472,16 @@
               "id": "scarf",
               "label": "Scarf",
               "node": "Thingy_Accessory_scarf"
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "options": [
+            {
+              "id": "hat",
+              "label": "Stocking hat",
+              "node": "Thingy_Accessory_hat"
             }
           ]
         }

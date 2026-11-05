@@ -1,12 +1,25 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createServer } from "node:http";
 
-/** On a phone one group of controls is open at a time: open the one a step needs. */
+/**
+ * On a phone one group of controls is open at a time, and on the wide layout scene and
+ * accessories are dropdowns: open the one a step needs.
+ */
 async function open(page: Page, tab: string): Promise<void> {
   const button = page.locator(`[data-sheet-tab="${tab}"]`);
-  if (!(await button.isVisible())) return;
-  if ((await button.getAttribute("aria-expanded")) !== "true")
-    await button.click();
+  if (await button.isVisible()) {
+    if ((await button.getAttribute("aria-expanded")) !== "true")
+      await button.click();
+    return;
+  }
+  const trigger = page.locator(
+    tab === "scene" ? "#scene-trigger" : "#accessory-trigger",
+  );
+  if (
+    (tab === "scene" || tab === "accessories") &&
+    (await trigger.getAttribute("aria-expanded")) !== "true"
+  )
+    await trigger.click();
 }
 
 test("scenes, poses, playback, light and keyboard camera work on a real WebGL character", async ({
@@ -37,7 +50,6 @@ test("scenes, poses, playback, light and keyboard camera work on a real WebGL ch
     path: `/tmp/thingy-home-${info.project.name}.png`,
     fullPage: true,
   });
-  await open(page, "scene");
   for (const name of [
     "Outdoors",
     "Workshop",
@@ -47,11 +59,13 @@ test("scenes, poses, playback, light and keyboard camera work on a real WebGL ch
     "Cabin",
     "Library",
   ]) {
+    await open(page, "scene");
     await page.getByRole("radio", { name, exact: true }).check();
     await expect(character).toHaveAttribute("data-ready", "", {
       timeout: 30000,
     });
   }
+  await open(page, "scene");
   await page.getByRole("radio", { name: "Workshop", exact: true }).check();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   // Present is the laptop's, and it comes with that one pose.

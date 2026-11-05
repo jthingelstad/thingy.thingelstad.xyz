@@ -159,7 +159,31 @@
           <div class="controls-left">
             <fieldset class="scenes" id="scenes" data-panel="scene">
               <legend>Scene</legend>
-              <div id="scene-options"></div>
+              <div class="chooser">
+                <button
+                  type="button"
+                  class="chooser-trigger"
+                  id="scene-trigger"
+                  aria-expanded="false"
+                  aria-controls="scene-options"
+                >
+                  <span class="chooser-mark" id="scene-mark"></span
+                  ><span class="chooser-value" id="scene-value"></span
+                  ><svg
+                    class="chooser-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div
+                  class="chooser-panel"
+                  id="scene-options"
+                  role="radiogroup"
+                  aria-label="Scene"
+                ></div>
+              </div>
             </fieldset>
             <fieldset
               class="accessories"
@@ -168,7 +192,31 @@
               hidden
             >
               <legend>Accessories</legend>
-              <div id="accessory-options"></div>
+              <div class="chooser">
+                <button
+                  type="button"
+                  class="chooser-trigger"
+                  id="accessory-trigger"
+                  aria-expanded="false"
+                  aria-controls="accessory-options"
+                >
+                  <span class="chooser-mark" id="accessory-mark"></span
+                  ><span class="chooser-value" id="accessory-value"></span
+                  ><svg
+                    class="chooser-chevron"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div
+                  class="chooser-panel"
+                  id="accessory-options"
+                  role="group"
+                  aria-label="Accessories"
+                ></div>
+              </div>
             </fieldset>
           </div>
           <fieldset class="expressions" id="poses" data-panel="pose">
@@ -188,7 +236,7 @@
                   class="switch"
                   aria-hidden="true"
                 ></span
-                ><span id="light-label">Light off</span></label
+                ><span id="light-label" class="sr-only">Light off</span></label
               >
               <label class="light-control"
                 ><span>Little movements</span
@@ -196,7 +244,7 @@
                   class="switch"
                   aria-hidden="true"
                 ></span
-                ><span id="life-label">Moving</span></label
+                ><span id="life-label" class="sr-only">Moving</span></label
               >
               <div class="playback">
                 <button class="button primary" id="play" aria-pressed="false">

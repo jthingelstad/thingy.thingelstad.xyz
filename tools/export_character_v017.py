@@ -841,7 +841,7 @@ def take_prop(part_name, node):
     accessory_meshes.append(part)
 
 
-def little_thingy(source, name, keep_material, target=None, hold='Thingy v06 · Hello', scale=.19):
+def little_thingy(source, name, keep_material, target=None, hold='Thingy v06 · Hello', scale=.19, on_printer=False):
     """Himself, small, in one pose: the delivery mesh with the atlas it already has,
     rigid on the plate's hand. The screen keeps his face material, so it changes with his."""
     frame = json.loads(rig['plate_frame'])
@@ -856,10 +856,21 @@ def little_thingy(source, name, keep_material, target=None, hold='Thingy v06 · 
     place = (rig.data.bones[frame['bone']].matrix_local @ Matrix(frame['matrix'])
              @ Matrix.Translation((0, 0, frame['top'] + frame['brim']))
              @ Matrix.Scale(scale, 4) @ source.matrix_world)
+    bone = frame['bone']
+    if on_printer:
+        printer = json.loads(rig['printer_frame'])
+        turn = Matrix.Rotation(printer['turn'], 4, 'Z')
+        place = (Matrix.Translation(printer['at']) @ turn @ Matrix.Translation(printer['bed'])
+                 @ Matrix.Scale(printer['scale'], 4) @ source.matrix_world)
+        bone = 'root'
     mesh.transform(place)
     # It keeps its UVs and loses the body's weights: it is one rigid print.
     edit = bmesh.new()
     edit.from_mesh(mesh)
+    if on_printer:
+        # Printed this far and no further.
+        height = printer['bed'][2] + printer['scale'] * printer['him'] * printer['cut']
+        bmesh.ops.bisect_plane(edit, geom=edit.verts[:] + edit.edges[:] + edit.faces[:], plane_co=(0, 0, height), plane_no=(0, 0, 1), clear_outer=True)
     if edit.verts.layers.deform.active:
         edit.verts.layers.deform.remove(edit.verts.layers.deform.active)
     edit.to_mesh(mesh)
@@ -872,7 +883,7 @@ def little_thingy(source, name, keep_material, target=None, hold='Thingy v06 · 
     scene.collection.objects.link(ob)
     # The mesh remembers the body's group names, and a bone's would be taken.
     ob.vertex_groups.clear()
-    group = ob.vertex_groups.new(name=frame['bone'])
+    group = ob.vertex_groups.new(name=bone)
     group.add(range(len(mesh.vertices)), 1, 'REPLACE')
     if target and len(mesh.vertices) > target:
         bpy.ops.object.select_all(action='DESELECT')
@@ -910,6 +921,11 @@ if 'plate' in PROP_POSES:
     take_prop('plate brim', 'Thingy_Accessory_plate_brim')
     little_thingy(body, 'Thingy_Accessory_plate_him', surface, target=9000)
     little_thingy(screen, 'Thingy_Accessory_plate_him_screen', face)
+    # The printer beside him, and himself in it, most of the way up.
+    for part_name, suffix in json.loads(rig['prop_parts'])['plate_printer']:
+        take_prop(part_name, f'Thingy_Accessory_plate_{suffix}')
+    little_thingy(body, 'Thingy_Accessory_plate_printer_him', surface, target=5000, on_printer=True)
+    little_thingy(screen, 'Thingy_Accessory_plate_printer_him_screen', face, on_printer=True)
 if 'phone' in PROP_POSES:
     take_prop('phone', 'Thingy_Accessory_phone')
     take_prop('phone lens', 'Thingy_Accessory_phone_lens')

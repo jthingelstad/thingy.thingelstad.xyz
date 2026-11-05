@@ -249,17 +249,134 @@ h1 {
 .sheet-tabs {
   display: none;
 }
-/* Two columns, so seven scenes and eight accessories leave the poses in view. */
-#scene-options,
-#accessory-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 4px;
+/* A styled dropdown for scene and accessories: a button that says what is chosen, and a
+   floating list. On the phone the sheet's tabs are the button; see below. */
+.chooser {
+  position: relative;
 }
-#accessory-options .accessory-option {
-  gap: 7px;
-  padding-inline: 8px;
+.chooser-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 12px 6px 7px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+.chooser-trigger:hover,
+.chooser-trigger[aria-expanded="true"] {
+  border-color: var(--green);
+  box-shadow: 0 2px 10px rgb(23 27 29 / 8%);
+}
+.chooser-trigger:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.chooser-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: var(--soft);
+  color: var(--green);
+  overflow: hidden;
+}
+.chooser-mark svg {
+  width: 22px;
+  height: 22px;
+}
+.chooser-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.chooser-chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.14s;
+}
+.chooser-trigger[aria-expanded="true"] .chooser-chevron {
+  transform: rotate(180deg);
+}
+.chooser-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 248px);
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 16px 44px rgb(23 27 29 / 18%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 5;
+}
+.chooser-panel.opens-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+.chooser-trigger[aria-expanded="true"] + .chooser-panel {
+  display: block;
+}
+.chooser-group + .chooser-group {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--line);
+}
+.scene-thumb {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: var(--soft);
+  /* His head and shoulders: the poster is the whole of him. */
+  object-fit: cover;
+  object-position: 50% 8%;
+  transform: scale(1.5);
+  transform-origin: 50% 20%;
+}
+.chooser-panel .scene-thumb {
+  transform: none;
+  object-position: 50% 0;
+}
+.chooser-tick {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  visibility: hidden;
+}
+.scene-option:has(:checked) .chooser-tick,
+.accessory-option[aria-pressed="true"] .chooser-tick {
+  visibility: visible;
 }
 .scene-option,
 .accessory-option {
@@ -268,15 +385,20 @@ h1 {
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 40px;
-  padding: 6px 10px;
+  min-height: 44px;
+  padding: 5px 10px 5px 7px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 9px;
+  white-space: nowrap;
   background: transparent;
   color: var(--ink);
   font-size: 15px;
   text-align: left;
   cursor: pointer;
+}
+.scene-option:hover,
+.accessory-option:hover {
+  background: rgb(23 27 29 / 4%);
 }
 .scene-option:has(:checked),
 .accessory-option[aria-pressed="true"] {
@@ -377,7 +499,9 @@ h1 {
   opacity: 0.45;
   cursor: default;
 }
+/* The name on the left, the switch out of the way on the right, one under the other. */
 .light-control {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -387,17 +511,22 @@ h1 {
   cursor: pointer;
 }
 .light-control > span:first-child {
+  flex: 1;
   font-weight: 600;
-  margin-right: 2px;
   white-space: nowrap;
 }
 .light-control input {
   position: absolute;
+  right: 0;
   opacity: 0;
   width: 50px;
   height: 30px;
 }
+.light-control > span:last-child:not(.sr-only) {
+  color: var(--muted);
+}
 .switch {
+  order: 1;
   width: 48px;
   height: 28px;
   position: relative;
@@ -729,7 +858,10 @@ footer p > span {
     inset: auto -22px 198px;
     height: min(calc(100% - 242px), 112vw);
   }
-  .studio:has(.controls[data-tab="none"]) .turntable {
+  /* The choosers float over him, so he stays his full size behind them. */
+  .studio:has(.controls[data-tab="none"]) .turntable,
+  .studio:has(.controls[data-tab="scene"]) .turntable,
+  .studio:has(.controls[data-tab="accessories"]) .turntable {
     bottom: 80px;
     height: min(calc(100% - 124px), 112vw);
   }
@@ -896,8 +1028,6 @@ footer p > span {
     overflow: hidden;
     clip-path: inset(50%);
   }
-  #scene-options,
-  #accessory-options,
   #pose-options,
   #face-options {
     display: flex;
@@ -908,14 +1038,28 @@ footer p > span {
     overflow-x: auto;
     scrollbar-width: none;
   }
-  /* Seven scenes: all of them in view, never one hidden off the edge. */
-  #scene-options {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    overflow: visible;
+  /* The sheet's tabs stand in for the button, and the list is the sheet's: two columns,
+     so every choice is in view and he is still there above them. */
+  .chooser-trigger {
+    display: none;
   }
-  .scene-option,
-  .accessory-option,
+  .chooser-trigger + .chooser-panel,
+  .chooser-trigger[aria-expanded="true"] + .chooser-panel {
+    display: block;
+    position: static;
+    width: auto;
+    max-height: 46vh !important;
+    padding: 0 2px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #scene-options,
+  .chooser-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
   .pose-option {
     flex: none;
     flex-direction: row;
@@ -931,14 +1075,6 @@ footer p > span {
     font-weight: 400;
     white-space: nowrap;
   }
-  .scene-option {
-    justify-content: center;
-    padding: 6px 2px;
-  }
-  .scene-option:has(:checked),
-  .accessory-option[aria-pressed="true"] {
-    border-color: var(--green);
-  }
   .face-option {
     flex: none;
     width: 76px;
@@ -949,6 +1085,7 @@ footer p > span {
     line-height: 1.4;
   }
   .light-control {
+    width: 100%;
     margin: 0;
     min-height: 46px;
   }

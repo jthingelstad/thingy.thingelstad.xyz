@@ -164,7 +164,7 @@ export const SCENES = {
           { id: "laptop", label: "Laptop", poses: ["present", "work"] },
           {
             id: "plate",
-            label: "Build plate",
+            label: "3D Printing",
             poses: ["carry", "show"],
             steady: true,
           },
@@ -223,6 +223,10 @@ export const SCENES = {
         id: "neck",
         standard: "scarf",
         options: [{ id: "scarf", label: "Scarf" }],
+      },
+      {
+        id: "head",
+        options: [{ id: "hat", label: "Stocking hat" }],
       },
     ],
   },
@@ -420,10 +424,10 @@ export type EmbedState = Omit<CharacterState, "pose"> & {
 export const MODEL_WEIGHT: Record<SceneKey, string> = {
   library: "2.6 MB",
   outdoors: "2.4 MB",
-  workshop: "2.7 MB",
+  workshop: "3.0 MB",
   concert: "2.5 MB",
-  kitchen: "2.2 MB",
-  winter: "2.1 MB",
+  kitchen: "2.3 MB",
+  winter: "2.2 MB",
   cabin: "2.1 MB",
 };
 export function embedURL(
