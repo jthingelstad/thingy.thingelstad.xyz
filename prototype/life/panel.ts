@@ -30,6 +30,39 @@ THREE.ImageBitmapLoader.prototype.load = function (
   image.src = url;
 } as never;
 
+// The viewer serves no .glb files, so each model sits beside this page as JSON
+// holding the same bytes in base64. The component still asks for its .glb.
+const loadFile = THREE.FileLoader.prototype.load;
+THREE.FileLoader.prototype.load = function (
+  this: THREE.FileLoader,
+  url: string,
+  onLoad?: (data: ArrayBuffer) => void,
+  onProgress?: (event: ProgressEvent) => void,
+  onError?: (error: unknown) => void,
+) {
+  if (!url.endsWith(".glb"))
+    return loadFile.call(
+      this,
+      url,
+      onLoad as never,
+      onProgress,
+      onError as never,
+    );
+  fetch(url.replace(/\.glb$/, ".json"))
+    .then((response) => {
+      if (!response.ok) throw new Error(`${response.status} for ${url}`);
+      return response.json() as Promise<{ glb: string }>;
+    })
+    .then(({ glb }) => {
+      const text = atob(glb);
+      const bytes = new Uint8Array(text.length);
+      for (let index = 0; index < text.length; index++)
+        bytes[index] = text.charCodeAt(index);
+      onLoad?.(bytes.buffer);
+    })
+    .catch((error) => onError?.(error));
+} as never;
+
 type Control = {
   key: keyof LifeSettings;
   label: string;
