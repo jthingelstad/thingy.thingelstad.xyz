@@ -98,6 +98,12 @@
         "rest": {
           "webp": "poses/workshop-rest.webp"
         },
+        "present-proud": {
+          "webp": "poses/workshop-present-proud.webp"
+        },
+        "thinking-curious": {
+          "webp": "poses/workshop-thinking-curious.webp"
+        },
         "screwdriver-carry": {
           "webp": "poses/workshop-screwdriver-carry.webp"
         },
