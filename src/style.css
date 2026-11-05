@@ -573,6 +573,7 @@ h1 {
     gap: 7px;
   }
   .bring h2,
+  .bring-kit,
   .way pre {
     grid-column: 1 / -1;
   }

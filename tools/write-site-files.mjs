@@ -71,14 +71,6 @@ await fs.cp(
   "dist/character/latest",
   { recursive: true },
 );
-// Ask Thingy still names its pictures librarian-*, until its own change lands.
-// Then take this out: the newest model publishes them as library-*.
-for (const name of await fs.readdir("dist/character/latest/poses"))
-  if (name.startsWith("library-"))
-    await fs.copyFile(
-      `dist/character/latest/poses/${name}`,
-      `dist/character/latest/poses/librarian-${name.slice("library-".length)}`,
-    );
 await fs.writeFile(
   "dist/revision.json",
   JSON.stringify({
