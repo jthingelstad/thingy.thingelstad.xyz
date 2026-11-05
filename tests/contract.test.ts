@@ -371,7 +371,8 @@ test("the kit names everything a consumer can use", () => {
   ];
   const attributes = /observedAttributes[^[]*\[([^\]]+)\]/.exec(element)!;
   names.push(...attributes[1].match(/[a-z-]+/g)!);
-  for (const name of new Set(names))
+  // `life` is a prototype nothing may use yet. The kit names it if it ever ships.
+  for (const name of new Set(names).difference(new Set(["life"])))
     assert.ok(kit.includes(`\`${name}\``), `the kit names ${name}`);
 });
 

@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { Life, LIFE_DEFAULTS, type LifeSettings } from "./life";
 import {
   ALL_POSES,
   FACES,
@@ -85,6 +86,7 @@ export class ThingyCharacter extends HTMLElement {
     "poster",
     "view-label",
     "view",
+    "life",
   ];
   #root = this.attachShadow({ mode: "open" });
   #renderer?: THREE.WebGLRenderer;
@@ -106,8 +108,14 @@ export class ThingyCharacter extends HTMLElement {
   #generation = 0;
   #currentScene?: SceneKey;
   #currentVersion?: Version;
+  #heldPose = "";
   #faceMap?: THREE.Texture;
   #blinkTimer = 0;
+  #faceTimer = 0;
+  #life?: Life;
+  #lifeSettings: LifeSettings = { ...LIFE_DEFAULTS };
+  #pointer: { x: number; y: number } | null = null;
+  #pointerUntil = 0;
   #press?: { x: number; y: number; at: number };
   #head?: THREE.Object3D;
   #beacon = new THREE.PointLight(0xff933f, 0, 1.2, 2);
@@ -138,6 +146,22 @@ export class ThingyCharacter extends HTMLElement {
   }
   get playing(): boolean {
     return this.getAttribute("motion") === "on" && !this.#reduced.matches;
+  }
+  /** Whether the small movements are running. Never under reduced motion. */
+  get alive(): boolean {
+    return this.getAttribute("life") === "on" && !this.#reduced.matches;
+  }
+  get lifeSettings(): LifeSettings {
+    return { ...this.#lifeSettings };
+  }
+  set lifeSettings(value: Partial<LifeSettings>) {
+    this.#lifeSettings = { ...this.#lifeSettings, ...value };
+    if (this.#life) this.#life.settings = this.#lifeSettings;
+    this.#scheduleBlink();
+  }
+  /** How he is turned right now, while he is alive. */
+  get lifeState() {
+    return this.alive ? this.#life?.state : undefined;
   }
   get version(): Version {
     return modelVersion(this.getAttribute("version"));
@@ -193,10 +217,9 @@ export class ThingyCharacter extends HTMLElement {
       void this.#load();
     else if (name === "light") this.#setLight();
     else if (name === "motion") this.#setMotion();
-    else if (name === "face") {
-      this.#setFace();
-      this.#scheduleBlink();
-    } else if (name === "blink") this.#scheduleBlink();
+    else if (name === "life") this.#setLife();
+    else if (name === "face") this.#changeFace(before);
+    else if (name === "blink") this.#scheduleBlink();
     else if (name === "zoom" || name === "view-label") this.#setZoom();
     else if (name === "view") this.#setView();
     else if (name === "pose" || name === "accessories") this.#setPose();
@@ -413,6 +436,26 @@ export class ThingyCharacter extends HTMLElement {
         },
         { signal: this.#abort.signal },
       );
+      // He attends to the pointer anywhere on the page, and to a tap for a moment.
+      window.addEventListener(
+        "pointermove",
+        (event) => {
+          if (!this.#life || this.#press || event.pointerType === "touch")
+            return;
+          this.#pointer = { x: event.clientX, y: event.clientY };
+          this.#pointerUntil = performance.now() + 2500;
+        },
+        { passive: true, signal: this.#abort.signal },
+      );
+      window.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (!this.#life) return;
+          this.#pointer = { x: event.clientX, y: event.clientY };
+          this.#pointerUntil = performance.now() + 2500;
+        },
+        { passive: true, signal: this.#abort.signal },
+      );
       canvas.addEventListener("keydown", this.#keyboard, {
         signal: this.#abort.signal,
       });
@@ -439,6 +482,7 @@ export class ThingyCharacter extends HTMLElement {
         "change",
         () => {
           if (this.#hop) this.#hop.duration = 0;
+          this.#setLife();
           this.#setPose();
           this.#scheduleBlink();
         },
@@ -551,6 +595,8 @@ export class ThingyCharacter extends HTMLElement {
       }
       this.#model = gltf.scene;
       this.#faceMap = undefined;
+      this.#life = undefined;
+      this.#heldPose = "";
       this.#hop = undefined;
       this.#lift = 0;
       this.style.translate = "";
@@ -579,6 +625,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#mixer = new THREE.AnimationMixer(this.#model);
       this.#currentScene = selected;
       this.#currentVersion = version;
+      this.#setLife();
       this.#setPose();
       this.#setLight();
       this.#setFace();
@@ -608,6 +655,12 @@ export class ThingyCharacter extends HTMLElement {
     const now = this.#stage();
     const clip = this.#clips.find((item) => item.name === now.clip);
     if (!clip) return;
+    const life = this.alive ? this.#life : undefined;
+    // Only a change of pose moves him. Taking off a hat leaves him standing.
+    if (life && this.#heldPose && now.clip + now.frame !== this.#heldPose)
+      life.startBlend();
+    this.#heldPose = now.clip + now.frame;
+    life?.restore();
     this.#mixer.stopAllAction();
     const action = this.#mixer.clipAction(clip);
     action.reset().setLoop(THREE.LoopRepeat, Infinity).play();
@@ -616,6 +669,7 @@ export class ThingyCharacter extends HTMLElement {
       : Math.min((now.frame - 1) / 24, clip.duration);
     action.paused = !this.playing;
     this.#mixer.update(0);
+    life?.capture();
     this.#action = action;
     const shown = shownNodes(this.scene, now.accessories);
     this.#model.traverse((part) => {
@@ -657,29 +711,96 @@ export class ThingyCharacter extends HTMLElement {
   #setFace(closed = false): void {
     if (!this.#faceMap) return;
     const item = FACES[face(this.getAttribute("face"))];
-    const [x, y] = faceOffset(closed ? (item.blink ?? item.cell) : item.cell);
+    this.#showCell(closed ? (item.blink ?? item.cell) : item.cell);
+  }
+
+  #showCell(cell: number): void {
+    if (!this.#faceMap) return;
+    const [x, y] = faceOffset(cell);
     this.#faceMap.offset.set(x, y);
     this.#dirty = true;
+  }
+
+  /** While he is alive his eyes shut across a change of expression, and his head reacts. */
+  #changeFace(before: string | null): void {
+    clearTimeout(this.#faceTimer);
+    const wait = this.#lifeSettings.faceChange;
+    const life = this.alive ? this.#life : undefined;
+    if (!life || wait <= 0) {
+      this.#setFace();
+      this.#scheduleBlink();
+      life?.react();
+      return;
+    }
+    clearTimeout(this.#blinkTimer);
+    const old = FACES[face(before)];
+    const next = FACES[face(this.getAttribute("face"))];
+    this.#showCell(old.blink ?? next.blink ?? FACES.idle!.blink!);
+    this.#faceTimer = window.setTimeout(() => {
+      this.#setFace();
+      this.#scheduleBlink();
+      life.react();
+    }, wait);
+  }
+
+  /** Starts or stops the small movements, whichever now applies. */
+  #setLife(): void {
+    if (!this.#model) return;
+    if (this.alive) {
+      if (!this.#life) {
+        this.#life = new Life(this.#model);
+        this.#life.settings = this.#lifeSettings;
+        this.#life.onBigGlance = () => this.#blinkNow();
+      }
+    } else if (this.#life) {
+      this.#life.stop();
+      this.#mixer?.update(0);
+      this.#life = undefined;
+    }
+    this.#scheduleBlink();
+    this.#dirty = true;
+  }
+
+  #blinkNow(): void {
+    if (FACES[face(this.getAttribute("face"))].blink === undefined) return;
+    clearTimeout(this.#blinkTimer);
+    this.#setFace(true);
+    this.#blinkTimer = window.setTimeout(() => this.#scheduleBlink(), 120);
   }
 
   /** A blink every few seconds, only on request and never under reduced motion. */
   #scheduleBlink(): void {
     clearTimeout(this.#blinkTimer);
     this.#setFace();
+    const alive = this.alive;
     if (
-      this.getAttribute("blink") !== "on" ||
+      (this.getAttribute("blink") !== "on" && !alive) ||
       this.#reduced.matches ||
       !this.#faceMap ||
       FACES[face(this.getAttribute("face"))].blink === undefined
     )
       return;
+    const every = this.#lifeSettings.blinkEvery * 1000;
     this.#blinkTimer = window.setTimeout(
       () => {
         if (!this.#visible || document.hidden) return this.#scheduleBlink();
         this.#setFace(true);
-        this.#blinkTimer = window.setTimeout(() => this.#scheduleBlink(), 130);
+        const pair = alive && Math.random() < this.#lifeSettings.doubleBlink;
+        this.#blinkTimer = window.setTimeout(() => {
+          if (!pair) return this.#scheduleBlink();
+          this.#setFace();
+          this.#blinkTimer = window.setTimeout(() => {
+            this.#setFace(true);
+            this.#blinkTimer = window.setTimeout(
+              () => this.#scheduleBlink(),
+              110,
+            );
+          }, 130);
+        }, 130);
       },
-      2600 + Math.random() * 4200,
+      alive
+        ? every * (0.55 + Math.random() * 0.9)
+        : 2600 + Math.random() * 4200,
     );
   }
 
@@ -700,8 +821,11 @@ export class ThingyCharacter extends HTMLElement {
 
   #setMotion(): void {
     if (!this.#action) return;
+    const life = this.alive ? this.#life : undefined;
+    life?.restore();
     this.#action.paused = !this.playing;
     this.#mixer?.update(0);
+    life?.capture();
     this.#dirty = true;
     this.dispatchEvent(
       new CustomEvent("thingy-change", {
@@ -751,8 +875,23 @@ export class ThingyCharacter extends HTMLElement {
     this.#stepHop();
     if (!this.#visible || document.hidden || !this.#renderer) return;
     this.#controls?.update();
-    if (this.playing) {
-      this.#mixer?.update(Math.min(this.#clock.getDelta(), 0.05));
+    const dt = Math.min(this.#clock.getDelta(), 0.05);
+    const life = this.alive ? this.#life : undefined;
+    if (life) {
+      life.restore();
+      if (this.playing) this.#mixer?.update(dt);
+      life.capture();
+      if (this.#pointer && performance.now() > this.#pointerUntil)
+        this.#pointer = null;
+      life.apply(dt, {
+        camera: this.#camera,
+        rect: this.getBoundingClientRect(),
+        pointer: this.#press ? null : this.#pointer,
+        busy: Boolean(this.#hop),
+      });
+      this.#dirty = true;
+    } else if (this.playing) {
+      this.#mixer?.update(dt);
       this.#dirty = true;
     }
     if (this.#dirty) {
@@ -773,6 +912,9 @@ export class ThingyCharacter extends HTMLElement {
     ++this.#generation;
     cancelAnimationFrame(this.#frame);
     clearTimeout(this.#blinkTimer);
+    clearTimeout(this.#faceTimer);
+    this.#life = undefined;
+    this.#heldPose = "";
     this.#abort.abort();
     this.#observer?.disconnect();
     this.#intersection?.disconnect();
