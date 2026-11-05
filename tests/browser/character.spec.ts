@@ -773,6 +773,7 @@ test("Shuffle sets him up somewhere else, and the line and address follow", asyn
   await expect(page.locator("#scene-line")).toHaveText("A librarian.");
   let was = "library";
   for (let turn = 0; turn < 3; turn++) {
+    const line = await page.locator("#scene-line").textContent();
     await page.locator("#shuffle").click();
     await expect(character).not.toHaveAttribute("scene", was);
     await expect(character).toHaveAttribute("data-ready", "", {
@@ -783,8 +784,9 @@ test("Shuffle sets him up somewhere else, and the line and address follow", asyn
     expect(page.url()).toContain(`scene=${was}`);
     await expect(page.locator(`[data-face="off"]`)).toHaveCount(0);
     expect(await character.getAttribute("face")).not.toBe("off");
+    // Each scene has its own line, and a shuffle may come back to the Library later.
+    await expect(page.locator("#scene-line")).not.toHaveText(line!);
   }
-  await expect(page.locator("#scene-line")).not.toHaveText("A librarian.");
   // What he has on is exactly what the sheet says.
   await open(page, "scene");
   await expect(page.locator(`input[value="${was}"]`)).toBeChecked();

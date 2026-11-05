@@ -484,11 +484,17 @@ test("a shuffle is always somewhere else, and always something he can do", () =>
         assert.deepEqual(made.accessories, got.accessories);
         assert.equal(made.pose, got.pose);
       }
-  // A real run reaches every scene and takes the things he can have off too.
+  // A long run reaches every scene and takes the things he can have off too.
   const seen = new Set<string>();
   const held = new Set<string>();
+  // Seeded, so a run of bad luck can't fail this.
+  let number = 12345;
+  const seeded = () => {
+    number = (number * 1103515245 + 12345) % 2147483648;
+    return number / 2147483648;
+  };
   for (let turn = 0; turn < 400; turn++) {
-    const got = shuffled("library");
+    const got = shuffled("library", seeded);
     seen.add(got.scene);
     for (const id of got.accessories) held.add(id);
   }
