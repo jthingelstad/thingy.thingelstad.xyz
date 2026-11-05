@@ -84,7 +84,7 @@
         "workshop-thinking-curious"
       ],
       "keeps": [
-        "docs/THINGY.md: his job, outfit and register on this site",
+        "docs/THINGY.md: his job, scene and register on this site",
         "public/img/thingy-96.png: the illustration, for the footer byline",
         "Pages in his voice, written by the agents that keep the site"
       ]

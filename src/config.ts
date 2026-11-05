@@ -172,6 +172,10 @@ export const SCENES = {
           { id: "candle", label: "Candle", poses: ["carry", "show"] },
         ],
       },
+      {
+        id: "printer",
+        options: [{ id: "printer", label: "3D printer" }],
+      },
     ],
   },
   concert: {
@@ -420,6 +424,58 @@ export type EmbedState = Omit<CharacterState, "pose"> & {
   face?: string;
   view?: string;
 };
+/** What he is in each scene, for the line under the title. Always Thingy follows it. */
+export const SCENE_LINES: Record<SceneKey, string> = {
+  library: "A librarian.",
+  outdoors: "A trail companion.",
+  workshop: "A builder.",
+  concert: "A concert companion.",
+  kitchen: "A home cook.",
+  winter: "A winter walker.",
+  cabin: "A cabin regular.",
+};
+/**
+ * Somewhere else, with something else: a new scene, what each of its slots holds, a
+ * pose those allow and a face a reader may choose. Pass `random` to pin it in a test.
+ */
+export function shuffled(
+  from: SceneKey,
+  random: () => number = Math.random,
+): {
+  scene: SceneKey;
+  accessories: string[];
+  pose: AnyPose;
+  face: string;
+  light: boolean;
+} {
+  const pick = <T>(items: readonly T[]): T =>
+    items[Math.floor(random() * items.length)]!;
+  const next = pick(SCENE_KEYS.filter((key) => key !== from));
+  const held = slotsOf(next).flatMap((slot) => {
+    // A switch stays as the scene has it more often than not.
+    if (!slot.empty && slot.options.length === 1)
+      return random() < (slot.standard ? 0.8 : 0.5)
+        ? [slot.options[0]!.id]
+        : [];
+    const one = pick([
+      ...slot.options.map((option) => option.id),
+      ...(slot.empty ? [null] : []),
+    ]);
+    return one ? [one] : [];
+  });
+  const stage = stageOf(
+    next,
+    accessoriesValue(held),
+    pick(posesFor(next, held)),
+  );
+  return {
+    scene: next,
+    accessories: stage.accessories,
+    pose: stage.pose,
+    face: pick(Object.keys(FACE_CHOICES)),
+    light: random() < 0.5,
+  };
+}
 /** The published size of each scene on the newest model, as a page offers it. */
 export const MODEL_WEIGHT: Record<SceneKey, string> = {
   library: "2.6 MB",
@@ -427,7 +483,7 @@ export const MODEL_WEIGHT: Record<SceneKey, string> = {
   workshop: "3.0 MB",
   concert: "2.5 MB",
   kitchen: "2.3 MB",
-  winter: "2.2 MB",
+  winter: "2.3 MB",
   cabin: "2.1 MB",
 };
 export function embedURL(

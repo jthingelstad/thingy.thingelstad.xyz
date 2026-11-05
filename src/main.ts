@@ -10,6 +10,7 @@ import {
   MODEL_WEIGHT,
   POSES,
   SCENES,
+  SCENE_LINES,
   accessoriesIn,
   accessoriesValue,
   anyPose,
@@ -18,6 +19,7 @@ import {
   posesFor,
   posterPath,
   scene,
+  shuffled,
   stageOf,
   type AnyPose,
   type CharacterState,
@@ -59,7 +61,7 @@ const character = $<HTMLElementTagNameMap["thingy-character"]>("#main-thingy");
 if (parseView(params.get("view")))
   character.setAttribute("view", params.get("view")!);
 const TICK =
-  '<svg class="chooser-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4.500 4.500L19 7"/></svg>';
+  '<svg class="choice-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4.500 4.500L19 7"/></svg>';
 /** He stands in the scene's clothes on its poster, so it makes his portrait. */
 const scenePortrait = (id: string): string =>
   posterPath(id as keyof typeof SCENES, "present");
@@ -74,7 +76,7 @@ const slotsHere = (): readonly Slot[] => SCENES[state.scene].slots;
 function accessoryButtons(slot: Slot): string {
   const button = (id: string, label: string) =>
     `<button type="button" class="accessory-option" data-slot="${slot.id}" data-accessory="${id}" aria-pressed="false">${icon(id || "none")}<span>${label}</span>${TICK}</button>`;
-  return `<div class="chooser-group">${[
+  return `<div class="choice-group">${[
     ...(slot.empty ? [button("", slot.empty.label)] : []),
     ...slot.options.map((option) => button(option.id, option.label)),
   ].join("")}</div>`;
@@ -107,7 +109,7 @@ $("#face-options").innerHTML = Object.entries(FACE_CHOICES)
   })
   .join("");
 
-/** The sheet's tabs say what is chosen; only the phone and tablet layouts show them. */
+/** The sheet's tabs say what is chosen. */
 function syncSheet(): void {
   const controls = $("#controls");
   const hasAccessories = slotsHere().length > 0;
@@ -120,6 +122,7 @@ function syncSheet(): void {
     );
   $('[data-sheet-tab="accessories"]').hidden = !hasAccessories;
   $("#tab-scene").textContent = SCENES[state.scene].label;
+  $("#scene-line").textContent = SCENE_LINES[state.scene];
   const held = accessoriesIn(state.scene).filter((item) =>
     state.accessories.includes(item.id),
   );
@@ -130,26 +133,6 @@ function syncSheet(): void {
     : slotsHere().find((slot) => slot.empty)
       ? "None"
       : "Off";
-  // The same words on the wider layout's two choosers.
-  $("#scene-value").textContent = SCENES[state.scene].label;
-  $("#scene-mark").innerHTML =
-    `<img class="scene-thumb" src="${scenePortrait(state.scene)}" alt="" width="40" height="40">`;
-  $("#scene-trigger").setAttribute(
-    "aria-label",
-    `Scene: ${SCENES[state.scene].label}`,
-  );
-  const inHand = held.find((item) =>
-    slotsHere().some(
-      (slot) =>
-        slot.options.length > 1 && slot.options.some((o) => o.id === item.id),
-    ),
-  );
-  const saying = held.length
-    ? held.map((item) => item.label).join(" + ")
-    : (slotsHere().find((slot) => slot.empty)?.empty?.label ?? "None");
-  $("#accessory-value").textContent = saying;
-  $("#accessory-mark").innerHTML = icon((inHand ?? held[0])?.id ?? "none");
-  $("#accessory-trigger").setAttribute("aria-label", `Accessories: ${saying}`);
   $("#tab-pose").textContent = ALL_POSES[state.pose].label;
   $("#tab-face").textContent = FACE_CHOICES[state.face]!.label;
 }
@@ -235,6 +218,10 @@ function syncCharacter(): void {
       "aria-pressed",
       String(button.dataset.pose === state.pose),
     );
+  for (const radio of document.querySelectorAll<HTMLInputElement>(
+    'input[name="scene"]',
+  ))
+    radio.checked = radio.value === state.scene;
   $("#accessories").hidden = !slotsHere().length;
   syncAccessories();
   syncSheet();
@@ -276,58 +263,22 @@ function toggleSheet(tab: string): void {
 }
 $("#bring-toggle").addEventListener("click", () => toggleSheet("bring"));
 
-// The two choosers. On the wide layout each opens a panel from its own button. On the
-// phone the sheet's tabs already do that, and the panel is the sheet's. Either way a
-// choice of one closes it, so he comes back into view, and a switch leaves it open.
-const sheetLayout = matchMedia("(max-width: 1000px)");
-const CHOOSERS = ["#scene-trigger", "#accessory-trigger"] as const;
-function closeChoosers(giveFocusBack = false): void {
-  for (const id of CHOOSERS) {
-    const trigger = $(id);
-    if (trigger.getAttribute("aria-expanded") !== "true") continue;
-    trigger.setAttribute("aria-expanded", "false");
-    if (giveFocusBack) trigger.focus();
-  }
-}
-function openChooser(trigger: HTMLElement): void {
-  closeChoosers();
-  const panel = trigger.nextElementSibling as HTMLElement;
-  trigger.setAttribute("aria-expanded", "true");
-  // It opens the way there is room, and scrolls if there is not enough either way.
-  panel.classList.remove("opens-up");
-  panel.style.maxHeight = "";
-  const box = trigger.getBoundingClientRect();
-  const below = innerHeight - box.bottom - 16;
-  const above = box.top - 16;
-  const up = panel.scrollHeight > below && above > below;
-  panel.classList.toggle("opens-up", up);
-  panel.style.maxHeight = `${Math.max(up ? above : below, 180)}px`;
-}
-/** Back to the figure, after a choice of one. */
+/** A choice of one closes the list, so he comes back into view. A switch leaves it. */
 function chosen(): void {
-  if (sheetLayout.matches) {
-    $("#controls").dataset.tab = "none";
-    syncSheet();
-  } else closeChoosers(true);
+  const controls = $("#controls");
+  const tab = controls.dataset.tab;
+  controls.dataset.tab = "none";
+  syncSheet();
+  $(`[data-sheet-tab="${tab}"]`).focus({ preventScroll: true });
 }
-for (const id of CHOOSERS)
-  $(id).addEventListener("click", (event) => {
-    const trigger = event.currentTarget as HTMLElement;
-    if (trigger.getAttribute("aria-expanded") === "true") closeChoosers();
-    else openChooser(trigger);
-  });
-document.addEventListener("pointerdown", (event) => {
-  if (!(event.target as Element).closest(".chooser")) closeChoosers();
-});
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && (event.target as Element).closest?.(".chooser"))
-    closeChoosers(true);
+  if (
+    event.key === "Escape" &&
+    (event.target as Element).closest?.("#controls") &&
+    $("#controls").dataset.tab !== "none"
+  )
+    chosen();
 });
-for (const chooser of document.querySelectorAll<HTMLElement>(".chooser"))
-  chooser.addEventListener("focusout", (event) => {
-    const to = event.relatedTarget as Element | null;
-    if (to && !chooser.contains(to)) closeChoosers();
-  });
 // Arrow keys walk the radios without closing the panel, so he can be looked at in each.
 $("#scene-options").addEventListener("click", (event) => {
   if (
@@ -382,6 +333,10 @@ $("#pose-options").addEventListener("click", (event) => {
     state.pose = anyPose(button.dataset.pose);
     syncCharacter();
   }
+});
+$("#shuffle").addEventListener("click", () => {
+  Object.assign(state, shuffled(state.scene));
+  syncCharacter();
 });
 $("#light").addEventListener("change", () => {
   state.light = $<HTMLInputElement>("#light").checked;
@@ -469,18 +424,14 @@ async function copy(
   words: string,
 ): Promise<void> {
   const label = button.querySelector("b")!;
-  const way = button.closest(".way")!;
   try {
     await navigator.clipboard.writeText(text);
     label.textContent = words;
   } catch {
-    label.textContent = "Select the text below to copy";
-    way.setAttribute("data-shown", "");
+    label.textContent = "Select the text above to copy";
   }
 }
 $("#copy").addEventListener("click", async () => {
-  // What was copied stays readable under the button.
-  $("#copy").closest(".way")!.setAttribute("data-shown", "");
   await copy(embedCode(), $("#copy"), "Embed copied");
 });
 $("#copy-link").addEventListener("click", () =>

@@ -24,7 +24,7 @@ Everything here is licensed CC BY-NC 4.0 (https://creativecommons.org/licenses/b
 
 - [Character manifest, v0.17](https://thingy.thingelstad.xyz/character/v0.17/manifest.json): the numbered directory of the current model. Its files are never replaced; a future incompatible revision gets a new directory.
 - [Character manifest, v0.14](https://thingy.thingelstad.xyz/character/v0.14/manifest.json): the model before Scenes, by its outfit names. The files stay published, but the component no longer draws it.
-- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): the first model, with no faces or tools. It has PNG stills beside each WebP. The files stay published, but the component no longer draws it.
+- [Character manifest, v0.10](https://thingy.thingelstad.xyz/character/v0.10/manifest.json): the first model, with no faces or accessories. It has PNG stills beside each WebP. The files stay published, but the component no longer draws it.
 
 ## Pages
 

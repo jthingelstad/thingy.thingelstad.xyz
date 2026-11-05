@@ -15,7 +15,7 @@ he changes here, a project that follows these addresses changes with him.
 | Part             | What it is                                                                                                                 | Where                                                                                                            |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | His persona      | Who he is, how he talks, and what he never does. The authority on him                                                      | [persona.md](https://thingy.thingelstad.xyz/persona.md), or [as a page](https://thingy.thingelstad.xyz/persona/) |
-| His model        | Rigged glTF 2.0, in four scenes, with faces and accessories                                                                | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
+| His model        | Rigged glTF 2.0, in seven scenes, with faces and accessories                                                               | [character/latest/](https://thingy.thingelstad.xyz/character/latest/manifest.json), described by its manifest    |
 | His pictures     | Transparent stills, with no code to run                                                                                    | `https://thingy.thingelstad.xyz/character/latest/poses/<name>.webp`                                              |
 | A frame          | An iframe with him in it, with no code to run                                                                              | `https://thingy.thingelstad.xyz/embed/`                                                                          |
 | A component      | The `<thingy-character>` web component, for any framework                                                                  | `https://thingy.thingelstad.xyz/thingy.js`                                                                       |
@@ -41,7 +41,7 @@ today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-w
 | Host of Supporting Membership | Concert                | `concert`                                  |
 | Narrator of the audio edition | None, he is only heard |                                            |
 
-`outdoors` is a scene with no job yet.
+`outdoors`, `kitchen`, `winter` and `cabin` are scenes with no job yet.
 
 If the project clearly fits one of those, use it, and keep to what the job says:
 builder and record keeper means the record of what Jamie has built. If you aren't
@@ -91,12 +91,12 @@ Readers sign in with an active Weekly Thing subscription. An agent can also use
 
 ## Show him
 
-| You want                                  | Use           | It costs                                               |
-| ----------------------------------------- | ------------- | ------------------------------------------------------ |
-| A picture on a page                       | A still       | Under 60 KB, and no JavaScript                         |
-| Him on a page, turnable by whoever visits | The frame     | A model of about 2 MB, loaded inside the frame         |
-| Him inside an app, reacting to it         | The component | `thingy.js` at about 820 KB, and a model of about 2 MB |
-| Him in your own 3D scene                  | The model     | A model of about 2 MB, and your own renderer           |
+| You want                                  | Use           | It costs                                              |
+| ----------------------------------------- | ------------- | ----------------------------------------------------- |
+| A picture on a page                       | A still       | Under 60 KB, and no JavaScript                        |
+| Him on a page, turnable by whoever visits | The frame     | A model of 2 to 3 MB, loaded inside the frame         |
+| Him inside an app, reacting to it         | The component | `thingy.js` at about 840 KB, and a model of 2 to 3 MB |
+| Him in your own 3D scene                  | The model     | A model of 2 to 3 MB, and your own renderer           |
 
 Each of these follows the newest Thingy as written here. See
 [Follow him or keep him](#follow-him-or-keep-him) to hold one still instead.
@@ -112,15 +112,15 @@ Each of these follows the newest Thingy as written here. See
 />
 ```
 
-The name is `<scene>-<pose>.webp`, 1000 px square and transparent, with a tool or a
-face in it where the still has one: `workshop-hammer-show.webp`,
+The name is `<scene>-<pose>.webp`, 1000 px square and transparent, with an accessory or
+a face in it where the still has one: `workshop-hammer-show.webp`,
 `library-rest-delighted.webp`.
 
 - **Every scene has `present`.** Outdoors, Concert, Kitchen, Winter and Cabin have only
   that, named by `poster` in the manifest, and they show the accessories the scene gives him. In
   `workshop-present` he holds the laptop.
-- **The Library's stills also have faces, and the Workshop's have tools and two
-  faces for his job there:** `workshop-present-proud` and
+- **The Library's stills also have faces and its accessories, and the Workshop's
+  have its accessories and two faces for his job there:** `workshop-present-proud` and
   `workshop-thinking-curious`. `stills` for each scene in the
   [manifest](https://thingy.thingelstad.xyz/character/latest/manifest.json) lists
   them. A still shows the `original` face unless its name gives another.
@@ -269,8 +269,8 @@ shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for 
 
 - **Poses** are animation clips named for the pose, at 24 fps. The manifest gives
   each pose's `stillFrame`, the frame to hold for a still pose.
-- **Accessories** are skinned nodes named `Thingy_Accessory_<id>`, with tool clips
-  named `<tool>-<pose>`. Show the ones he has and hide the rest. An accessory's
+- **Accessories** are skinned nodes named `Thingy_Accessory_<id>`, with clips named
+  `<accessory>-<pose>` for the ones that have their own poses. Show the ones he has and hide the rest. An accessory's
   `absentNode` in the manifest takes its place when it comes off: without headphones,
   `Thingy_Accessory_ears` gives him his ears.
 - **The face** is one cell of an atlas on the node `Thingy_Screen`: material
@@ -283,8 +283,8 @@ shared rig of 40 joints. From v0.16 the Workshop and Concert have one more, for 
 
 ### Poses
 
-`hello`, `present`, `thinking` and `rest`, in every scene. On a page where people
-can turn him, `hello` makes the better first pose, since the `present` hand can
+`hello`, `present`, `thinking` and `rest`, in every scene. Accessories bring poses
+of their own, listed [below](#accessories). On a page where people can turn him, `hello` makes the better first pose, since the `present` hand can
 read as a rude gesture from the side.
 
 ### Faces
@@ -322,12 +322,14 @@ he has, separated by commas, or say `none`.
 | `workshop` | `screwdriver`, `hammer`, `drill` | Empty     | Empty hands           |
 | `workshop` | `laptop`                         | Empty     | `laptop` in `present` |
 | `workshop` | `plate`, `mug`, `candle`         | Empty     | Empty hands           |
+| `workshop` | `printer`                        | Off       | No printer            |
 | `concert`  | `headphones`                     | Off       | `headphones`          |
 | `concert`  | `scarf`                          | Off       | No scarf              |
 | `concert`  | `phone`, `mic`                   | Empty     | Empty hands           |
 | `kitchen`  | `tongs`, `whisk`, `mug`          | Empty     | Empty hands           |
 | `kitchen`  | `grill`                          | Off       | No grill              |
 | `winter`   | `scarf`                          | Off       | `scarf`               |
+| `winter`   | `hat`                            | Off       | No hat                |
 | `cabin`    | `baton`, `mug`                   | Empty     | Empty hands           |
 
 Some accessories keep to the poses they were made for:
@@ -346,12 +348,31 @@ Some accessories keep to the poses they were made for:
 | `tongs`, `whisk`                 | `carry`, `work`             |
 | `none`, in the Workshop          | `hello`, `thinking`, `rest` |
 
-`carry` holds the tool at his side, `show` holds it in front of him, and `work` is
-using it. The laptop's `present` turns its screen to you, and its `work` to him. The `phone` shows the Thingy Model page on Things I've built, on a screen turned to him. The `plate` is 3D Printing: a build plate with a small Thingy on it, held in both hands, and a printer beside him with another Thingy most of the way up on its bed. Both wear the face you give him. In Concert, `check` looks at the `phone` and `hold` holds it up to film. `read` opens the `book` in both hands, `sip` drinks from the `mug`, `speak` talks into the `mic`, and `throw` swings the Kubb `baton`. The `book` is the Yearly Thing and the `mug` has the Road Sign Math logo. The `grill` is a green ceramic egg standing beside him, the `helmet` and the Winter `hat` have room for his antenna, and the `scarf` is colors only. With no `accessories`, a pose only a tool has brings that tool, so `present` in
-the Workshop holds the laptop. Asking for a pose the accessory does not have moves
-him to its first pose. Tool poses are single frames, so `motion` has nothing to play.
-An accessory a scene doesn't have is ignored. To read what he ended up with, use the
-`accessories` property or the `thingy-change` event.
+`carry` holds an accessory at his side, `show` holds it in front of him, and `work`
+is using it. In the Workshop:
+
+- The `laptop`'s `present` turns its screen to you, and its `work` to him.
+- The `plate` is 3D Printing: a build plate with a small Thingy on it, held in both
+  hands.
+- The `printer` stands beside him with a Thingy most of the way up on its bed. It
+  goes with anything in his hands. Both small Thingys wear the face you give him.
+
+Elsewhere:
+
+- In Concert, `check` looks at the `phone` and `hold` holds it up to film. The screen
+  shows the Thingy Model page on Things I've built, turned to him. `speak` talks into
+  the `mic`.
+- `read` opens the `book` in both hands. The `book` is the Yearly Thing.
+- `sip` drinks from the `mug`, which has the Road Sign Math logo.
+- `throw` swings the Kubb `baton`.
+- The `grill` is a green ceramic egg standing beside him, the `helmet` and the Winter
+  `hat` have room for his antenna, and the `scarf` is colors only.
+
+With no `accessories`, a pose only one accessory has brings it, so `present` in the
+Workshop holds the laptop. Asking for a pose the accessory does not have moves him to
+its first pose. An accessory's own poses are single frames, so `motion` has nothing to
+play. An accessory a scene doesn't have is ignored. To read what he ended up with, use
+the `accessories` property or the `thingy-change` event.
 
 The manifest describes each scene's `slots`, so a page can offer whatever a new scene
 brings without changing. A slot holds one accessory at a time.

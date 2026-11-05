@@ -334,6 +334,16 @@
               ]
             }
           ]
+        },
+        {
+          "id": "printer",
+          "options": [
+            {
+              "id": "printer",
+              "label": "3D printer",
+              "node": "Thingy_Accessory_printer"
+            }
+          ]
         }
       ]
     },

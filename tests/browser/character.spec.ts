@@ -1,25 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createServer } from "node:http";
 
-/**
- * On a phone one group of controls is open at a time, and on the wide layout scene and
- * accessories are dropdowns: open the one a step needs.
- */
+/** One group of controls is open at a time: open the one a step needs. */
 async function open(page: Page, tab: string): Promise<void> {
-  const button = page.locator(`[data-sheet-tab="${tab}"]`);
-  if (await button.isVisible()) {
-    if ((await button.getAttribute("aria-expanded")) !== "true")
-      await button.click();
-    return;
-  }
-  const trigger = page.locator(
-    tab === "scene" ? "#scene-trigger" : "#accessory-trigger",
-  );
-  if (
-    (tab === "scene" || tab === "accessories") &&
-    (await trigger.getAttribute("aria-expanded")) !== "true"
-  )
-    await trigger.click();
+  const button = page.locator(`[data-sheet-tab="${tab}"]`).first();
+  if ((await button.getAttribute("aria-expanded")) !== "true")
+    await button.click();
 }
 
 test("scenes, poses, playback, light and keyboard camera work on a real WebGL character", async ({
@@ -339,8 +325,7 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(page.locator("#embed-code")).toContainText("face=eager");
 
   // The picture comes from the stage: square, a real PNG, transparent corners.
-  if (info.project.name === "phone")
-    await page.locator('#bring-ways [data-way="picture"]').click();
+  await page.locator('#bring-ways [data-way="picture"]').click();
   const download = page.waitForEvent("download");
   await page.locator("#download").click();
   const saved = await download;
@@ -382,8 +367,7 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(character).toHaveAttribute("data-ready", "");
 
   // The link opens this page set up the same way, at the same angle.
-  if (info.project.name === "phone")
-    await page.locator('#bring-ways [data-way="link"]').click();
+  await page.locator('#bring-ways [data-way="link"]').click();
   await page.locator("#copy-link").click();
   await expect(page.locator("#copy-link-label")).toHaveText("Link copied");
   const link = await page.evaluate(() => navigator.clipboard.readText());
@@ -636,7 +620,8 @@ test("the new scenes each stand ready with their own accessories", async ({
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   for (const [name, standard, others] of [
     ["Kitchen", "none", ["tongs", "whisk", "mug", "grill"]],
-    ["Winter", "scarf", []],
+    ["Winter", "scarf", ["hat"]],
+    ["Workshop", "laptop", ["plate", "printer"]],
     ["Cabin", "none", ["baton", "mug"]],
   ] as const) {
     await open(page, "scene");
@@ -765,17 +750,43 @@ test("the studio offers every face and, for each scene, its accessories", async 
   );
   await page.goto("/?face=off");
   await expect(character).toHaveAttribute("face", "original");
-  // On a phone the open group closes again, leaving him the whole stage.
-  const faceTab = page.locator('[data-sheet-tab="face"]');
-  if (await faceTab.isVisible()) {
-    await faceTab.click();
-    await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
-    await expect(page.locator("#faces")).toBeHidden();
-  }
+  // The open group closes again, leaving him the whole stage.
+  await page.locator('[data-sheet-tab="face"]').click();
+  await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
+  await expect(page.locator("#faces")).toBeHidden();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("Shuffle sets him up somewhere else, and the line and address follow", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(page.locator("#scene-line")).toHaveText("A librarian.");
+  let was = "library";
+  for (let turn = 0; turn < 3; turn++) {
+    await page.locator("#shuffle").click();
+    await expect(character).not.toHaveAttribute("scene", was);
+    await expect(character).toHaveAttribute("data-ready", "", {
+      timeout: 30000,
+    });
+    was = (await character.getAttribute("scene"))!;
+    await expect(page.locator(`input[value="${was}"]`)).toBeChecked();
+    expect(page.url()).toContain(`scene=${was}`);
+    await expect(page.locator(`[data-face="off"]`)).toHaveCount(0);
+    expect(await character.getAttribute("face")).not.toBe("off");
+  }
+  await expect(page.locator("#scene-line")).not.toHaveText("A librarian.");
+  // What he has on is exactly what the sheet says.
+  await open(page, "scene");
+  await expect(page.locator(`input[value="${was}"]`)).toBeChecked();
   expect(errors).toEqual([]);
 });

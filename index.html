@@ -72,10 +72,8 @@
       <section class="studio" id="character" aria-labelledby="title">
         <div class="introduction">
           <h1 id="title">Meet Thingy.</h1>
-          <p>
-            A librarian. A trail companion.<br />
-            A builder. Always Thingy.
-          </p>
+          <p><span id="scene-line">A librarian.</span> Always Thingy.</p>
+          <p class="hint">Drag to turn <span>·</span> Scroll to zoom</p>
         </div>
         <button
           class="bring-toggle"
@@ -104,7 +102,6 @@
               width="1000"
               height="1000"
           /></thingy-character>
-          <p class="hint">Drag to turn <span>·</span> Scroll to zoom</p>
         </div>
         <aside
           class="controls"
@@ -156,171 +153,115 @@
               <small>More</small><b>Light, play</b>
             </button>
           </div>
-          <div class="controls-left">
-            <fieldset class="scenes" id="scenes" data-panel="scene">
-              <legend>Scene</legend>
-              <div class="chooser">
-                <button
-                  type="button"
-                  class="chooser-trigger"
-                  id="scene-trigger"
-                  aria-expanded="false"
-                  aria-controls="scene-options"
-                >
-                  <span class="chooser-mark" id="scene-mark"></span
-                  ><span class="chooser-value" id="scene-value"></span
-                  ><svg
-                    class="chooser-chevron"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-                <div
-                  class="chooser-panel"
-                  id="scene-options"
-                  role="radiogroup"
-                  aria-label="Scene"
-                ></div>
-              </div>
-            </fieldset>
-            <fieldset
-              class="accessories"
-              id="accessories"
-              data-panel="accessories"
-              hidden
-            >
-              <legend>Accessories</legend>
-              <div class="chooser">
-                <button
-                  type="button"
-                  class="chooser-trigger"
-                  id="accessory-trigger"
-                  aria-expanded="false"
-                  aria-controls="accessory-options"
-                >
-                  <span class="chooser-mark" id="accessory-mark"></span
-                  ><span class="chooser-value" id="accessory-value"></span
-                  ><svg
-                    class="chooser-chevron"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-                <div
-                  class="chooser-panel"
-                  id="accessory-options"
-                  role="group"
-                  aria-label="Accessories"
-                ></div>
-              </div>
-            </fieldset>
-          </div>
+          <button class="shuffle" id="shuffle" type="button">
+            <span data-icon="shuffle"></span>Shuffle
+          </button>
+          <fieldset class="scenes" id="scenes" data-panel="scene">
+            <legend>Scene</legend>
+            <div
+              class="choice-list"
+              id="scene-options"
+              role="radiogroup"
+              aria-label="Scene"
+            ></div>
+          </fieldset>
+          <fieldset
+            class="accessories"
+            id="accessories"
+            data-panel="accessories"
+            hidden
+          >
+            <legend>Accessories</legend>
+            <div
+              class="choice-list"
+              id="accessory-options"
+              role="group"
+              aria-label="Accessories"
+            ></div>
+          </fieldset>
           <fieldset class="expressions" id="poses" data-panel="pose">
             <legend class="sr-only">Pose</legend>
             <div id="pose-options"></div>
           </fieldset>
-          <div class="controls-right">
-            <fieldset class="faces" id="faces" data-panel="face">
-              <legend>Face</legend>
-              <div id="face-options"></div>
-              <p id="face-note" class="face-note" aria-live="polite"></p>
-            </fieldset>
-            <div class="more" id="more">
-              <label class="light-control"
-                ><span>Antenna light</span
-                ><input id="light" type="checkbox" role="switch" /><span
-                  class="switch"
-                  aria-hidden="true"
-                ></span
-                ><span id="light-label" class="sr-only">Light off</span></label
-              >
-              <label class="light-control"
-                ><span>Little movements</span
-                ><input id="life" type="checkbox" role="switch" /><span
-                  class="switch"
-                  aria-hidden="true"
-                ></span
-                ><span id="life-label" class="sr-only">Moving</span></label
-              >
-              <div class="playback">
-                <button class="button primary" id="play" aria-pressed="false">
-                  <span data-icon="play"></span
-                  ><span id="play-label">Play</span></button
-                ><button class="button" id="reset">
-                  <span data-icon="reset"></span>Reset view
-                </button>
-              </div>
-              <p id="motion-note" class="motion-note" hidden>
-                Your reduced-motion setting is on, so he stays still.
-              </p>
-            </div>
-            <section
-              class="bring"
-              id="bring-along"
-              data-panel="bring"
-              data-way="live"
-              aria-labelledby="bring-title"
+          <fieldset class="faces" id="faces" data-panel="face">
+            <legend>Face</legend>
+            <div id="face-options"></div>
+            <p id="face-note" class="face-note" aria-live="polite"></p>
+          </fieldset>
+          <div class="more" id="more">
+            <label class="light-control"
+              ><span>Antenna light</span
+              ><input id="light" type="checkbox" role="switch" /><span
+                class="switch"
+                aria-hidden="true"
+              ></span
+              ><span id="light-label" class="sr-only">Light off</span></label
             >
-              <h2 id="bring-title">Bring him along</h2>
-              <p class="bring-summary" id="bring-summary"></p>
-              <div class="bring-ways" id="bring-ways">
-                <button data-way="live" aria-pressed="true">Live</button
-                ><button data-way="picture" aria-pressed="false">Picture</button
-                ><button data-way="link" aria-pressed="false">Link</button>
-              </div>
-              <div class="way" data-way="live">
-                <p>
-                  The real 3D Thingy. People can drag him round on your page.
-                  Loads a <span class="bring-weight"></span> model.
-                </p>
-                <button class="take" id="copy">
-                  <span data-icon="code"></span
-                  ><span
-                    ><b id="copy-label">Copy embed</b
-                    ><small
-                      >Live 3D on your site,
-                      <span class="bring-weight"></span> model</small
-                    ></span
-                  >
-                </button>
-                <pre tabindex="0"><code id="embed-code"></code></pre>
-              </div>
-              <div class="way" data-way="picture">
-                <p>
-                  A still image, turned just the way you have him now.
-                  Transparent background.
-                </p>
-                <button class="take" id="download">
-                  <span data-icon="image"></span
-                  ><span
-                    ><b id="download-label">Download picture</b
-                    ><small>A still, as you have him turned now</small></span
-                  >
-                </button>
-              </div>
-              <div class="way" data-way="link">
-                <p>
-                  This page, set up like this. For sharing him with someone.
-                </p>
-                <button class="take" id="copy-link">
-                  <span data-icon="link"></span
-                  ><span
-                    ><b id="copy-link-label">Copy link</b
-                    ><small>This page, set up like this</small></span
-                  >
-                </button>
-                <pre tabindex="0"><code id="link-code"></code></pre>
-              </div>
-              <p class="bring-kit">
-                Building something with him?
-                <a href="/kit/">Thingy Kit</a> has the rest.
-              </p>
-            </section>
+            <label class="light-control"
+              ><span>Little movements</span
+              ><input id="life" type="checkbox" role="switch" /><span
+                class="switch"
+                aria-hidden="true"
+              ></span
+              ><span id="life-label" class="sr-only">Moving</span></label
+            >
+            <div class="playback">
+              <button class="button primary" id="play" aria-pressed="false">
+                <span data-icon="play"></span
+                ><span id="play-label">Play</span></button
+              ><button class="button" id="reset">
+                <span data-icon="reset"></span>Reset view
+              </button>
+            </div>
+            <p id="motion-note" class="motion-note" hidden>
+              Your reduced-motion setting is on, so he stays still.
+            </p>
           </div>
+          <section
+            class="bring"
+            id="bring-along"
+            data-panel="bring"
+            data-way="live"
+            aria-labelledby="bring-title"
+          >
+            <h2 id="bring-title">Bring him along</h2>
+            <p class="bring-summary" id="bring-summary"></p>
+            <div class="bring-ways" id="bring-ways">
+              <button data-way="live" aria-pressed="true">Live</button
+              ><button data-way="picture" aria-pressed="false">Picture</button
+              ><button data-way="link" aria-pressed="false">Link</button>
+            </div>
+            <div class="way" data-way="live">
+              <p>
+                The real 3D Thingy. People can drag him round on your page.
+                Loads a <span class="bring-weight"></span> model.
+              </p>
+              <button class="take" id="copy">
+                <b id="copy-label">Copy embed</b>
+              </button>
+              <pre tabindex="0"><code id="embed-code"></code></pre>
+            </div>
+            <div class="way" data-way="picture">
+              <p>
+                A still image, turned just the way you have him now. Transparent
+                background.
+              </p>
+              <button class="take" id="download">
+                <b id="download-label">Download picture</b>
+              </button>
+            </div>
+            <div class="way" data-way="link">
+              <p>This page, set up like this. For sharing him with someone.</p>
+              <button class="take" id="copy-link">
+                <b id="copy-link-label">Copy link</b>
+              </button>
+              <pre tabindex="0"><code id="link-code"></code></pre>
+            </div>
+            <p class="bring-kit">
+              Building something with him?
+              <a href="/kit/">Thingy Kit</a> has the rest.
+            </p>
+          </section>
         </aside>
       </section>
       <section class="builder-example" aria-labelledby="builder-title">

@@ -921,11 +921,10 @@ if 'plate' in PROP_POSES:
     take_prop('plate brim', 'Thingy_Accessory_plate_brim')
     little_thingy(body, 'Thingy_Accessory_plate_him', surface, target=9000)
     little_thingy(screen, 'Thingy_Accessory_plate_him_screen', face)
-    # The printer beside him, and himself in it, most of the way up.
-    for part_name, suffix in json.loads(rig['prop_parts'])['plate_printer']:
-        take_prop(part_name, f'Thingy_Accessory_plate_{suffix}')
-    little_thingy(body, 'Thingy_Accessory_plate_printer_him', surface, target=5000, on_printer=True)
-    little_thingy(screen, 'Thingy_Accessory_plate_printer_him_screen', face, on_printer=True)
+if 'printer' in PROP_POSES:
+    # Himself in the printer, most of the way up.
+    little_thingy(body, 'Thingy_Accessory_printer_him', surface, target=5000, on_printer=True)
+    little_thingy(screen, 'Thingy_Accessory_printer_him_screen', face, on_printer=True)
 if 'phone' in PROP_POSES:
     take_prop('phone', 'Thingy_Accessory_phone')
     take_prop('phone lens', 'Thingy_Accessory_phone_lens')
