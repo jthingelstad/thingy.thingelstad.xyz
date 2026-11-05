@@ -206,7 +206,7 @@ memory.
 ## How he looks
 
 The original illustration (`reference/thingy-original.png` in
-thingy-character) is the authority. The Blender master, v0.14, is the working
+thingy-character) is the authority. The Blender master, v0.17, is the working
 model.
 
 - **What never changes:**
@@ -222,9 +222,7 @@ model.
   - **Library:** a navy felt jacket, an orange polka-dot bow tie and pens in
     the pocket. For the archive: Ask Thingy and Echoes.
   - **Workshop:** an indigo canvas vest, a cream tee with a terminal
-    mark and rolled cuffs. His accessories include a screwdriver, hammer, drill
-    and laptop.
-    For Things I've Built.
+    mark and rolled cuffs. For Things I've Built.
   - **Concert:** charcoal denim, a sound-wave tee and over-ear
     headphones. For live music, and for Supporting Membership.
   - **Outdoors:** a forest-green shell and an orange daypack. For

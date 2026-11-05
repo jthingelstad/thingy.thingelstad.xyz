@@ -125,6 +125,14 @@ button svg,
   height: calc(100svh - 96px);
   min-height: 560px;
   max-height: 1000px;
+  /* What the stage leaves clear above him. */
+  --stage-top: 44px;
+}
+/* On a phone the line runs across the middle, where his antenna is. */
+@media (max-width: 640px) {
+  .studio {
+    --stage-top: 64px;
+  }
 }
 .introduction {
   position: absolute;
@@ -165,7 +173,7 @@ h1 {
 .turntable {
   position: absolute;
   inset: auto -22px 198px;
-  height: min(calc(100% - 242px), 112vw);
+  height: min(calc(100% - 198px - var(--stage-top)), 112vw);
   container-type: size;
   z-index: 0;
   isolation: isolate;
@@ -175,11 +183,11 @@ h1 {
 .studio:has(.controls[data-tab="scene"]) .turntable,
 .studio:has(.controls[data-tab="accessories"]) .turntable {
   bottom: 80px;
-  height: min(calc(100% - 124px), 112vw);
+  height: min(calc(100% - 80px - var(--stage-top)), 112vw);
 }
 .studio:has(.controls[data-tab="bring"]) .turntable {
   bottom: 342px;
-  height: min(calc(100% - 386px), 112vw);
+  height: min(calc(100% - 342px - var(--stage-top)), 112vw);
 }
 #main-thingy {
   position: absolute;
