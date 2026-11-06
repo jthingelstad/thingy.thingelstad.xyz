@@ -1,10 +1,16 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createServer } from "node:http";
 
-/** One group of controls is open at a time: open the one a step needs. */
+/**
+ * On the sheet one group of controls is open at a time: open the one a step needs. Wider,
+ * every control is already out and there is nothing to open.
+ */
 async function open(page: Page, tab: string): Promise<void> {
   const button = page.locator(`[data-sheet-tab="${tab}"]`).first();
-  if ((await button.getAttribute("aria-expanded")) !== "true")
+  if (
+    (await button.isVisible()) &&
+    (await button.getAttribute("aria-expanded")) !== "true"
+  )
     await button.click();
 }
 
@@ -325,7 +331,8 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(page.locator("#embed-code")).toContainText("face=eager");
 
   // The picture comes from the stage: square, a real PNG, transparent corners.
-  await page.locator('#bring-ways [data-way="picture"]').click();
+  if (info.project.name === "phone")
+    await page.locator('#bring-ways [data-way="picture"]').click();
   const download = page.waitForEvent("download");
   await page.locator("#download").click();
   const saved = await download;
@@ -367,7 +374,8 @@ test("what stands on the stage is what you copy, save and link", async ({
   await expect(character).toHaveAttribute("data-ready", "");
 
   // The link opens this page set up the same way, at the same angle.
-  await page.locator('#bring-ways [data-way="link"]').click();
+  if (info.project.name === "phone")
+    await page.locator('#bring-ways [data-way="link"]').click();
   await page.locator("#copy-link").click();
   await expect(page.locator("#copy-link-label")).toHaveText("Link copied");
   const link = await page.evaluate(() => navigator.clipboard.readText());
@@ -645,7 +653,7 @@ test("the new scenes each stand ready with their own accessories", async ({
 
 test("the studio offers every face and, for each scene, its accessories", async ({
   page,
-}) => {
+}, info) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   // These compare pictures, so he has to hold still between them.
@@ -750,10 +758,12 @@ test("the studio offers every face and, for each scene, its accessories", async 
   );
   await page.goto("/?face=off");
   await expect(character).toHaveAttribute("face", "original");
-  // The open group closes again, leaving him the whole stage.
-  await page.locator('[data-sheet-tab="face"]').click();
-  await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
-  await expect(page.locator("#faces")).toBeHidden();
+  // On the sheet the open group closes again, leaving him the whole stage.
+  if (info.project.name === "phone") {
+    await page.locator('[data-sheet-tab="face"]').click();
+    await expect(page.locator("#controls")).toHaveAttribute("data-tab", "none");
+    await expect(page.locator("#faces")).toBeHidden();
+  }
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -791,4 +801,86 @@ test("Shuffle sets him up somewhere else, and the line and address follow", asyn
   await open(page, "scene");
   await expect(page.locator(`input[value="${was}"]`)).toBeChecked();
   expect(errors).toEqual([]);
+});
+
+test("on a wide window every control is out, and stays out after a choice", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === "phone", "The phone keeps its sheet");
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const out = [
+    "#scene-options",
+    "#accessory-options",
+    "#pose-options",
+    "#face-options",
+    "#light",
+    "#play",
+    "#shuffle",
+    "#copy",
+    "#download",
+    "#copy-link",
+  ];
+  await expect(page.locator("#sheet-tabs")).toBeHidden();
+  await expect(page.locator("#bring-toggle")).toBeHidden();
+  for (const selector of out)
+    await expect(page.locator(selector).first()).toBeAttached();
+  const seeAll = async () => {
+    for (const selector of out.filter((item) => item !== "#light"))
+      await expect(page.locator(selector)).toBeVisible();
+  };
+  await seeAll();
+  // He stays the same size whatever a scene does to the length of the rail.
+  const before = await character.boundingBox();
+  await page.locator('input[value="workshop"]').check({ force: true });
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await page.locator('[data-accessory="hammer"]').click();
+  await seeAll();
+  expect(await character.boundingBox()).toEqual(before);
+  await page.locator('input[value="library"]').check({ force: true });
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await seeAll();
+  expect(errors).toEqual([]);
+});
+
+test("he appears only when the model is ready, and the still comes back if it can't load", async ({
+  page,
+}) => {
+  const stillShown = () =>
+    page
+      .locator("#main-thingy")
+      .evaluate(
+        (el) => getComputedStyle(el.shadowRoot!.querySelector("img")!).display,
+      );
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/*.glb", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(page.locator("h1")).toBeVisible();
+  expect(await stillShown()).toBe("none");
+  await expect(character.locator("canvas")).toBeHidden();
+  release();
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(character.locator("canvas")).toBeVisible();
+
+  await page.unroute("**/*.glb");
+  await page.route("**/*.glb", (route) => route.abort());
+  await page.reload();
+  await expect(character).toHaveAttribute("data-fallback", "", {
+    timeout: 30000,
+  });
+  expect(await stillShown()).not.toBe("none");
+  // The still fits the stage rather than filling its width.
+  expect(
+    await character.evaluate(
+      (el) => getComputedStyle(el.shadowRoot!.querySelector("img")!).objectFit,
+    ),
+  ).toBe("contain");
 });

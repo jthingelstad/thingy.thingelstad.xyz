@@ -184,6 +184,7 @@ It works in plain HTML or any framework. Change an attribute and he changes.
 | `view`        | The angle he starts at, written as the frame's `view` is                     |
 | `zoom`        | `off` leaves the mouse wheel to the page                                     |
 | `poster`      | An image to show until the model is ready                                    |
+| `reveal`      | `ready` shows no picture while loading; the still appears only if 3D fails   |
 | `view-label`  | The canvas's accessible name                                                 |
 | `asset-base`  | Another directory to load the models from, when hosting the files yourself   |
 

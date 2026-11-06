@@ -37,7 +37,8 @@ const styles = `
 :host{display:block;position:relative;contain:layout style;min-height:160px}
 canvas{display:block;width:100%;height:100%;outline:none;touch-action:pan-y;cursor:grab}canvas:active{cursor:grabbing}
 canvas:focus-visible{outline:2px solid var(--thingy-character-focus,#23533b);outline-offset:-4px;border-radius:8px}
-.frame{position:absolute;inset:0}img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.frame{position:absolute;inset:0}img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+:host([reveal="ready"]:not([data-fallback])) img{display:none}
 :host([data-ready]) img{display:none}.status{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;font:14px/1.5 system-ui;color:#51544f}
 :host([data-ready]) .status{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(prefers-reduced-motion:reduce){img{transition:none}}
@@ -496,6 +497,7 @@ export class ThingyCharacter extends HTMLElement {
         (event) => {
           event.preventDefault();
           this.removeAttribute("data-ready");
+          this.setAttribute("data-fallback", "");
           this.#status(
             "The 3D view paused. Thingy’s pose image is still here.",
           );
@@ -505,6 +507,7 @@ export class ThingyCharacter extends HTMLElement {
       canvas.addEventListener(
         "webglcontextrestored",
         () => {
+          this.removeAttribute("data-fallback");
           if (this.#model) this.setAttribute("data-ready", "");
           this.#dirty = true;
         },
@@ -575,6 +578,7 @@ export class ThingyCharacter extends HTMLElement {
       this.#loop();
       void this.#load();
     } catch {
+      this.setAttribute("data-fallback", "");
       this.#status(
         "A still of Thingy. This browser could not start the 3D view.",
       );
@@ -608,6 +612,7 @@ export class ThingyCharacter extends HTMLElement {
     )
       return;
     this.removeAttribute("data-ready");
+    this.removeAttribute("data-fallback");
     if (this.#renderer) this.#renderer.domElement.style.visibility = "hidden";
     this.#status("Getting Thingy ready…");
     try {
@@ -676,6 +681,7 @@ export class ThingyCharacter extends HTMLElement {
       );
     } catch {
       if (generation !== this.#generation) return;
+      this.setAttribute("data-fallback", "");
       this.#status("The 3D model could not load. Here is Thingy’s pose image.");
       this.dispatchEvent(
         new CustomEvent("thingy-fallback", { bubbles: true, composed: true }),
