@@ -869,6 +869,26 @@ test("he appears only when the model is ready, and the still comes back if it ca
   release();
   await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
   await expect(character.locator("canvas")).toBeVisible();
+  // He fades in, and arrives fully there at his full size.
+  await expect(character).toHaveAttribute("data-shown", "");
+  const canvasStyle = () =>
+    character.locator("canvas").evaluate((el) => {
+      const { opacity, transform, transitionDuration } = getComputedStyle(el);
+      return { opacity, transform, transitionDuration };
+    });
+  expect((await canvasStyle()).transitionDuration).toContain("0.6s");
+  await expect
+    .poll(async () => {
+      const { opacity, transform } = await canvasStyle();
+      return { opacity, transform };
+    })
+    .toEqual({ opacity: "1", transform: "none" });
+  // Under reduced motion he simply appears.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  await expect(character).toHaveAttribute("data-shown", "", { timeout: 30000 });
+  expect((await canvasStyle()).transitionDuration).toBe("0s");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
 
   await page.unroute("**/*.glb");
   await page.route("**/*.glb", (route) => route.abort());

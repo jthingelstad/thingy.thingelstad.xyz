@@ -170,23 +170,23 @@ zoom, as `view=60,80,1.2`.
 
 It works in plain HTML or any framework. Change an attribute and he changes.
 
-| Attribute     | Values                                                                       |
-| ------------- | ---------------------------------------------------------------------------- |
-| `version`     | `latest` or `v0.17`, with the `v`. Anything else is the newest               |
-| `scene`       | `library`, `outdoors`, `workshop`, `concert`, `kitchen`, `winter`, `cabin`   |
-| `pose`        | See [poses](#poses). Without one he stands in `present`, so set it           |
-| `face`        | See [faces](#faces)                                                          |
-| `accessories` | See [accessories](#accessories). A comma list, or `none`                     |
-| `light`       | `on` or `off`. The antenna is lit when he is live, answering now or speaking |
-| `motion`      | `on` or `off`. It obeys reduced motion even when `on`                        |
-| `blink`       | `on` blinks the faces that can, never under reduced motion                   |
-| `life`        | `on` gives him small movements of his own. See [below](#small-movements)     |
-| `view`        | The angle he starts at, written as the frame's `view` is                     |
-| `zoom`        | `off` leaves the mouse wheel to the page                                     |
-| `poster`      | An image to show until the model is ready                                    |
-| `reveal`      | `ready` shows no picture while loading; the still appears only if 3D fails   |
-| `view-label`  | The canvas's accessible name                                                 |
-| `asset-base`  | Another directory to load the models from, when hosting the files yourself   |
+| Attribute     | Values                                                                              |
+| ------------- | ----------------------------------------------------------------------------------- |
+| `version`     | `latest` or `v0.17`, with the `v`. Anything else is the newest                      |
+| `scene`       | `library`, `outdoors`, `workshop`, `concert`, `kitchen`, `winter`, `cabin`          |
+| `pose`        | See [poses](#poses). Without one he stands in `present`, so set it                  |
+| `face`        | See [faces](#faces)                                                                 |
+| `accessories` | See [accessories](#accessories). A comma list, or `none`                            |
+| `light`       | `on` or `off`. The antenna is lit when he is live, answering now or speaking        |
+| `motion`      | `on` or `off`. It obeys reduced motion even when `on`                               |
+| `blink`       | `on` blinks the faces that can, never under reduced motion                          |
+| `life`        | `on` gives him small movements of his own. See [below](#small-movements)            |
+| `view`        | The angle he starts at, written as the frame's `view` is                            |
+| `zoom`        | `off` leaves the mouse wheel to the page                                            |
+| `poster`      | An image to show until the model is ready                                           |
+| `reveal`      | `ready` shows no picture while loading, then fades him in; a still only if 3D fails |
+| `view-label`  | The canvas's accessible name                                                        |
+| `asset-base`  | Another directory to load the models from, when hosting the files yourself          |
 
 - **Events:** `thingy-ready`, `thingy-change`, `thingy-view` as he turns,
   `thingy-tap` on a press that barely moves, and `thingy-fallback` when he falls

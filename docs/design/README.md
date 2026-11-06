@@ -82,6 +82,8 @@ you choose.
 
 The stage shows no picture while the model loads (`reveal="ready"`), only the ground ring
 and "Getting Thingy ready…". The still is framed differently from the model, so showing it
-first made him jump in size when the model arrived (Jamie, 2026-11-05). It still appears
+first made him jump in size when the model arrived (Jamie, 2026-11-05). Once his first
+frame is painted he fades in and settles from 96% to full size, growing from the ground
+ring so his feet stay put. Under reduced motion he simply appears. It still appears
 if 3D can't start or the model can't load. Other hosts keep the still by default, and it
 now fits its frame (`object-fit: contain`) rather than filling a wide one.
