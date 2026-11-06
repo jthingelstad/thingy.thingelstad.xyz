@@ -33,25 +33,30 @@ lighting finish. The browser uses a lighter PBR atlas and environment lighting.
 
 ## The studio
 
-The rail could not hold eleven faces and five tools without running past the
+The first rail could not hold eleven faces and five tools without running past the
 fold, and it kept Thingy small. A Claude Design run compared a floating panel, a
 dock and controls around him, and Jamie chose controls around him above 1000 px,
-with a sheet on the phone (2026-11-04). A day later, having used both, Jamie moved
-every width to the sheet (2026-11-05: "the control interface in the Thingy Preview
-is better").
+with a sheet on the phone (2026-11-04). The next day Jamie moved every width to the
+sheet, then moved desktop back the same day: "on desktop I think the more expansive
+controls were better and left the page more usable… easier to discover" (2026-11-05).
 
-The stage is one layout. He stands above a sheet of five tabs at its foot, each tab
-showing what is chosen now: Scene, Accessories (where the scene has any), Pose, Face,
-More. One group opens at a time, and tapping the open tab closes it. Scene and
-accessories float over him, in lists of two columns, or three above 1000 px, and a
-choice of one closes the list. Figure size follows the height of the canvas, because
-the camera is orthographic and does not fit width, and that height is capped at 112vw,
-which keeps the widest tool poses inside a phone's screen. Above 1000 px the stage
-reaches up behind the header, so the header sits above it to keep its links, and the
-drag hint stands under the intro.
+So there are two layouts. Up to 1000 px he stands above a sheet of five tabs at the foot
+of the stage, each tab showing what is chosen now: Scene, Accessories (where the scene
+has any), Pose, Face, More. One group opens at a time, and tapping the open tab closes it.
+Scene and accessories float over him in lists of two columns, and a choice of one closes
+the list. Above 1000 px every control is out and nothing opens: scene and accessory lists
+with Shuffle in the left rail, poses in front of him, and faces, switches, playback and
+Bring him along in the right rail. The lists stay open there, rather than the dropdowns
+of the first version, so another choice is one click away.
 
-Shuffle rides on top of the sheet, in reach at every width and whichever group is open.
-It picks another scene, then what each of its slots holds, a pose those allow, a face a
+Figure size follows the height of the canvas, because the camera is orthographic and does
+not fit width. On the sheet that height is capped at 112vw, which keeps the widest tool
+poses inside a phone's screen. Above 1000 px it comes from the window alone, so a scene
+with more accessories can lengthen the rail without changing him, and the stage reaches
+up behind the header, which sits above it to keep its links.
+
+Shuffle rides on top of the sheet, and sits beside the word Scene on the wide layout, so
+it is always in reach. It picks another scene, then what each of its slots holds, a pose those allow, a face a
 reader may choose and the antenna light, in `shuffled()` in `src/config.ts`. It leaves
 little movements, playback and the angle alone. The line under the title follows the
 scene, one line each in `SCENE_LINES`, then "Always Thingy."
@@ -61,10 +66,9 @@ scene, one line each in `SCENE_LINES`, then "Always Thingy."
 The first reuse section had its own character and pose pickers, and only ever
 showed stills, though its code was live 3D. A second Claude Design run compared a
 card, the rail and a section below the stage, and Jamie chose the rail, with a sheet
-on the phone (2026-11-04). Since the stage became one layout it has been the sheet's
-at every width, opened by Bring him at the top of the stage. What stands on the stage
-is what you take, so there are no pickers of its own: Live, Picture and Link, each with
-one button.
+on the phone (2026-11-04). On the sheet it opens from Bring him at the top of the
+stage: Live, Picture and Link, each with one button. In the rail the three buttons are
+always out. What stands on the stage is what you take, so there are no pickers of its own.
 
 Copied embeds say `version=latest` so they follow the newest model, and start at the
 angle you turned him. Which pose someone picks and how they turn him is theirs: Jamie
@@ -73,3 +77,13 @@ in the browser, because a still for every combination would be some 275 files.
 
 The stage shrinks when the Bring him sheet is open, so all of him stays in view while
 you choose.
+
+## Loading
+
+The stage shows no picture while the model loads (`reveal="ready"`), only the ground ring
+and "Getting Thingy ready…". The still is framed differently from the model, so showing it
+first made him jump in size when the model arrived (Jamie, 2026-11-05). Once his first
+frame is painted he fades in and settles from 96% to full size, growing from the ground
+ring so his feet stay put. Under reduced motion he simply appears. It still appears
+if 3D can't start or the model can't load. Other hosts keep the still by default, and it
+now fits its frame (`object-fit: contain`) rather than filling a wide one.

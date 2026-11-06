@@ -263,8 +263,13 @@ function toggleSheet(tab: string): void {
 }
 $("#bring-toggle").addEventListener("click", () => toggleSheet("bring"));
 
-/** A choice of one closes the list, so he comes back into view. A switch leaves it. */
+/**
+ * On the sheet a choice of one closes the list, so he comes back into view, and a switch
+ * leaves it. Above that width every control is always out, so there is nothing to close.
+ */
+const sheetLayout = matchMedia("(max-width: 1000px)");
 function chosen(): void {
+  if (!sheetLayout.matches) return;
   const controls = $("#controls");
   const tab = controls.dataset.tab;
   controls.dataset.tab = "none";
@@ -404,7 +409,7 @@ for (const start of ["pointerdown", "wheel", "keydown"])
   character.addEventListener(start, syncBring, { passive: true });
 /** An address may arrive asking for this section, which the sheet keeps closed. */
 function showBringIfAsked(): void {
-  if (location.hash === "#bring-along") {
+  if (sheetLayout.matches && location.hash === "#bring-along") {
     $("#controls").dataset.tab = "bring";
     syncSheet();
   }
@@ -424,14 +429,18 @@ async function copy(
   words: string,
 ): Promise<void> {
   const label = button.querySelector("b")!;
+  const way = button.closest<HTMLElement>(".way")!;
   try {
     await navigator.clipboard.writeText(text);
     label.textContent = words;
   } catch {
-    label.textContent = "Select the text above to copy";
+    label.textContent = "Select the text to copy";
+    way.dataset.shown = "";
   }
 }
 $("#copy").addEventListener("click", async () => {
+  // What was copied stays readable beside the button.
+  $("#copy").closest<HTMLElement>(".way")!.dataset.shown = "";
   await copy(embedCode(), $("#copy"), "Embed copied");
 });
 $("#copy-link").addEventListener("click", () =>
