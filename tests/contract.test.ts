@@ -429,12 +429,15 @@ test("the newest model publishes every still a surface names", () => {
   const manifest = JSON.parse(
     readFileSync(new URL("manifest.json", root), "utf8"),
   );
+  // A scene's poster is a still too: Concert has only `present`, its poster.
   const published = new Set(
-    Object.values<{ stills?: Record<string, { webp: string }> }>(
-      manifest.scenes,
-    ).flatMap((item) =>
-      Object.values(item.stills ?? {}).map((still) => still.webp),
-    ),
+    Object.values<{
+      poster: string;
+      stills?: Record<string, { webp: string }>;
+    }>(manifest.scenes).flatMap((item) => [
+      item.poster,
+      ...Object.values(item.stills ?? {}).map((still) => still.webp),
+    ]),
   );
   for (const surface of surfaces)
     for (const still of surface.stills) {

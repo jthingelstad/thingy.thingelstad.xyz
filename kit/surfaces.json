@@ -58,12 +58,18 @@
       "name": "The Weekly Thing site",
       "url": "https://weekly.thingelstad.com/",
       "repo": "jthingelstad/weekly.thingelstad.com",
-      "job": "Host of Supporting Membership",
-      "follows": [],
-      "stills": [],
+      "job": "Host of its Members page and of Supporting Membership, and the librarian at its doors to Ask Thingy",
+      "follows": ["stills from character/latest/"],
+      "stills": [
+        "concert-present",
+        "library-hello-idle",
+        "library-thinking-curious"
+      ],
       "keeps": [
-        "apps/site/img/: its own copies of his pictures, including the concert one",
-        "FAQ, support and confirm pages that name him"
+        "docs/THINGY.md: his jobs, his stills and whose words go where on this site",
+        "apps/site/_includes/partials/thingy-members.njk: every word he says on the Members page",
+        "FAQ, confirm and topic pages that name him",
+        "apps/site/img/: the audio edition's chapter art and the transcript's avatars"
       ]
     },
     {
