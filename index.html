@@ -73,7 +73,10 @@
         <div class="introduction">
           <h1 id="title">Meet Thingy.</h1>
           <p><span id="scene-line">A librarian.</span> Always Thingy.</p>
-          <p class="hint">Drag to turn <span>·</span> Scroll to zoom</p>
+          <p class="hint">
+            Tap&nbsp;to&nbsp;talk <span>·</span> Drag&nbsp;to&nbsp;turn
+            <span>·</span> Scroll&nbsp;to&nbsp;zoom
+          </p>
         </div>
         <button
           class="bring-toggle"
@@ -103,6 +106,31 @@
               width="1000"
               height="1000"
           /></thingy-character>
+          <div class="speech" id="speech" hidden>
+            <p class="speech-line" id="speech-line" aria-live="polite"></p>
+            <div class="speech-foot">
+              <a
+                class="speech-ask"
+                id="speech-ask"
+                href="https://thingy.thingelstad.com/chat/"
+                ><b>Ask Thingy:</b> <span id="speech-question"></span></a
+              ><button
+                class="speech-button"
+                id="speech-sound"
+                type="button"
+                aria-pressed="false"
+                aria-label="Sound"
+              ></button
+              ><button
+                class="speech-button"
+                id="speech-close"
+                type="button"
+                aria-label="Close"
+              >
+                <span data-icon="close"></span>
+              </button>
+            </div>
+          </div>
         </div>
         <aside
           class="controls"
@@ -151,7 +179,7 @@
               aria-controls="more"
               aria-expanded="false"
             >
-              <small>More</small><b>Light, play</b>
+              <small>More</small><b>Light, sound</b>
             </button>
           </div>
           <div class="controls-left">
@@ -208,6 +236,14 @@
                   aria-hidden="true"
                 ></span
                 ><span id="life-label" class="sr-only">Moving</span></label
+              >
+              <label class="light-control"
+                ><span>Sound</span
+                ><input id="sound" type="checkbox" role="switch" /><span
+                  class="switch"
+                  aria-hidden="true"
+                ></span
+                ><span id="sound-label" class="sr-only">Sound off</span></label
               >
               <div class="playback">
                 <button class="button primary" id="play" aria-pressed="false">

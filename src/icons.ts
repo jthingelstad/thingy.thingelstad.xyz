@@ -58,6 +58,10 @@ const paths: Record<string, string> = {
   shuffle:
     '<path d="M2 18h3.5c1.600 0 3-.8 3.900-2l5.200-8c.9-1.200 2.300-2 3.900-2H22M2 6h3.500c1.600 0 3 .8 3.900 2l1 1.500M22 18h-4.500c-1.600 0-3-.8-3.900-2l-1-1.500M19 3l3 3-3 3M19 15l3 3-3 3"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
+  "sound-on":
+    '<path d="M4 9v6h3l5 4V5L7 9ZM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+  "sound-off": '<path d="M4 9v6h3l5 4V5L7 9ZM16 9.5l5 5M21 9.5l-5 5"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
   reset: '<path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/>',
   copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
   image:

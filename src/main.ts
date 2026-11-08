@@ -26,6 +26,7 @@ import {
   type Slot,
 } from "./config";
 import { icon } from "./icons";
+import { SCENE_VOICE, askAddress, recording } from "./voice";
 
 const $ = <T extends HTMLElement = HTMLElement>(selector: string): T =>
   document.querySelector<T>(selector)!;
@@ -203,6 +204,7 @@ function syncCharacter(): void {
             : "off"
           : value,
     );
+  syncLight();
   const offered = posesFor(state.scene, state.accessories);
   const options = $("#pose-options");
   if (options.dataset.offered !== offered.join())
@@ -302,6 +304,7 @@ $("#scene-options").addEventListener("change", (event) => {
   state.pose = now.pose;
   state.accessories = now.accessories;
   syncCharacter();
+  speak();
 });
 $("#accessory-options").addEventListener("click", (event) => {
   const button = (event.target as Element).closest<HTMLElement>(
@@ -340,8 +343,10 @@ $("#pose-options").addEventListener("click", (event) => {
   }
 });
 $("#shuffle").addEventListener("click", () => {
+  const was = state.scene;
   Object.assign(state, shuffled(state.scene));
   syncCharacter();
+  if (state.scene !== was) speak();
 });
 $("#light").addEventListener("change", () => {
   state.light = $<HTMLInputElement>("#light").checked;
@@ -389,6 +394,102 @@ $("#reset").addEventListener("click", () => {
   character.resetView();
   syncBring();
 });
+
+/*
+ * His voice. Each scene has three lines written for it and recorded once
+ * (src/voice.ts). Picking a scene or tapping him shows the next one, in turn,
+ * so a line comes round again only after the other two. The words are always
+ * shown; he is heard only once a reader turns the sound on, and his antenna is
+ * lit while he speaks (persona/THINGY.md, How he looks).
+ */
+const voice = new Audio();
+voice.preload = "none";
+let sound = false;
+let speaking = false;
+const heard: Partial<Record<keyof typeof SCENES, number>> = {};
+let line:
+  (typeof SCENE_VOICE)[keyof typeof SCENES]["lines"][number] | undefined;
+function syncLight(): void {
+  character.setAttribute("light", state.light || speaking ? "on" : "off");
+}
+function syncSound(): void {
+  $<HTMLInputElement>("#sound").checked = sound;
+  $("#sound-label").textContent = sound ? "Sound on" : "Sound off";
+  const button = $("#speech-sound");
+  button.setAttribute("aria-pressed", String(sound));
+  button.title = sound ? "Sound on" : "Sound off";
+  button.innerHTML = icon(sound ? "sound-on" : "sound-off");
+}
+/**
+ * On a phone, a panel that shrinks the stage hides his words, which would cover
+ * him, and he never speaks without his words in view.
+ */
+const shown = (): boolean => $("#speech").getClientRects().length > 0;
+/** Tapping him, or turning him up, brings him back into view first. */
+function inView(): void {
+  if (sheetLayout.matches && $("#controls").dataset.tab !== "none") chosen();
+}
+function play(): void {
+  voice.pause();
+  const file = line && recording(line);
+  if (!sound || !file || !shown()) return;
+  voice.src = file;
+  voice.play().catch(() => {
+    // Refused or failed: the words are still there to read.
+  });
+}
+/** The next line for the scene he is in. */
+function speak(): void {
+  const scene = SCENE_VOICE[state.scene];
+  const turn = heard[state.scene] ?? 0;
+  heard[state.scene] = turn + 1;
+  line = scene.lines[turn % scene.lines.length];
+  $("#speech-line").textContent = line.text;
+  $("#speech-question").textContent = scene.ask;
+  $<HTMLAnchorElement>("#speech-ask").href = askAddress(scene.ask);
+  $("#speech").hidden = false;
+  play();
+}
+function quiet(): void {
+  voice.pause();
+  $("#speech").hidden = true;
+  line = undefined;
+}
+function setSound(on: boolean): void {
+  sound = on;
+  syncSound();
+  // Turning him up says the line on show, or a new one; turning him down stops him.
+  if (on) line ? play() : speak();
+  else voice.pause();
+}
+voice.addEventListener("playing", () => {
+  speaking = true;
+  syncLight();
+});
+for (const done of ["pause", "ended", "error"])
+  voice.addEventListener(done, () => {
+    speaking = false;
+    syncLight();
+  });
+new MutationObserver(() => {
+  if (!shown()) voice.pause();
+}).observe($("#controls"), { attributes: true, attributeFilter: ["data-tab"] });
+character.addEventListener("thingy-tap", () => {
+  inView();
+  speak();
+});
+$("#sound").addEventListener("change", () => {
+  const on = $<HTMLInputElement>("#sound").checked;
+  if (on) inView();
+  setSound(on);
+});
+$("#speech-sound").addEventListener("click", () => setSound(!sound));
+$("#speech-close").addEventListener("click", quiet);
+$("#speech").addEventListener("keydown", (event) => {
+  if (event.key === "Escape") quiet();
+});
+syncSound();
+
 syncCharacter();
 syncMotionPreference();
 

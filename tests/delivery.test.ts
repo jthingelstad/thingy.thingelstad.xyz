@@ -48,6 +48,10 @@ test("every public file has a MIME type", () => {
 
 test("caching keeps entry points short and hashed bundles long", () => {
   assert.match(cacheControl("assets/main-abc123.js"), /immutable/);
+  assert.match(
+    cacheControl("voice/5bb83b2e28abb08e4e4464aeb2a6639e.mp3"),
+    /immutable/,
+  );
   assert.equal(cacheControl("thingy.js"), "public, max-age=300");
   assert.equal(
     cacheControl("character/v0.10/manifest.json"),
