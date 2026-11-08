@@ -471,9 +471,15 @@ for (const done of ["pause", "ended", "error"])
     speaking = false;
     syncLight();
   });
-new MutationObserver(() => {
+// A panel opening, or a window narrowing to the sheet, can hide his words: he stops.
+const hush = (): void => {
   if (!shown()) voice.pause();
-}).observe($("#controls"), { attributes: true, attributeFilter: ["data-tab"] });
+};
+new MutationObserver(hush).observe($("#controls"), {
+  attributes: true,
+  attributeFilter: ["data-tab"],
+});
+sheetLayout.addEventListener("change", hush);
 character.addEventListener("thingy-tap", () => {
   inView();
   speak();
