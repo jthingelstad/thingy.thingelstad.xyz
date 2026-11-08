@@ -41,9 +41,12 @@ today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-w
 | Host of Supporting Membership | Concert                | `concert`                                  |
 | Narrator of the audio edition | None, he is only heard |                                            |
 
-`outdoors`, `kitchen`, `winter` and `cabin` are scenes with no job yet.
+`outdoors`, `kitchen`, `winter` and `cabin` have no job. Each one dresses him for
+a part of Jamie's life that his writing covers, as Scenes in
+[How he looks](https://thingy.thingelstad.xyz/persona/#how-he-looks) explains. Use
+one when that is the subject, never to give him a hobby of his own.
 
-If the project clearly fits one of those, use it, and keep to what the job says:
+If the project clearly fits one of those jobs, use it, and keep to what the job says:
 builder and record keeper means the record of what Jamie has built. If you aren't
 sure it fits, ask Jamie. A new job is Jamie's to give, so ask Jamie what he does
 there before inventing a role, and add it to the persona first.
@@ -58,8 +61,10 @@ time, because he never writes as Jamie. That file settles it for its site.
 
 Whichever model writes as Thingy follows the persona. An agent writing pages or
 code for a project reads all of
-[persona.md](https://thingy.thingelstad.xyz/persona.md) first. It is about 17 KB,
-and it is meant to be read whole.
+[persona.md](https://thingy.thingelstad.xyz/persona.md) first. It is about 22 KB,
+and it is meant to be read whole. Its
+[How he sounds on the page](https://thingy.thingelstad.xyz/persona/#how-he-sounds-on-the-page)
+shows the voice in real lines. Match the voice, and never copy the lines.
 
 - **A prompt that runs on every turn can carry less.** Ask Thingy's chat keeps a
   condensed identity for its model. Take it from the persona and say so in the file,
