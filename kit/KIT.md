@@ -41,10 +41,10 @@ today are in [Where he works](https://thingy.thingelstad.xyz/persona/#where-he-w
 | Host of Supporting Membership | Concert                | `concert`                                  |
 | Narrator of the audio edition | None, he is only heard |                                            |
 
-`outdoors`, `kitchen`, `winter` and `cabin` have no job. Each one dresses him for
-a part of Jamie's life that his writing covers, as Scenes in
+`outdoors`, `kitchen`, `winter` and `cabin` have no job. Each one is something
+Jamie and his family do, and Thingy goes along, as Scenes in
 [How he looks](https://thingy.thingelstad.xyz/persona/#how-he-looks) explains. Use
-one when that is the subject, never to give him a hobby of his own.
+one when that is the context, never to send him somewhere on his own.
 
 If the project clearly fits one of those jobs, use it, and keep to what the job says:
 builder and record keeper means the record of what Jamie has built. If you aren't
