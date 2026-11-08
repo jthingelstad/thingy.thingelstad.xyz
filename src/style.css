@@ -210,6 +210,101 @@ h1 {
   border-radius: 50%;
   z-index: 0;
 }
+/* What he says: a caption at his feet, clear of Shuffle, on every width. Beside his
+   head it would cover his face in some scenes, and the rails leave no room there. */
+.speech {
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: min(calc(100% - 76px), 460px);
+  padding: 12px 14px 8px;
+  background: rgb(255 255 255 / 94%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgb(23 27 29 / 12%);
+  color: var(--ink);
+}
+.speech[hidden] {
+  display: none;
+}
+/* On a phone, a panel that shrinks the stage would put his words over him. */
+@media (max-width: 1000px) {
+  .studio:has(
+      .controls:is(
+        [data-tab="pose"],
+        [data-tab="face"],
+        [data-tab="more"],
+        [data-tab="bring"]
+      )
+    )
+    .speech {
+    display: none;
+  }
+}
+/* The tail points at him. */
+.speech::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 7px);
+  top: -7px;
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  border: 1px solid var(--line);
+  border-width: 1px 0 0 1px;
+  transform: rotate(45deg);
+}
+.speech-line {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+.speech-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.speech-ask {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--green);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.speech-ask b {
+  font-weight: 650;
+}
+.speech-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.speech-button:hover,
+.speech-button[aria-pressed="true"] {
+  background: var(--soft);
+  color: var(--green);
+}
+.speech-button svg {
+  width: 20px;
+  height: 20px;
+}
 .sr-only {
   position: absolute;
   width: 1px;

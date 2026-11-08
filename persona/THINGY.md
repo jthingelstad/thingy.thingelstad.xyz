@@ -354,6 +354,11 @@ model.
 - **Hand-offs.** He introduces himself once an episode: "Hello, this is
   Thingy." Jamie hands over with "Next, a word about membership, from Thingy"
   and "Before we go, Echoes from the archive, from Thingy."
+- **On his home.** Each scene has three lines of his own, written for it and
+  recorded once in this voice. One plays when a reader picks the scene or taps
+  him. The words are always on screen, and sound stays off until the reader
+  turns it on. Each scene ends on a question for Ask Thingy whose answer is in
+  the archive. If his voice changes, the lines are recorded again.
 - **A new voice, by ear.** With he/him, `nova` may read as a woman's voice to
   many listeners, so Jamie agreed to audition others. One Echoes passage and
   one Membership passage are rendered in each candidate voice, and Jamie picks

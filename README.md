@@ -188,6 +188,29 @@ rendered at build time by a small Markdown renderer (`src/markdown.ts`, which
 knows only what the file uses), and `/persona.md`, the file as is, for agents.
 `validate-site.mjs` fails if either drifts from the source.
 
+## His voice
+
+Each scene has three lines he says, and a question for Ask Thingy, in
+[`src/voice.ts`](src/voice.ts). Picking a scene or tapping him shows the next
+line under him. Sound is off until the reader turns it on, from the More panel
+or the speaker in the caption, so no recording loads before then. The antenna
+lights while he speaks.
+
+The lines were written for the home and recorded once, in the voice WT Builder
+gives him everywhere (`nova`, `tts-1-hd`). Each recording in `public/voice/` is
+named by WT Builder's piece key for the words it says, so a line changed without
+a new recording fails `npm test`. To record, with a WT Builder checkout beside
+this one (its own settings hold the key; nothing secret passes through here):
+
+```sh
+node --import tsx tools/render-voice.ts ../thingelstad.com/wt-builder
+```
+
+It records only lines that have no recording yet, hears each one back with the
+transcriber, retries one that is silent or drops its last sentence, deletes
+recordings no line uses, and rewrites `src/voice-files.ts`. If WT Builder's voice
+changes, change `VOICE` to match and run it again: every line is recorded anew.
+
 ## The print model
 
 [/print/](print/index.html) offers a 180 mm one-colour print of Thingy, made for
@@ -251,7 +274,8 @@ What the edge promises, each held by `tests/delivery.test.ts`:
 - `Access-Control-Allow-Origin: *` and `Cross-Origin-Resource-Policy: cross-origin`
   on every response, so other sites can load `thingy.js` and the character files.
 - Missing paths return a real 404 with `404.html`, never an SPA fallback.
-- Caching (`tools/delivery-plan.mjs`): hashed `assets/` a year, immutable;
+- Caching (`tools/delivery-plan.mjs`): hashed `assets/` and `voice/` a year,
+  immutable;
   `thingy.js` and each `manifest.json` five minutes; other character files a day;
   pages, `llms.txt` and the sitemap revalidate every minute at the edge.
 - Files are stored as built; CloudFront compresses per request.

@@ -20,6 +20,7 @@ export const mime = {
   ".woff2": "font/woff2",
   ".3mf": "model/3mf",
   ".zip": "application/zip",
+  ".mp3": "audio/mpeg",
 };
 
 const IMMUTABLE = "public, max-age=31536000, immutable";
@@ -32,7 +33,8 @@ const PAGE = "public, max-age=0, s-maxage=60, must-revalidate";
 // are the stable entry points other sites load, so they stay short.
 export function cacheControl(key) {
   const extension = path.extname(key);
-  if (key.startsWith("assets/")) return IMMUTABLE;
+  // His recorded lines are named for the words they say, so they never change.
+  if (key.startsWith("assets/") || key.startsWith("voice/")) return IMMUTABLE;
   if (
     key === "thingy.js" ||
     key.startsWith("character/latest/") ||
