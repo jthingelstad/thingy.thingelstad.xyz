@@ -8,7 +8,7 @@ projects take him from here, starting with the librarian at
 - Use Node 24, TypeScript, Vite, and Three.js. This is a reusable web component,
   so consumers do not need a particular application framework.
 - The approved Blender master lives in the sibling character-art repository:
-  `../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend`, and
+  `../thingy-character/source/Thingy-wardrobe-v0.10.blend`, and
   `-v0.14.blend` for the Librarian, and the private `jthingelstad/thingy-character`
   repository holds `Thingy-wardrobe-v0.15.blend` for Scenes and `Thingy-wardrobe-v0.16.blend` for the v0.16 tool poses and `Thingy-wardrobe-v0.17.blend` for the v0.17 accessories and scenes. Never overwrite them. Export scripts
   operate in memory and write derivatives here.

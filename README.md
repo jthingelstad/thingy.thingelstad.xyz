@@ -155,7 +155,7 @@ assets; they are not needed to build or serve the site from committed assets.
 THINGY_BLENDER=blender
 for character_outfit in librarian trail workshop concert; do
   "$THINGY_BLENDER" --background \
-    ../thingelstad.com/thingy-character/source/Thingy-wardrobe-v0.10.blend \
+    ../thingy-character/source/Thingy-wardrobe-v0.10.blend \
     --python-exit-code 1 --python tools/export_character.py -- \
     --outfit="$character_outfit"
 done
@@ -203,7 +203,7 @@ a new recording fails `npm test`. To record, with a WT Builder checkout beside
 this one (its own settings hold the key; nothing secret passes through here):
 
 ```sh
-node --import tsx tools/render-voice.ts ../thingelstad.com/wt-builder
+node --import tsx tools/render-voice.ts ../wt-builder
 ```
 
 It records only lines that have no recording yet, hears each one back with the
@@ -221,7 +221,7 @@ built, the STL zipped beside a short read-me, web stills and a manifest with eac
 file's size and SHA-256:
 
 ```sh
-uv run --python 3.12 --with pillow python tools/prepare_print.py ../thingelstad.com/thingy-character
+uv run --python 3.12 --with pillow python tools/prepare_print.py ../thingy-character
 ```
 
 The zip has fixed timestamps, so the same inputs give the same bytes, and
