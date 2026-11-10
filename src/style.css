@@ -12,6 +12,7 @@
   --muted: #686b66;
   /* The rest of the palette, named so the dark block below can change it. */
   --text-soft: #43484b;
+  --text-quiet: #4f554f;
   --surface: #fff;
   --on-green: #fff;
   --green-deep: #173f2b;
@@ -43,6 +44,7 @@
     --line: #3f382c;
     --muted: #a9a08d;
     --text-soft: #ddd4c2;
+    --text-quiet: var(--text-soft);
     --surface: #26221b;
     --on-green: #1c1914;
     --green-deep: #a6e3bf;
@@ -117,10 +119,6 @@
         rgb(246 238 220 / 7%),
         transparent
       );
-  }
-  /* Raised above the light rule further down, which keeps its literal colour. */
-  main .builder-example p {
-    color: var(--text-soft);
   }
 }
 * {

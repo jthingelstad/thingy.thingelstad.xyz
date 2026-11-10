@@ -101,6 +101,7 @@ const pairs: [string, string, number, string, "dark"?][] = [
   ["--text-soft", "--paper", 4.5, "his scene line, ledes, quotes"],
   ["--text-soft", "--sheet", 4.5, "the Bring him summary"],
   ["--text-soft", "--track", 4.5, "Live, Picture, Link"],
+  ["--text-quiet", "--paper", 4.5, "the builder lineup's words"],
   ["--muted", "--paper", 4.5, "hints, captions, footer"],
   ["--muted", "--soft", 4.5, "a chosen tab's small label"],
   ["--muted", "--sheet", 4.5, "notes in the sheet and rails"],
