@@ -94,6 +94,31 @@
         "public/img/thingy-96.png: the illustration, for the footer byline",
         "Pages in his voice, written by the agents that keep the site"
       ]
+    },
+    {
+      "name": "His home",
+      "url": "https://thingy.thingelstad.xyz/",
+      "repo": "jthingelstad/thingy.thingelstad.xyz",
+      "job": "Himself",
+      "follows": ["stills from character/latest/"],
+      "stills": [
+        "concert-present",
+        "library-book-read",
+        "library-present",
+        "library-present-proud",
+        "outdoors-present",
+        "workshop-hammer-show",
+        "workshop-hello",
+        "workshop-present",
+        "workshop-rest",
+        "workshop-thinking"
+      ],
+      "keeps": [
+        "index.html: the home page's introduction, Who he is, whose sentences are the persona's \"Where he works\" rows",
+        "persona/index.html: the jobs under the persona page's title",
+        "src/config.ts: the line under his name for each scene",
+        "src/voice.ts: his three lines for each scene and the question he offers, each recorded"
+      ]
     }
   ]
 }
