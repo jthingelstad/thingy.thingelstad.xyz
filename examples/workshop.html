@@ -65,6 +65,25 @@
           --line: #3f382c;
           --thingy-character-focus: var(--green);
           --thingy-character-status: #a9a08d;
+          --still-pool:
+            radial-gradient(
+              ellipse 40% 17% at 50% 82%,
+              rgb(246 238 220 / 26%),
+              transparent
+            ),
+            radial-gradient(
+              ellipse 46% 47% at 50% 52%,
+              rgb(246 238 220 / 10%),
+              transparent
+            );
+        }
+        /* His stills stand in the home page's pool of light. */
+        .poses img {
+          background-image: var(--still-pool);
+        }
+        /* The live one too: a square of it as tall as he is, centred. */
+        .live thingy-character {
+          background: var(--still-pool) center / 420px 100% no-repeat;
         }
       }
       * {

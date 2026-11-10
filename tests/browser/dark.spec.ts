@@ -14,6 +14,15 @@ const pages = [
   "/examples/workshop.html",
 ];
 const embed = "/embed/?scene=workshop&pose=hello";
+// Every still picture of him, by page, and the examples page's live one.
+const stills = [
+  ["/", ".builder-lineup img"],
+  ["/persona/", ".jobs img"],
+  ["/kit/", ".kit-hero > img"],
+  ["/404.html", ".not-found > img"],
+  ["/examples/workshop.html", ".poses img"],
+  ["/examples/workshop.html", ".live thingy-character"],
+] as const;
 const colours = {
   light: { ground: "rgb(250, 248, 242)", ink: "rgb(23, 27, 29)" },
   dark: { ground: "rgb(28, 25, 20)", ink: "rgb(246, 238, 220)" },
@@ -62,6 +71,26 @@ for (const scheme of ["light", "dark"] as const) {
           expect(themes, path).toEqual([
             scheme === "dark" ? "#1c1914" : "#faf8f2",
           ]);
+      }
+    });
+
+    test("every still of him stands in the pool of light only in dark", async ({
+      page,
+    }) => {
+      // On the dark ground his legs and gloves sink without it.
+      for (const [path, selector] of stills) {
+        await page.goto(path, { waitUntil: "domcontentloaded" });
+        const images = page.locator(selector);
+        await expect(images.first(), path).toBeAttached();
+        const backgrounds = await images.evaluateAll((all) =>
+          all.map((img) => getComputedStyle(img).backgroundImage),
+        );
+        for (const background of backgrounds)
+          if (scheme === "dark")
+            expect(background, `${path} ${selector}`).toMatch(
+              /^radial-gradient\(.*radial-gradient\(/,
+            );
+          else expect(background, `${path} ${selector}`).toBe("none");
       }
     });
 
