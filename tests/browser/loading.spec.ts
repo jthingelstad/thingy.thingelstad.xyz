@@ -98,7 +98,7 @@ test.describe("without JavaScript", () => {
     const quiet = await boxes(page, still, ".turntable");
     expectInside(quiet.still, quiet.stage);
     expect(quiet.scrollWidth).toBeLessThanOrEqual(quiet.innerWidth);
-    const next = await page.locator(".builder-example").boundingBox();
+    const next = await page.locator("section.meet").boundingBox();
     expect(quiet.stage.y + quiet.stage.height).toBeLessThanOrEqual(next!.y);
     for (const selector of [
       "#controls",
@@ -108,7 +108,7 @@ test.describe("without JavaScript", () => {
     ])
       await expect(page.locator(selector)).toBeHidden();
     await expect(page.locator("h1")).toHaveText("Meet Thingy.");
-    await expect(page.locator("#builder-title")).toBeVisible();
+    await expect(page.locator("#meet-title")).toBeVisible();
     await expect(page.getByRole("link", { name: "Thingy Kit" })).toBeVisible();
   });
 

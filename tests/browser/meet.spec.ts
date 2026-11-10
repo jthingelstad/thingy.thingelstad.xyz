@@ -1,0 +1,92 @@
+import { test, expect, type Page } from "@playwright/test";
+
+/*
+ * The home page says who he is, under the stage: his jobs, each with a still and a
+ * link to where he does it. It is in the page source, so it reads with scripts off.
+ */
+const JOBS = [
+  [
+    "Librarian",
+    "Ask Thingy",
+    "https://thingy.thingelstad.com/?ref=character-jobs",
+  ],
+  [
+    "Builder and record keeper",
+    "Things I’ve Built",
+    "https://thingelstad.xyz/?ref=character-jobs",
+  ],
+  [
+    "Host",
+    "The Members page",
+    "https://weekly.thingelstad.com/members/?ref=character-jobs",
+  ],
+  [
+    "Narrator",
+    "The Weekly Thing, audio",
+    "https://weekly.thingelstad.com/podcast/?ref=character-jobs",
+  ],
+] as const;
+
+async function expectIntroduction(page: Page): Promise<void> {
+  const meet = page.locator("section.meet");
+  await meet.scrollIntoViewIfNeeded();
+  await expect(meet.getByRole("heading", { level: 2 })).toHaveText(
+    "Who he is.",
+  );
+  await expect(meet.locator(".meet-lede")).toHaveText(
+    "Jamie’s agent sidekick. He has read everything Jamie has published, and each place he works gives him a job.",
+  );
+  const rows = meet.locator(".meet-jobs > li");
+  await expect(rows).toHaveCount(4);
+  for (const [index, [job, label, href]] of JOBS.entries()) {
+    const row = rows.nth(index);
+    await expect(row.getByRole("heading", { level: 3 })).toHaveText(job);
+    const link = row.getByRole("link");
+    await expect(link).toHaveText(label);
+    await expect(link).toHaveAttribute("href", href);
+    const still = row.locator("img");
+    await expect(still).toBeVisible();
+    await expect(still).toHaveAttribute("alt", /^Thingy /);
+    await expect
+      .poll(() => still.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBe(1000);
+  }
+  await expect(
+    meet.getByRole("link", { name: "Who Thingy is" }),
+  ).toHaveAttribute("href", "/persona/");
+  // Nothing in it is wider than the page.
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+}
+
+test("the home page says who he is, under the stage", async ({ page }) => {
+  await page.goto("/?life=off");
+  await expect(page.locator("#main-thingy")).toHaveAttribute("data-ready", "", {
+    timeout: 30000,
+  });
+  await expectIntroduction(page);
+  // The site's external-link mark is drawn into each job's link.
+  await expect(
+    page.locator(".meet-jobs [data-icon='external'] svg"),
+  ).toHaveCount(4);
+  // Each link shows where focus is.
+  const first = page.locator(".meet-jobs a").first();
+  await first.focus();
+  expect(await first.evaluate((a) => getComputedStyle(a).outlineStyle)).toBe(
+    "solid",
+  );
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the introduction is in the page, readable as it is", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expectIntroduction(page);
+  });
+});

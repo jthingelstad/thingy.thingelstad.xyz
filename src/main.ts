@@ -8,7 +8,6 @@ import {
   HOME_VIEW,
   LATEST,
   MODEL_WEIGHT,
-  POSES,
   SCENES,
   SCENE_LINES,
   accessoriesIn,
@@ -573,11 +572,3 @@ $("#download").addEventListener("click", async () => {
     label.textContent = "The picture needs the 3D view";
   }
 });
-$("#builder-lineup").innerHTML = (
-  ["hello", "present", "thinking", "rest"] as const
-)
-  .map(
-    (id) =>
-      `<figure><img src="${posterPath("workshop", id)}" alt="Workshop, ${POSES[id].label}" width="240" height="240" loading="lazy"><figcaption>${POSES[id].label}</figcaption></figure>`,
-  )
-  .join("");
