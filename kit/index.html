@@ -8,9 +8,26 @@
       name="description"
       content="Everything it takes to bring Thingy into a project, behind one link: his persona, his 3D model, his faces and accessories, and the code to show him."
     />
-    <meta name="theme-color" content="#faf8f2" />
+    <meta
+      name="theme-color"
+      content="#faf8f2"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1c1914"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      @media screen and (prefers-color-scheme: dark) {
+        html {
+          background: #1c1914;
+          color-scheme: dark;
+        }
+      }
+    </style>
     <link rel="stylesheet" href="/shared/tokens.css" />
     <link rel="stylesheet" href="/src/style.css" />
     <link
@@ -63,7 +80,7 @@
       .lede {
         font-size: clamp(21px, 1.95vw, 30px);
         line-height: 1.4;
-        color: #43484b;
+        color: var(--text-soft);
         max-width: 34ch;
       }
       .source {
@@ -82,7 +99,7 @@
         padding: 14px 16px;
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--surface);
       }
       .send h2 {
         margin: 0 0 4px;
@@ -108,7 +125,7 @@
         cursor: pointer;
       }
       .send button:hover {
-        background: #f0f0e9;
+        background: var(--tint);
       }
       @media (max-width: 760px) {
         .kit-hero {

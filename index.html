@@ -8,9 +8,26 @@
       name="description"
       content="Meet Thingy in three dimensions. Choose a scene, a pose, a face and what he has with him, turn him around, and bring Jamie’s sidekick into your own pages. This site is the source of his character."
     />
-    <meta name="theme-color" content="#faf8f2" />
+    <meta
+      name="theme-color"
+      content="#faf8f2"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1c1914"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      @media screen and (prefers-color-scheme: dark) {
+        html {
+          background: #1c1914;
+          color-scheme: dark;
+        }
+      }
+    </style>
     <link rel="stylesheet" href="/shared/tokens.css" />
     <link
       rel="preload"

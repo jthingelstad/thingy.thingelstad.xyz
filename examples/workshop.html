@@ -45,16 +45,63 @@
     />
     <link rel="me" href="https://micro.blog/jthingelstad" />
     <link rel="me" href="https://github.com/jthingelstad" />
+    <style>
+      @media screen and (prefers-color-scheme: dark) {
+        html {
+          background: #1c1914;
+          color-scheme: dark;
+        }
+      }
+    </style>
     <link rel="stylesheet" href="/shared/tokens.css" />
     <style>
+      :root {
+        --paper: #faf8f2;
+        --ink: #171b1d;
+        --green: #214f38;
+        --code: #eeece3;
+        --line: #d5d6cc;
+      }
+      /* Dark follows the system, on screens only, in the home page's colours. */
+      @media screen and (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --paper: #1c1914;
+          --ink: #f6eedc;
+          --green: #74d3a0;
+          --code: #322c23;
+          --line: #3f382c;
+          --thingy-character-focus: var(--green);
+          --thingy-character-status: #a9a08d;
+          --still-pool:
+            radial-gradient(
+              ellipse 40% 17% at 50% 82%,
+              rgb(246 238 220 / 26%),
+              transparent
+            ),
+            radial-gradient(
+              ellipse 46% 47% at 50% 52%,
+              rgb(246 238 220 / 10%),
+              transparent
+            );
+        }
+        /* His stills stand in the home page's pool of light. */
+        .poses img {
+          background-image: var(--still-pool);
+        }
+        /* The live one too: a square of it as tall as he is, centred. */
+        .live thingy-character {
+          background: var(--still-pool) center / 420px 100% no-repeat;
+        }
+      }
       * {
         box-sizing: border-box;
       }
       body {
         margin: 0;
         padding: 40px 24px;
-        background: #faf8f2;
-        color: #171b1d;
+        background: var(--paper);
+        color: var(--ink);
         font: 18px/1.6 var(--jt-font-body);
       }
       main {
@@ -75,7 +122,7 @@
         font-size: 30px;
       }
       a {
-        color: #214f38;
+        color: var(--green);
         text-underline-offset: 4px;
       }
       .poses {
@@ -107,7 +154,7 @@
         font-size: 14px;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
-        background: #eeece3;
+        background: var(--code);
         padding: 20px;
         border-radius: 8px;
       }
@@ -116,7 +163,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 40px;
         align-items: center;
-        border-top: 1px solid #d5d6cc;
+        border-top: 1px solid var(--line);
         padding-top: 30px;
       }
       /* Block before its code runs too, so the page doesn't move when it does. */

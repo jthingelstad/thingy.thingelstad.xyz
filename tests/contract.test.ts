@@ -411,6 +411,10 @@ test("the kit names everything a consumer can use", () => {
     ...[...element.matchAll(/CustomEvent\(\s*"(thingy-[a-z]+)"/g)].map(
       (m) => m[1],
     ),
+    // The colours a host page can set on him.
+    ...[...element.matchAll(/var\(\s*(--thingy-character-[a-z-]+)/g)].map(
+      (m) => m[1],
+    ),
   ];
   const attributes = /observedAttributes[^[]*\[([^\]]+)\]/.exec(element)!;
   names.push(...attributes[1].match(/[a-z-]+/g)!);
