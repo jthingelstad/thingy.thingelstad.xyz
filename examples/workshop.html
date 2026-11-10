@@ -9,6 +9,7 @@
       content="Thingy the Workshop Builder in four poses: images and a live component to use on another site."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link
       rel="canonical"
       href="https://thingy.thingelstad.xyz/examples/workshop.html"
@@ -114,8 +115,15 @@
         border-top: 1px solid #d5d6cc;
         padding-top: 30px;
       }
+      /* Block before its code runs too, so the page doesn't move when it does. */
       thingy-character {
+        display: block;
         height: 420px;
+      }
+      /* The still inside shows until then, and is all there is without scripts. */
+      thingy-character > img {
+        height: 100%;
+        object-fit: contain;
       }
       p {
         max-width: 700px;
@@ -192,7 +200,12 @@
           asset-base="/character/"
           light="off"
           motion="off"
-        ></thingy-character>
+          ><img
+            src="/character/latest/poses/workshop-present.webp"
+            alt="Thingy, the Workshop Builder, presenting a laptop"
+            width="1000"
+            height="1000"
+        /></thingy-character>
         <div>
           <h2>A character with an address.</h2>
           <p>

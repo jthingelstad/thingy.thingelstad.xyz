@@ -10,6 +10,7 @@
     />
     <meta name="theme-color" content="#faf8f2" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="/shared/tokens.css" />
     <link rel="stylesheet" href="/src/style.css" />
     <link
@@ -112,6 +113,12 @@
         .kit-hero img {
           max-width: 200px;
           order: -1;
+        }
+      }
+      /* Copying needs the script below; without it the words are there to select. */
+      @media (scripting: none) {
+        .send button {
+          display: none;
         }
       }
     </style>

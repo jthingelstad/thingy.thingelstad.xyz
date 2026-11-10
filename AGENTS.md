@@ -7,10 +7,11 @@ projects take him from here, starting with the librarian at
 
 - Use Node 24, TypeScript, Vite, and Three.js. This is a reusable web component,
   so consumers do not need a particular application framework.
-- The approved Blender master lives in the sibling character-art repository:
-  `../thingy-character/source/Thingy-wardrobe-v0.10.blend`, and
-  `-v0.14.blend` for the Librarian, and the private `jthingelstad/thingy-character`
-  repository holds `Thingy-wardrobe-v0.15.blend` for Scenes and `Thingy-wardrobe-v0.16.blend` for the v0.16 tool poses and `Thingy-wardrobe-v0.17.blend` for the v0.17 accessories and scenes. Never overwrite them. Export scripts
+- The approved Blender masters live in the sibling character-art repository, the
+  private `jthingelstad/thingy-character`, in `../thingy-character/source/`:
+  `Thingy-wardrobe-v0.10.blend`, `-v0.14.blend` for the Librarian, `-v0.15.blend`
+  for Scenes, `-v0.16.blend` for the v0.16 tool poses and `-v0.17.blend`, the
+  newest, for the v0.17 accessories and scenes. Never overwrite them. Export scripts
   operate in memory and write derivatives here.
 - `persona/THINGY.md` is Thingy's persona and the authority for him on every
   surface (approved by Jamie, November 3, 2026). Edit it only on Jamie's word;
@@ -25,8 +26,9 @@ projects take him from here, starting with the librarian at
 - `public/print/v0.13/` is published the same way: make it with
   `tools/prepare_print.py` from the character-art repository's print build,
   never by hand, and give a new print its own directory.
-- `public/character/v0.17/` is the newest, and `v0.16/`, `v0.15/`, `v0.10/` and `v0.14/` stay published
-  under their outfit names. The component draws only the versions in `VERSIONS`.
+- `public/character/v0.17/` is the newest, and `v0.16/` and `v0.15/` stay published,
+  with `v0.10/` and `v0.14/` under the outfit names they were made with. The
+  component draws only the versions in `VERSIONS` (v0.15 to v0.17).
   To add a scene, add it to `SCENES` in `src/config.ts` and the manifest, and
   publish its model and `present` still, with `since` if older models lack it: the pages have no per-scene code.
   These directories are the versioned delivery contract.
