@@ -1186,8 +1186,9 @@ thingy-character:not(:defined) > img {
     order: 2;
   }
 }
-/* Who he is: his jobs, each with a still of him at it. Four across where there is room,
-   two by two below that, and on a phone each still beside its words. */
+/* Who he is: his jobs, each with a still of him at it. Two by two up to 1180px, four
+   across above that, and on a phone each still beside its words. Each job is a subgrid
+   of the list, so the stills, names, sentences and links of a row start level. */
 .meet {
   border-top: 1px solid var(--line);
   padding-block: 48px 56px;
@@ -1209,18 +1210,30 @@ thingy-character:not(:defined) > img {
 }
 .meet-jobs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 40px clamp(20px, 2.4vw, 40px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 44px clamp(24px, 3vw, 40px);
   margin: 32px 0 0;
   padding: 0;
   list-style: none;
 }
+.meet-jobs li {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
+}
+.meet-job {
+  display: contents;
+}
 .meet-jobs img {
   display: block;
   width: 100%;
+  max-width: 270px;
   height: auto;
 }
 .meet-job h3 {
+  margin-top: 4px;
   font-size: 23px;
   font-weight: 800;
   line-height: 1.15;
@@ -1232,10 +1245,25 @@ thingy-character:not(:defined) > img {
   line-height: 1.55;
   color: var(--ink);
 }
+/* Inline, not the site's inline-flex, so a label that wraps keeps its arrow beside
+   the last word instead of out at the column's edge. */
 .meet .text-link {
+  display: inline;
+  justify-self: start;
+  align-self: start;
   font-size: 15px;
   font-weight: 600;
   text-decoration-thickness: 1px;
+}
+.meet .text-link [data-icon] {
+  margin-left: 2px;
+}
+.meet .text-link svg {
+  display: inline;
+  vertical-align: -2px;
+}
+.meet .keep {
+  white-space: nowrap;
 }
 .meet-more {
   margin: 40px 0 0;
@@ -1245,13 +1273,9 @@ thingy-character:not(:defined) > img {
 .meet-more .text-link {
   font-size: 17px;
 }
-@media (max-width: 1000px) {
+@media (min-width: 1181px) {
   .meet-jobs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .meet-jobs img {
-    max-width: 360px;
-    margin-inline: auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 @media (max-width: 560px) {
@@ -1263,12 +1287,17 @@ thingy-character:not(:defined) > img {
     gap: 28px;
   }
   .meet-jobs li {
-    display: grid;
+    grid-row: auto;
+    grid-template-rows: none;
     grid-template-columns: clamp(112px, 40%, 180px) minmax(0, 1fr);
     gap: 14px;
     align-items: center;
   }
+  .meet-job {
+    display: block;
+  }
   .meet-job h3 {
+    margin-top: 0;
     font-size: 21px;
   }
   .meet-job p {
