@@ -207,6 +207,11 @@ It works in plain HTML or any framework. Change an attribute and he changes.
   `strained` says he stopped them because the machine could not keep up (a
   `thingy-strained` event says so too), and
   `lifeSettings` reads or sets how much he does them.
+- **Colours:** two custom properties, set on the element or anything above it.
+  `--thingy-character-status` colours the line of text shown while he loads or
+  when he falls back to a still (default `#51544f`), and
+  `--thingy-character-focus` colours the canvas's focus ring (default `#23533b`).
+  Both defaults are dark, so set them on a dark page.
 - **Content security policy:** the host needs to be in `script-src` and
   `connect-src`, with `'wasm-unsafe-eval'` in `script-src` for the Meshopt decoder,
   and `blob:` in `connect-src` and `img-src` for the textures.
