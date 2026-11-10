@@ -175,8 +175,10 @@ test("the examples page's colours are the stylesheet's, light and dark", () => {
     "utf8",
   );
   const pageLight = variables(block(page, page.indexOf(":root")));
+  // The palette's dark block, after its light :root (the early ground comes first).
   const pageDarkAt = page.indexOf(
     "@media screen and (prefers-color-scheme: dark)",
+    page.indexOf(":root"),
   );
   assert.ok(pageDarkAt > 0, "the dark block is in examples/workshop.html");
   const pageDarkBody = block(page, pageDarkAt);
@@ -206,4 +208,31 @@ test("the examples page's colours are the stylesheet's, light and dark", () => {
         `${scheme} ${name}`,
       );
     }
+});
+
+// Each page paints its dark ground before the stylesheet arrives, so a cold load
+// never flashes white. The embed has none: it stays transparent.
+test("each page's first paint in dark is the dark paper", () => {
+  const read = (path: string) =>
+    readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  for (const path of [
+    "index.html",
+    "404.html",
+    "persona/index.html",
+    "kit/index.html",
+    "print/index.html",
+    "examples/workshop.html",
+  ]) {
+    const page = read(path);
+    const early = page.match(
+      /<style>\s*@media screen and \(prefers-color-scheme: dark\) \{\s*html \{\s*background: (#[0-9a-f]{6});\s*color-scheme: dark;\s*\}\s*\}\s*<\/style>/,
+    );
+    assert.ok(early, `${path} has the early dark ground`);
+    assert.equal(early[1], dark["--paper"], path);
+    assert.ok(
+      early.index! < page.indexOf('rel="stylesheet"'),
+      `${path} paints it before any stylesheet`,
+    );
+  }
+  assert.doesNotMatch(read("embed/index.html"), /prefers-color-scheme/);
 });
