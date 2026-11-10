@@ -199,6 +199,34 @@ h1 {
   height: 100%;
   z-index: 1;
 }
+/* Until his code has run, the component is an unknown element and the still inside
+   it is a plain 1000 px image, which would spill out of the stage and, on a phone,
+   widen the page. Size it the way the component will: the stage, contained. */
+thingy-character:not(:defined) {
+  display: block;
+}
+thingy-character:not(:defined) > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* With scripts on, reveal="ready" shows nothing until the 3D Thingy fades in. Once
+   the component is defined this still is never drawn, so it only shows if his code
+   has not come after eight seconds: a failed or blocked script still leaves him on
+   the page. Without scripts, or in a browser that doesn't know the media feature,
+   the still shows at once. */
+@media (scripting: enabled) {
+  thingy-character[reveal="ready"]:not(:defined) > img {
+    opacity: 0;
+    animation: thingy-still-late 0.6s ease-out 8s forwards;
+  }
+}
+@keyframes thingy-still-late {
+  to {
+    opacity: 1;
+  }
+}
 .ground-ring {
   position: absolute;
   top: 90.5%;
@@ -1431,5 +1459,23 @@ footer p > span {
   .persona-copy td::before {
     content: attr(data-label) ": ";
     font-weight: 600;
+  }
+}
+
+/* Without scripts he is his still, and the controls that work him (the sheet and its
+   rails, Bring him, the tap-and-drag hint) would do nothing, so they are not shown. */
+@media (scripting: none) {
+  #controls,
+  #bring-toggle,
+  .studio .introduction .hint {
+    display: none;
+  }
+}
+/* On the sheet's widths, with no sheet under him, he can stand on the room it leaves.
+   No taller than wide, so the square still keeps his feet on the ground ring. */
+@media (scripting: none) and (max-width: 1000px) {
+  .studio .turntable {
+    bottom: 24px;
+    height: min(calc(100% - 24px - var(--stage-top)), 100vw);
   }
 }
