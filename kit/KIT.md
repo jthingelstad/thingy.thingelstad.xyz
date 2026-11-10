@@ -106,6 +106,8 @@ Readers sign in with an active Weekly Thing subscription. An agent can also use
 Each of these follows the newest Thingy as written here. See
 [Follow him or keep him](#follow-him-or-keep-him) to hold one still instead.
 
+[See the integration examples](https://thingy.thingelstad.xyz/examples/workshop.html).
+
 ### A still
 
 ```html
