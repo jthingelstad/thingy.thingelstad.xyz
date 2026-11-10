@@ -26,18 +26,34 @@ const JAMIES_SITES = new Set([
   "another.thingelstad.com",
   "links.thingelstad.xyz",
   "www.thingelstad.com",
+  "thingelstad.com",
+  "sync.thingelstad.xyz",
 ]);
+
+/** An attribute's value, quoted with either kind of quote. */
+function attribute(attributes: string, name: string): string {
+  const match = attributes.match(
+    new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`),
+  );
+  return match?.[1] ?? match?.[2] ?? "";
+}
 
 function links(html: string): { href: string; rel: string }[] {
   return [...html.matchAll(/<a\b([^>]*)>/g)].map(([, attributes]) => ({
-    href: attributes.match(/\bhref="([^"]*)"/)?.[1] ?? "",
-    rel: attributes.match(/\brel="([^"]*)"/)?.[1] ?? "",
+    href: attribute(attributes, "href"),
+    rel: attribute(attributes, "rel"),
   }));
 }
 
-/** The footer's credit to Jamie, which names who he is, not where a reader came from. */
+/**
+ * The footer's credit to Jamie, which names who he is, not where a reader came from.
+ * Decided by where it points and its rel, never by its query, so a ref added to it
+ * is caught below instead of passing as an ordinary link.
+ */
 const isIdentity = (url: URL, rel: string): boolean =>
-  url.href === "https://www.thingelstad.com/" && /\b(me|author)\b/.test(rel);
+  url.hostname === "www.thingelstad.com" &&
+  url.pathname === "/" &&
+  rel.split(/\s+/).some((word) => word === "me" || word === "author");
 
 test("every template link to Jamie's other sites says it came from here", () => {
   let checked = 0;
