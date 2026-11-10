@@ -49,6 +49,9 @@ test("every public file has a MIME type", () => {
     ["favicon.svg", "image/svg+xml"],
     ["favicon.ico", "image/x-icon"],
     ["apple-touch-icon.png", "image/png"],
+    // The share images pages name as og:image: redrawn in place when he
+    // changes, so an hour, not a day.
+    ["share/home.png", "image/png"],
   ]) {
     const object = prepareObject(key, Buffer.from("x"));
     assert.equal(object.ContentType, type, key);

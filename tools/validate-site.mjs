@@ -183,6 +183,37 @@ for (const file of files.filter((name) => name.endsWith(".html"))) {
     await fs.access(path.join("dist", href));
   }
 }
+// Every share image a page names was built (tools/render-share-images.mjs), and
+// a share image is what its page says: its size, opaque, and small enough to fetch.
+for (const file of files.filter((name) => name.endsWith(".html"))) {
+  const head = (await fs.readFile(file, "utf8"))
+    .split("</head>")[0]
+    .replace(/\s+/g, " ");
+  const meta = (key) =>
+    head.match(
+      new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`),
+    )?.[1];
+  for (const key of ["og:image", "twitter:image"]) {
+    const image = meta(key);
+    if (!image) continue;
+    const { origin, pathname } = new URL(image);
+    assert.equal(origin, "https://thingy.thingelstad.xyz", `${file} ${key}`);
+    const built = path.join("dist", pathname);
+    await fs.access(built).catch(() => {
+      throw new Error(`${file} names ${key} ${image}, which was not built`);
+    });
+    if (!pathname.startsWith("/share/")) continue;
+    const png = await fs.readFile(built);
+    assert.ok(png.length < 300 * 1024, `${image} is under 300 KB`);
+    // IHDR: width and height, then bit depth and colour type (2 is RGB, no alpha).
+    assert.equal(png.readUInt32BE(16), Number(meta("og:image:width")), image);
+    assert.equal(png.readUInt32BE(20), Number(meta("og:image:height")), image);
+    assert.equal(png[25], 2, `${image} is opaque`);
+    assert.equal(meta("twitter:image"), meta("og:image"), file);
+    assert.equal(meta("twitter:card"), "summary_large_image", file);
+    assert.ok(meta("og:image:alt"), `${file} describes its share image`);
+  }
+}
 for (const icon of ["favicon.svg", "favicon.ico", "apple-touch-icon.png"])
   await fs.access(path.join("dist", icon));
 for (const mark of ["cc", "by", "nc", "by-nc"])
