@@ -184,7 +184,8 @@ for (const file of files.filter((name) => name.endsWith(".html"))) {
   }
 }
 // Every share image a page names was built (tools/render-share-images.mjs), and
-// a share image is what its page says: its size, opaque, and small enough to fetch.
+// a share image is what its page says: named by its model, its size, opaque, and
+// small enough to fetch.
 for (const file of files.filter((name) => name.endsWith(".html"))) {
   const head = (await fs.readFile(file, "utf8"))
     .split("</head>")[0]
@@ -203,6 +204,12 @@ for (const file of files.filter((name) => name.endsWith(".html"))) {
       throw new Error(`${file} names ${key} ${image}, which was not built`);
     });
     if (!pathname.startsWith("/share/")) continue;
+    // Named by the model it was drawn from, so a new one gets a new address.
+    assert.match(
+      pathname,
+      /^\/share\/[a-z-]+-v[0-9.]+\.png$/,
+      `${file} ${key}`,
+    );
     const png = await fs.readFile(built);
     assert.ok(png.length < 300 * 1024, `${image} is under 300 KB`);
     // IHDR: width and height, then bit depth and colour type (2 is RGB, no alpha).
