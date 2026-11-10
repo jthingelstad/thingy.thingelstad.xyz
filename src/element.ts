@@ -41,7 +41,7 @@ canvas:focus-visible{outline:2px solid var(--thingy-character-focus,#23533b);out
 :host([reveal="ready"]:not([data-fallback])) img{display:none}
 :host([reveal="ready"]) canvas{opacity:0;transform:scale(.96);transform-origin:50% 90.5%}
 :host([reveal="ready"][data-shown]) canvas{opacity:1;transform:none;transition:opacity .6s ease-out,transform .75s cubic-bezier(.2,.8,.2,1)}
-:host([data-ready]) img{display:none}.status{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;font:14px/1.5 system-ui;color:#51544f}
+:host([data-ready]) img{display:none}.status{position:absolute;bottom:8px;left:12px;right:12px;text-align:center;font:14px/1.5 system-ui;color:var(--thingy-character-status,#51544f)}
 :host([data-ready]) .status{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(prefers-reduced-motion:reduce){img{transition:none}:host([reveal="ready"]) canvas{transform:none}:host([reveal="ready"][data-shown]) canvas{transition:none}}
 `;
