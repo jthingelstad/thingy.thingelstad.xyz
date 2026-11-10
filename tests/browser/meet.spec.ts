@@ -90,3 +90,38 @@ test.describe("without JavaScript", () => {
     await expectIntroduction(page);
   });
 });
+
+test("the hint says only what works with the pointer in hand", async ({
+  page,
+}, info) => {
+  await page.goto("/?life=off");
+  await expect(page.locator("#main-thingy")).toHaveAttribute("data-ready", "", {
+    timeout: 30000,
+  });
+  const hint = page.locator(".introduction .hint");
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText("Tap to talk");
+  await expect(hint).toContainText("Drag to turn");
+  const zoom = page.locator(".hint .hint-zoom");
+  if (info.project.name === "phone") {
+    // A finger's scroll moves the page, not him.
+    await expect(zoom).toBeHidden();
+    // The stage starts below it, so it never runs across his antenna, and the
+    // sheet and his words stay at his feet, whichever panel is open.
+    for (const tab of ["none", "scene", "face", "bring"]) {
+      await page.evaluate((t) => {
+        document.querySelector<HTMLElement>("#controls")!.dataset.tab = t;
+      }, tab);
+      const [hintBox, stage, sheet] = await Promise.all([
+        hint.boundingBox(),
+        page.locator(".turntable").boundingBox(),
+        page.locator("#controls").boundingBox(),
+      ]);
+      expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(stage!.y + 0.5);
+      expect(hintBox!.y + hintBox!.height).toBeLessThan(sheet!.y);
+    }
+  } else {
+    await expect(zoom).toBeVisible();
+    await expect(hint).toContainText("Scroll to zoom");
+  }
+});
