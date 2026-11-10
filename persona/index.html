@@ -8,7 +8,16 @@
       name="description"
       content="Thingy is Jamie Thingelstad’s agent sidekick. Who he is, how he talks, where he works, how he looks and sounds, and what he never does."
     />
-    <meta name="theme-color" content="#faf8f2" />
+    <meta
+      name="theme-color"
+      content="#faf8f2"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1c1914"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="/shared/tokens.css" />
@@ -54,7 +63,7 @@
       .lede {
         font-size: clamp(21px, 1.95vw, 30px);
         line-height: 1.4;
-        color: #43484b;
+        color: var(--text-soft);
         max-width: 34ch;
       }
       .jobs {

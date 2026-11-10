@@ -1,8 +1,8 @@
 :root {
   font-family: var(--jt-font-body);
   font-size: 16px;
-  color: #171b1d;
-  background: #faf8f2;
+  color: var(--ink);
+  background: var(--paper);
   font-synthesis: none;
   --paper: #faf8f2;
   --ink: #171b1d;
@@ -10,7 +10,98 @@
   --soft: #eaf0e6;
   --line: #d5d6cc;
   --muted: #686b66;
+  /* The rest of the palette, named so the dark block below can change it. */
+  --text-soft: #43484b;
+  --surface: #fff;
+  --on-green: #fff;
+  --green-deep: #173f2b;
+  --tint: #f0f0e9;
+  --code: #eeece3;
+  --track: #f0efe7;
+  --edge: #c9ccc2;
+  --edge-strong: #999e92;
+  --ring: #d4d3ca;
+  --switch-off: #8b9187;
+  --knob: white;
+  --wash: rgb(23 27 29 / 4%);
+  --sheet: rgb(255 255 255 / 90%);
+  --bubble: rgb(255 255 255 / 94%);
+  --shadow: rgb(23 27 29 / 12%);
+  --sheet-edge: var(--line);
   scroll-behavior: smooth;
+}
+/* Dark follows the system, with no switch of its own: the ground of Ask Thingy, his
+   other site, cream ink and his green made light enough to read on it. On screens
+   only, so a printed page stays ink on white. */
+@media screen and (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --paper: #1c1914;
+    --ink: #f6eedc;
+    --green: #74d3a0;
+    --soft: #213027;
+    --line: #3f382c;
+    --muted: #a9a08d;
+    --text-soft: #ddd4c2;
+    --surface: #26221b;
+    --on-green: #1c1914;
+    --green-deep: #a6e3bf;
+    --tint: #2b2620;
+    --code: #322c23;
+    --track: #15120e;
+    --edge: #7a6d56;
+    --edge-strong: #8c7f68;
+    --ring: #5a4f3e;
+    --switch-off: #7a6d56;
+    --knob: #f6eedc;
+    --wash: rgb(246 238 220 / 6%);
+    --sheet: rgb(38 34 27 / 92%);
+    --bubble: rgb(38 34 27 / 96%);
+    --shadow: rgb(0 0 0 / 45%);
+    --sheet-edge: #5a4f3e;
+    --mark: #ddd4c2;
+    --thingy-character-focus: var(--green);
+    --thingy-character-status: var(--muted);
+  }
+  /* The base of his antenna in the header mark is near black. */
+  .brand path[fill="#252a26"] {
+    fill: var(--mark);
+  }
+  .brand path[stroke="#252a26"] {
+    stroke: var(--mark);
+  }
+  /* On, the knob darkens against the light green, as the label does on a green fill. */
+  .light-control input:checked + .switch:after {
+    background: var(--on-green);
+  }
+  /* His face tiles are black screens, so on a dark ground they need an edge. */
+  .face-option {
+    box-shadow: 0 0 0 1px var(--edge);
+  }
+  /* Light falling on the floor where he stands, so his dark gloves, legs and coat
+     keep their outline against the ground. */
+  .turntable::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 30cqh 9cqh at 50% 90.5%,
+        rgb(246 238 220 / 10%),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 40cqh 54cqh at 50% 54%,
+        rgb(246 238 220 / 7%),
+        transparent
+      );
+  }
+  /* Raised above the light rule further down, which keeps its literal colour. */
+  main .builder-example p {
+    color: var(--text-soft);
+  }
 }
 * {
   box-sizing: border-box;
@@ -158,7 +249,7 @@ h1 {
   margin: 6px 0 0;
   font-size: clamp(15px, 1.4vw, 18px);
   line-height: 1.35;
-  color: #43484b;
+  color: var(--text-soft);
   letter-spacing: -0.02em;
 }
 .introduction .hint {
@@ -264,7 +355,7 @@ thingy-character:not(:defined) > img {
   width: 68cqh;
   height: 8cqh;
   transform: translate(-50%, -50%);
-  border: 1px solid #d4d3ca;
+  border: 1px solid var(--ring);
   border-radius: 50%;
   z-index: 0;
 }
@@ -278,11 +369,11 @@ thingy-character:not(:defined) > img {
   z-index: 2;
   width: min(calc(100% - 76px), 460px);
   padding: 12px 14px 8px;
-  background: rgb(255 255 255 / 94%);
+  background: var(--bubble);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--line);
+  border: 1px solid var(--sheet-edge);
   border-radius: 16px;
-  box-shadow: 0 14px 40px rgb(23 27 29 / 12%);
+  box-shadow: 0 14px 40px var(--shadow);
   color: var(--ink);
 }
 .speech[hidden] {
@@ -311,7 +402,7 @@ thingy-character:not(:defined) > img {
   width: 12px;
   height: 12px;
   background: inherit;
-  border: 1px solid var(--line);
+  border: 1px solid var(--sheet-edge);
   border-width: 1px 0 0 1px;
   transform: rotate(45deg);
 }
@@ -386,11 +477,11 @@ thingy-character:not(:defined) > img {
   flex-direction: column;
   width: min(calc(100% + 28px), 640px);
   padding: 6px;
-  background: rgb(255 255 255 / 90%);
+  background: var(--sheet);
   backdrop-filter: blur(14px);
-  border: 1px solid var(--line);
+  border: 1px solid var(--sheet-edge);
   border-radius: 18px;
-  box-shadow: 0 14px 40px rgb(23 27 29 / 12%);
+  box-shadow: 0 14px 40px var(--shadow);
   z-index: 2;
 }
 .controls fieldset {
@@ -431,7 +522,7 @@ thingy-character:not(:defined) > img {
   padding: 0 14px;
   border: 1px solid var(--green);
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface);
   color: var(--green);
   font-size: 14px;
   font-weight: 600;
@@ -453,7 +544,7 @@ thingy-character:not(:defined) > img {
 }
 .bring-toggle[aria-expanded="true"] {
   background: var(--green);
-  color: #fff;
+  color: var(--on-green);
 }
 .sheet-tabs {
   order: 9;
@@ -480,7 +571,7 @@ thingy-character:not(:defined) > img {
   display: none;
 }
 .sheet-tab:hover {
-  background: rgb(23 27 29 / 4%);
+  background: var(--wash);
 }
 .sheet-tab[aria-expanded="true"] {
   background: var(--soft);
@@ -561,7 +652,7 @@ thingy-character:not(:defined) > img {
 }
 .scene-option:hover,
 .accessory-option:hover {
-  background: rgb(23 27 29 / 4%);
+  background: var(--wash);
 }
 .scene-option:has(:checked),
 .accessory-option[aria-pressed="true"] {
@@ -604,7 +695,7 @@ thingy-character:not(:defined) > img {
   gap: 6px;
   min-height: 48px;
   padding: 6px 13px;
-  border: 1px solid #c9ccc2;
+  border: 1px solid var(--edge);
   border-radius: 8px;
   background: transparent;
   color: var(--ink);
@@ -706,7 +797,7 @@ thingy-character:not(:defined) > img {
   height: 28px;
   position: relative;
   border-radius: 20px;
-  background: #8b9187;
+  background: var(--switch-off);
   flex-shrink: 0;
 }
 .switch:after {
@@ -716,7 +807,7 @@ thingy-character:not(:defined) > img {
   left: 4px;
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--knob);
   border-radius: 50%;
   transition: transform 0.16s;
 }
@@ -748,7 +839,7 @@ thingy-character:not(:defined) > img {
   justify-content: center;
   gap: 10px;
   padding: 15px 18px;
-  border: 1px solid #999e92;
+  border: 1px solid var(--edge-strong);
   background: transparent;
   color: var(--ink);
   border-radius: 9px;
@@ -758,15 +849,15 @@ thingy-character:not(:defined) > img {
   text-decoration: none;
 }
 .button:hover {
-  background: #f0f0e9;
+  background: var(--tint);
 }
 .button.primary {
   background: var(--green);
   border-color: var(--green);
-  color: #fff;
+  color: var(--on-green);
 }
 .button.primary:hover {
-  background: #173f2b;
+  background: var(--green-deep);
 }
 .motion-note {
   width: 100%;
@@ -806,14 +897,14 @@ thingy-character:not(:defined) > img {
   margin: 0 0 8px;
   font-size: 13px;
   line-height: 1.4;
-  color: #43484b;
+  color: var(--text-soft);
 }
 .bring-ways {
   display: flex;
   gap: 3px;
   padding: 3px;
   border-radius: 10px;
-  background: #f0efe7;
+  background: var(--track);
 }
 .bring-ways button {
   flex: 1;
@@ -821,13 +912,13 @@ thingy-character:not(:defined) > img {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #43484b;
+  color: var(--text-soft);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
 .bring-ways button[aria-pressed="true"] {
-  background: #fff;
+  background: var(--surface);
   color: var(--green);
 }
 .way {
@@ -857,7 +948,7 @@ thingy-character:not(:defined) > img {
   max-height: 72px;
   overflow: auto;
   border-radius: 8px;
-  background: #eeece3;
+  background: var(--code);
   font-size: 11px;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -877,12 +968,12 @@ thingy-character:not(:defined) > img {
   border: 0;
   border-radius: 10px;
   background: var(--green);
-  color: #fff;
+  color: var(--on-green);
   font-size: 15px;
   cursor: pointer;
 }
 .take:hover {
-  background: #173f2b;
+  background: var(--green-deep);
 }
 .take b {
   font-weight: 600;
@@ -1104,7 +1195,7 @@ thingy-character:not(:defined) > img {
     justify-content: flex-start;
     gap: 12px;
     min-height: 54px;
-    border: 1px solid #c9ccc2;
+    border: 1px solid var(--edge);
     border-radius: 9px;
     background: transparent;
     color: var(--ink);
@@ -1112,7 +1203,7 @@ thingy-character:not(:defined) > img {
     text-align: left;
   }
   .take:hover {
-    background: #f0f0e9;
+    background: var(--tint);
   }
   .take > [data-icon] {
     display: flex;
@@ -1495,7 +1586,7 @@ footer p > span {
   margin: 0;
   padding-left: 20px;
   border-left: 3px solid var(--line);
-  color: #43484b;
+  color: var(--text-soft);
 }
 .persona-copy .table-wrap {
   overflow-x: auto;
@@ -1519,7 +1610,7 @@ footer p > span {
   padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: #f0f0e9;
+  background: var(--tint);
   font-size: 14px;
   line-height: 1.5;
 }
