@@ -167,3 +167,43 @@ test("the knob of a switch that is on stands out from its green", () => {
 test("the dark ground is Ask Thingy's", () => {
   assert.equal(dark["--paper"], "#1c1914");
 });
+
+// The examples page carries its own copy of the palette, without the stylesheet.
+test("the examples page's colours are the stylesheet's, light and dark", () => {
+  const page = readFileSync(
+    new URL("../examples/workshop.html", import.meta.url),
+    "utf8",
+  );
+  const pageLight = variables(block(page, page.indexOf(":root")));
+  const pageDarkAt = page.indexOf(
+    "@media screen and (prefers-color-scheme: dark)",
+  );
+  assert.ok(pageDarkAt > 0, "the dark block is in examples/workshop.html");
+  const pageDarkBody = block(page, pageDarkAt);
+  const pageDark = {
+    ...pageLight,
+    ...variables(block(pageDarkBody, pageDarkBody.indexOf(":root"))),
+  };
+  // A name's value with every var() it is made of filled in, spaces evened out.
+  const resolve = (value: string, palette: Record<string, string>): string =>
+    value
+      .replace(/var\((--[\w-]+)\)/g, (_, name: string) => {
+        assert.ok(name in palette, `${name} is defined`);
+        return resolve(palette[name], palette);
+      })
+      .replace(/\s+/g, " ")
+      .replace(/\( /g, "(")
+      .replace(/ \)/g, ")");
+  for (const [scheme, mine, theirs] of [
+    ["light", pageLight, light],
+    ["dark", pageDark, dark],
+  ] as const)
+    for (const name of Object.keys(mine)) {
+      assert.ok(name in theirs, `${scheme} ${name} is in src/style.css`);
+      assert.equal(
+        resolve(mine[name], mine),
+        resolve(theirs[name], theirs),
+        `${scheme} ${name}`,
+      );
+    }
+});
