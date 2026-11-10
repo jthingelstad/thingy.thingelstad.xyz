@@ -315,6 +315,13 @@ reconciles both.
 `apple-touch-icon.png`, which browsers ask for by name, are drawn from it with
 `node tools/render-icons.mjs`; run it again after changing the SVG.
 
+The home, persona, kit and example pages share a 1200 x 630 opaque PNG from
+`public/share/`: the newest model's still on the site's paper, with no words. Each is
+named by its page and that model (`share/home-v0.17.png`), because chat apps keep a
+share image by its address. `node tools/render-share-images.mjs` draws them and points
+the pages at them; run it again after a new model. The site check fails if a page
+names one that was not built.
+
 ## Analytics
 
 Tinylytics site 3849 (`iJwbo9BJKkpgx7a9sZo1`), in the thingelstad.com group. The

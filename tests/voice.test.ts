@@ -92,4 +92,6 @@ test("a question opens Ask Thingy with the words in the box", () => {
     url.searchParams.get("prompt"),
     "What does Jamie’s family do at the cabin?",
   );
+  // Ask Thingy's analytics see which of Jamie's sites sent the reader.
+  assert.equal(url.searchParams.get("ref"), "character-speech");
 });

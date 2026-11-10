@@ -162,7 +162,6 @@ h1 {
   letter-spacing: -0.02em;
 }
 .introduction .hint {
-  display: none;
   margin-top: 8px;
   font-size: 13px;
   letter-spacing: 0;
@@ -170,6 +169,37 @@ h1 {
 }
 .hint span {
   padding: 0 7px;
+}
+/* A finger's scroll moves the page, not him, so that phrase shows only where there is
+   a mouse or trackpad to scroll with, whatever the primary pointer says it is. */
+.hint .hint-zoom {
+  display: none;
+  padding: 0;
+}
+@media (any-pointer: fine) {
+  .hint .hint-zoom {
+    display: inline;
+  }
+}
+/* Below the rails, the hint stands at the right under Bring him (44px tall, then 8px
+   of air), one phrase to a line: there it clears his antenna and head, and he keeps
+   his full size. */
+@media (max-width: 1000px) {
+  .introduction {
+    right: 0;
+  }
+  .introduction .hint {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    max-width: 6.6em;
+    margin: 0;
+    line-height: 1.35;
+    text-align: right;
+  }
+  .hint span:not(.hint-zoom) {
+    display: none;
+  }
 }
 .turntable {
   position: absolute;
@@ -897,9 +927,6 @@ thingy-character:not(:defined) > img {
     font-size: clamp(44px, 3.6vw, 56px);
     white-space: nowrap;
   }
-  .introduction .hint {
-    display: block;
-  }
   .turntable {
     inset: -64px 0 auto;
     height: calc(var(--stage) - 96px + 64px);
@@ -1175,26 +1202,125 @@ thingy-character:not(:defined) > img {
     order: 2;
   }
 }
-.builder-example {
+/* Who he is: his jobs, each with a still of him at it. Two by two up to 1180px, four
+   across above that, and on a phone each still beside its words. Each job is a subgrid
+   of the list, so the stills, names, sentences and links of a row start level. */
+.meet {
   border-top: 1px solid var(--line);
-  padding-block: 45px;
-  display: grid;
-  grid-template-columns: 30% 1fr;
-  gap: 50px;
-  align-items: center;
+  padding-block: 48px 56px;
 }
-.builder-example h2 {
-  font-size: 32px;
+.meet-head {
+  max-width: 46rem;
+}
+.meet h2 {
+  font-size: clamp(30px, 2.6vw, 40px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.meet-lede {
+  margin: 12px 0 0;
+  font-size: clamp(19px, 1.6vw, 23px);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.meet-jobs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 44px clamp(24px, 3vw, 40px);
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.meet-jobs li {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
+}
+.meet-job {
+  display: contents;
+}
+.meet-jobs img {
+  display: block;
+  width: 100%;
+  max-width: 270px;
+  height: auto;
+}
+.meet-job h3 {
+  margin-top: 4px;
+  font-size: 23px;
+  font-weight: 800;
   line-height: 1.15;
+  color: var(--green);
 }
-.builder-example p {
-  line-height: 1.6;
+.meet-job p {
+  margin: 8px 0 12px;
   font-size: 17px;
-  color: #4f554f;
+  line-height: 1.55;
+  color: var(--ink);
 }
-.builder-lineup {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+/* Inline, not the site's inline-flex, so a label that wraps keeps its arrow beside
+   the last word instead of out at the column's edge. */
+.meet .text-link {
+  display: inline;
+  justify-self: start;
+  align-self: start;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+}
+.meet .text-link [data-icon] {
+  margin-left: 2px;
+}
+.meet .text-link svg {
+  display: inline;
+  vertical-align: -2px;
+}
+.meet .keep {
+  white-space: nowrap;
+}
+.meet-more {
+  margin: 40px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.meet-more .text-link {
+  font-size: 17px;
+}
+@media (min-width: 1181px) {
+  .meet-jobs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .meet {
+    padding-block: 36px 44px;
+  }
+  .meet-jobs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .meet-jobs li {
+    grid-row: auto;
+    grid-template-rows: none;
+    grid-template-columns: clamp(112px, 40%, 180px) minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+  }
+  .meet-job {
+    display: block;
+  }
+  .meet-job h3 {
+    margin-top: 0;
+    font-size: 21px;
+  }
+  .meet-job p {
+    margin: 6px 0 8px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
 }
 figure {
   margin: 0;
@@ -1241,10 +1367,6 @@ footer p > span {
   line-height: 0;
 }
 @media (max-width: 1180px) {
-  .builder-example {
-    grid-template-columns: 1fr 1.5fr;
-    gap: 20px;
-  }
   footer {
     font-size: 14px;
   }
@@ -1298,25 +1420,6 @@ footer p > span {
   }
   .site-header nav .ask {
     margin-left: 0;
-  }
-  .builder-example {
-    display: block;
-    padding-top: 30px;
-  }
-  .builder-example h2 {
-    font-size: 32px;
-  }
-  .builder-lineup {
-    margin-top: 20px;
-    grid-template-columns: repeat(2, 1fr);
-    row-gap: 22px;
-  }
-  .builder-lineup img {
-    max-width: 220px;
-    margin: auto;
-  }
-  .builder-example p {
-    font-size: 17px;
   }
   footer {
     display: block;

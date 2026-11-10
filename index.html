@@ -37,12 +37,16 @@
     <meta property="og:url" content="https://thingy.thingelstad.xyz/" />
     <meta
       property="og:image"
-      content="https://thingy.thingelstad.xyz/character/v0.10/poses/librarian-present.png"
+      content="https://thingy.thingelstad.xyz/share/home-v0.17.png"
     />
-    <meta property="og:image:width" content="1000" />
-    <meta property="og:image:height" content="1000" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Thingy in the Library" />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://thingy.thingelstad.xyz/share/home-v0.17.png"
+    />
     <link rel="me" href="https://micro.blog/jthingelstad" />
     <link rel="me" href="https://github.com/jthingelstad" />
     <link
@@ -64,7 +68,7 @@
       <nav aria-label="Main">
         <a href="#character">The character</a><a href="/persona/">Who he is</a
         ><a href="/kit/">Thingy Kit</a><a href="/print/">Print Thingy</a
-        ><a class="ask" href="https://thingy.thingelstad.com/"
+        ><a class="ask" href="https://thingy.thingelstad.com/?ref=character-nav"
           >Ask Thingy <span data-icon="external"></span
         ></a>
       </nav>
@@ -75,8 +79,11 @@
           <h1 id="title">Meet Thingy.</h1>
           <p><span id="scene-line">A librarian.</span> Always Thingy.</p>
           <p class="hint">
-            Tap&nbsp;to&nbsp;talk <span>·</span> Drag&nbsp;to&nbsp;turn
-            <span>·</span> Scroll&nbsp;to&nbsp;zoom
+            Tap&nbsp;to&nbsp;talk <span>·</span> Drag&nbsp;to&nbsp;turn<span
+              class="hint-zoom"
+            >
+              <span>·</span> Scroll&nbsp;to&nbsp;zoom</span
+            >
           </p>
         </div>
         <button
@@ -113,7 +120,7 @@
               <a
                 class="speech-ask"
                 id="speech-ask"
-                href="https://thingy.thingelstad.com/chat/"
+                href="https://thingy.thingelstad.com/chat/?ref=character-speech"
                 ><b>Ask Thingy:</b> <span id="speech-question"></span></a
               ><button
                 class="speech-button"
@@ -323,18 +330,107 @@
           </div>
         </aside>
       </section>
-      <section class="builder-example" aria-labelledby="builder-title">
-        <div>
-          <h2 id="builder-title">The builder, on Things I’ve Built.</h2>
-          <p>
-            A welcome, an explanation, a pause to think. The same Thingy can
-            keep a different pose on each page.
+      <section class="meet" id="who-he-is" aria-labelledby="meet-title">
+        <div class="meet-head">
+          <h2 id="meet-title">Who he is.</h2>
+          <p class="meet-lede">
+            Jamie’s agent sidekick. He has read everything Jamie has published,
+            and each place he works gives him a job.
           </p>
-          <a class="text-link" href="/examples/workshop.html"
-            >See the integration examples <span data-icon="external"></span
-          ></a>
         </div>
-        <div class="builder-lineup" id="builder-lineup"></div>
+        <ul class="meet-jobs">
+          <li>
+            <img
+              src="/character/latest/poses/library-present-proud.webp"
+              alt="Thingy in the Library: navy felt jacket and an orange polka-dot bow tie"
+              width="1000"
+              height="1000"
+              loading="lazy"
+            />
+            <div class="meet-job">
+              <h3>Librarian</h3>
+              <p>
+                Talks with a reader one to one and answers from the archive,
+                with citations.
+              </p>
+              <a
+                class="text-link"
+                href="https://thingy.thingelstad.com/?ref=character-jobs"
+                >Ask
+                <span class="keep"
+                  >Thingy <span data-icon="external"></span></span
+              ></a>
+            </div>
+          </li>
+          <li>
+            <img
+              src="/character/latest/poses/workshop-hammer-show.webp"
+              alt="Thingy in the Workshop, showing a hammer"
+              width="1000"
+              height="1000"
+              loading="lazy"
+            />
+            <div class="meet-job">
+              <h3>Builder and record keeper</h3>
+              <p>
+                Writes and keeps the record of everything Jamie has built. He
+                interviewed Jamie, and quotes him for every “why”.
+              </p>
+              <a
+                class="text-link"
+                href="https://thingelstad.xyz/?ref=character-jobs"
+                >Things I’ve
+                <span class="keep"
+                  >Built <span data-icon="external"></span></span
+              ></a>
+            </div>
+          </li>
+          <li>
+            <img
+              src="/character/latest/poses/concert-present.webp"
+              alt="Thingy at a Concert: charcoal denim, a sound-wave tee and over-ear headphones"
+              width="1000"
+              height="1000"
+              loading="lazy"
+            />
+            <div class="meet-job">
+              <h3>Host</h3>
+              <p>
+                Makes the case for Supporting Membership, asks readers to join,
+                and thanks members.
+              </p>
+              <a
+                class="text-link"
+                href="https://weekly.thingelstad.com/members/?ref=character-jobs"
+                >The Members
+                <span class="keep">page <span data-icon="external"></span></span
+              ></a>
+            </div>
+          </li>
+          <li>
+            <img
+              src="/character/latest/poses/library-book-read.webp"
+              alt="Thingy in the Library, reading"
+              width="1000"
+              height="1000"
+              loading="lazy"
+            />
+            <div class="meet-job">
+              <h3>Narrator</h3>
+              <p>Reads his own sections in his own voice.</p>
+              <a
+                class="text-link"
+                href="https://weekly.thingelstad.com/podcast/?ref=character-jobs"
+                >The Weekly Thing,
+                <span class="keep"
+                  >audio <span data-icon="external"></span></span
+              ></a>
+            </div>
+          </li>
+        </ul>
+        <p class="meet-more">
+          <a class="text-link" href="/persona/">Who Thingy is</a>
+        </p>
       </section>
     </main>
     <footer class="frame">
@@ -380,12 +476,13 @@
             width="16"
             height="16" /></a
         >.
-        <a href="https://thingelstad.xyz/things/thingy-model/"
+        <a
+          href="https://thingelstad.xyz/things/thingy-model/?ref=character-footer"
           >How Thingy was built</a
         >. <a href="/print/">Print Thingy</a>.
       </p>
       <p>
-        <a href="https://thingy.thingelstad.com/"
+        <a href="https://thingy.thingelstad.com/?ref=character-footer"
           >The librarian lives at .com</a
         >
         <span>·</span> The character lives at .xyz

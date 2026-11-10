@@ -139,5 +139,5 @@ export function recording(line: Line): string | undefined {
 
 /** Ask Thingy with the question in the box. The reader sends it. */
 export function askAddress(question: string): string {
-  return `https://thingy.thingelstad.com/chat/?prompt=${encodeURIComponent(question)}`;
+  return `https://thingy.thingelstad.com/chat/?prompt=${encodeURIComponent(question)}&ref=character-speech`;
 }
