@@ -16,7 +16,7 @@ const pages = [
 const embed = "/embed/?scene=workshop&pose=hello";
 // Every still picture of him, by page, and the examples page's live one.
 const stills = [
-  ["/", ".builder-lineup img"],
+  ["/", ".meet-jobs img"],
   ["/persona/", ".jobs img"],
   ["/kit/", ".kit-hero > img"],
   ["/404.html", ".not-found > img"],
