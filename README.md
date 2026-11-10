@@ -311,6 +311,10 @@ agents and names `/persona.md`. Google covers the site through the `sc-domain:th
 Bing tracks it as its own site. projects-sysadmin's `scripts/search-consoles`
 reconciles both.
 
+`favicon.svg` is the icon every page names first. `favicon.ico` and
+`apple-touch-icon.png`, which browsers ask for by name, are drawn from it with
+`node tools/render-icons.mjs`; run it again after changing the SVG.
+
 ## Analytics
 
 Tinylytics site 3849 (`iJwbo9BJKkpgx7a9sZo1`), in the thingelstad.com group. The

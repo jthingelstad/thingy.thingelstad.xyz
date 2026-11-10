@@ -172,6 +172,19 @@ for (const file of files.filter((name) => name.endsWith(".html"))) {
     `${file} shows the licence's marks`,
   );
 }
+// Every icon a page links was built, and so are the two browsers ask for by
+// name whether a page links them or not.
+for (const file of files.filter((name) => name.endsWith(".html"))) {
+  const head = (await fs.readFile(file, "utf8")).split("</head>")[0];
+  for (const [link] of head.matchAll(/<link\b[^>]*>/g)) {
+    if (!/\brel="[^"]*\bicon\b[^"]*"/.test(link)) continue;
+    const href = link.match(/\bhref="\/([^"]+)"/)?.[1];
+    assert.ok(href, `${file} links an icon by a site path: ${link}`);
+    await fs.access(path.join("dist", href));
+  }
+}
+for (const icon of ["favicon.svg", "favicon.ico", "apple-touch-icon.png"])
+  await fs.access(path.join("dist", icon));
 for (const mark of ["cc", "by", "nc", "by-nc"])
   await fs.access(`dist/shared/cc/${mark}.svg`);
 assert.ok(

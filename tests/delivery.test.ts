@@ -44,6 +44,16 @@ test("every public file has a MIME type", () => {
     ).ContentType,
     "application/zip",
   );
+  // The icons browsers ask for by name, kept an hour like favicon.svg.
+  for (const [key, type] of [
+    ["favicon.svg", "image/svg+xml"],
+    ["favicon.ico", "image/x-icon"],
+    ["apple-touch-icon.png", "image/png"],
+  ]) {
+    const object = prepareObject(key, Buffer.from("x"));
+    assert.equal(object.ContentType, type, key);
+    assert.equal(object.CacheControl, "public, max-age=3600", key);
+  }
 });
 
 test("caching keeps entry points short and hashed bundles long", () => {
