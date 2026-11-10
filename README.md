@@ -44,8 +44,7 @@ site check fails if it or `llms.txt` names a file that was not built.
 [`kit/surfaces.json`](kit/surfaces.json) lists every place he appears. A new model
 must publish every still named there, or the contract tests fail. A change to the
 persona opens an issue listing the words each surface keeps of its own to reread
-(`tools/persona-rollout.mjs`). It has run five times so far, opening issues #24 and
-#26 (November 5, 2026), #29 (November 6), and #31 and #33 (November 8).
+(`tools/persona-rollout.mjs`). It has run since November 5, 2026 (issues #24 onward).
 
 Things I've Built uses smaller vendored copies of the stills: hello on its index,
 present on About, thinking on Search, and rest on its 404 page.
@@ -56,8 +55,8 @@ present on About, thinking on Search, and rest on its 404 page.
 `library`, `outdoors`, `workshop`, `concert`, `kitchen`, `winter`, and `cabin`. Pose IDs are `hello`, `present`,
 `thinking`, and `rest`. `light` and `motion` accept `on` or `off`.
 
-Each scene loads separately, about 2–3 MB. The shared rig has 41 joints: the 40 every
-version has, and from v0.16 one more for the laptop. Meshopt
+Each scene loads separately, about 2–3 MB. The shared rig has 40 joints, plus a
+`laptop` joint in v0.16's Workshop and Concert and in every v0.17 scene. Meshopt
 compresses geometry and animation; WebP compresses the PBR texture atlas. Each
 accessory is a separate skinned node, `Thingy_Accessory_<id>`, so the runtime can
 show or hide it. The beacon keeps a separately named material. A future incompatible revision
