@@ -125,3 +125,31 @@ test("the hint says only what works with the pointer in hand", async ({
     await expect(hint).toContainText("Scroll to zoom");
   }
 });
+
+test("his question to Ask Thingy, and the nav's link, say they came from here", async ({
+  page,
+}) => {
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  await expect(page.locator(".site-header .ask")).toHaveAttribute(
+    "href",
+    "https://thingy.thingelstad.com/?ref=character-nav",
+  );
+  await character.evaluate((el) =>
+    el.dispatchEvent(new CustomEvent("thingy-tap", { bubbles: true })),
+  );
+  const ask = page.locator("#speech-ask");
+  await expect(ask).toBeVisible();
+  const url = new URL((await ask.getAttribute("href"))!);
+  expect(url.origin + url.pathname).toBe(
+    "https://thingy.thingelstad.com/chat/",
+  );
+  expect(url.searchParams.get("prompt")).toBeTruthy();
+  expect(url.searchParams.get("ref")).toBe("character-speech");
+  for (const link of await page.locator("footer a").all()) {
+    const href = (await link.getAttribute("href"))!;
+    if (/thingy\.thingelstad\.com|thingelstad\.xyz\/things/.test(href))
+      expect(new URL(href).searchParams.get("ref")).toBe("character-footer");
+  }
+});
