@@ -129,14 +129,8 @@ button svg,
   /* What the stage leaves clear above him. */
   --stage-top: 44px;
 }
-/* On a phone the line and the hint under it run across the middle, where his antenna
-   is. Without scripts there is no hint, so he can stand a little taller. */
+/* On a phone the line runs across the middle, where his antenna is. */
 @media (max-width: 640px) {
-  .studio {
-    --stage-top: 92px;
-  }
-}
-@media (scripting: none) and (max-width: 640px) {
   .studio {
     --stage-top: 64px;
   }
@@ -176,12 +170,34 @@ h1 {
 .hint span {
   padding: 0 7px;
 }
+/* A finger's scroll moves the page, not him, so that phrase shows only where there is
+   a mouse or trackpad to scroll with, whatever the primary pointer says it is. */
 .hint .hint-zoom {
+  display: none;
   padding: 0;
 }
-/* A finger's scroll moves the page, not him, so that phrase is only for a mouse. */
-@media (pointer: coarse) {
+@media (any-pointer: fine) {
   .hint .hint-zoom {
+    display: inline;
+  }
+}
+/* Below the rails, the hint stands at the right under Bring him (44px tall, then 8px
+   of air), one phrase to a line: there it clears his antenna and head, and he keeps
+   his full size. */
+@media (max-width: 1000px) {
+  .introduction {
+    right: 0;
+  }
+  .introduction .hint {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    max-width: 6.6em;
+    margin: 0;
+    line-height: 1.35;
+    text-align: right;
+  }
+  .hint span:not(.hint-zoom) {
     display: none;
   }
 }

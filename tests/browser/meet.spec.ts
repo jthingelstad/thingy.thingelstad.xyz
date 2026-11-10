@@ -106,23 +106,90 @@ test("the hint says only what works with the pointer in hand", async ({
   if (info.project.name === "phone") {
     // A finger's scroll moves the page, not him.
     await expect(zoom).toBeHidden();
-    // The stage starts below it, so it never runs across his antenna, and the
-    // sheet and his words stay at his feet, whichever panel is open.
-    for (const tab of ["none", "scene", "face", "bring"]) {
-      await page.evaluate((t) => {
-        document.querySelector<HTMLElement>("#controls")!.dataset.tab = t;
-      }, tab);
-      const [hintBox, stage, sheet] = await Promise.all([
-        hint.boundingBox(),
-        page.locator(".turntable").boundingBox(),
-        page.locator("#controls").boundingBox(),
-      ]);
-      expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(stage!.y + 0.5);
-      expect(hintBox!.y + hintBox!.height).toBeLessThan(sheet!.y);
-    }
   } else {
     await expect(zoom).toBeVisible();
     await expect(hint).toContainText("Scroll to zoom");
+  }
+});
+
+test("on a phone or tablet the hint clears him, and he keeps his size", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "phone", "below the rails only");
+  await page.goto("/?life=off");
+  const character = page.locator("#main-thingy");
+  await expect(character).toHaveAttribute("data-ready", "", { timeout: 30000 });
+  const hint = page.locator(".introduction .hint");
+  for (const [width, height] of [
+    [390, 844],
+    [768, 1024],
+    [900, 1200],
+  ]) {
+    await page.setViewportSize({ width, height });
+    // The hint takes no room from the stage: on a phone it starts where it did
+    // before there was a hint.
+    if (width <= 640)
+      expect(
+        await page
+          .locator(".studio")
+          .evaluate((el) =>
+            getComputedStyle(el).getPropertyValue("--stage-top"),
+          ),
+      ).toBe("64px");
+    // His words show at his feet.
+    await character.evaluate((el) =>
+      el.dispatchEvent(new CustomEvent("thingy-tap", { bubbles: true })),
+    );
+    for (const tab of ["none", "scene", "accessories", "face", "bring"]) {
+      await page.evaluate((t) => {
+        document.querySelector<HTMLElement>("#controls")!.dataset.tab = t;
+        scrollTo(0, 0);
+      }, tab);
+      await page.waitForTimeout(500);
+      const where = `${width}px, ${tab}`;
+      await expect(hint, where).toBeVisible();
+      const box = (await hint.boundingBox())!;
+      // Nothing it could run into: Bring him, the line beside it, the sheet,
+      // his words.
+      const others = await page.evaluate(() => {
+        const title = document.createRange();
+        title.selectNodeContents(
+          document.querySelector(".introduction p:not(.hint)")!,
+        );
+        return [
+          title.getBoundingClientRect(),
+          ...[".bring-toggle", "#controls", "#speech"].map((selector) =>
+            document.querySelector(selector)!.getBoundingClientRect(),
+          ),
+        ].map(({ x, y, width, height }) => ({ x, y, width, height }));
+      });
+      for (const other of others)
+        if (other.width && other.height)
+          expect(
+            box.x + box.width <= other.x ||
+              other.x + other.width <= box.x ||
+              box.y + box.height <= other.y ||
+              other.y + other.height <= box.y,
+            `${where}: the hint overlaps ${JSON.stringify(other)}`,
+          ).toBe(true);
+      // And none of him is there, with a few pixels of air: the hint's corner of
+      // the page looks the same with him drawn and not.
+      const clip = {
+        x: Math.max(0, box.x - 4),
+        y: Math.max(0, box.y - 4),
+        width: box.width + 8,
+        height: box.height + 8,
+      };
+      const drawn = await page.screenshot({ clip });
+      const hidden = await page.addStyleTag({
+        content: "#main-thingy, #main-thingy * { opacity: 0 !important; }",
+      });
+      const without = await page.screenshot({ clip });
+      await hidden.evaluate((style) => style.remove());
+      expect(drawn.equals(without), `${where}: the hint runs into him`).toBe(
+        true,
+      );
+    }
   }
 });
 
